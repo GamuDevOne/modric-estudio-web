@@ -207,9 +207,9 @@ function scrollToTop() {
 }
 
 // ========================================
-// ANIMACIONES AL HACER SCROLL (OPCIONAL)
+// ANIMACIONES AL HACER SCROLL (idea opcional de momento)
 // ========================================
-// Puedes descomentar esto si quieres animaciones al aparecer elementos
+//animaciones al aparecer elementos
 
 /*
 const observerOptions = {
