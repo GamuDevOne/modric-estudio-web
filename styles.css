@@ -822,6 +822,214 @@ nav ul li a.active {
 }
 
 /* ========================================
+   SECCIÓN CARNÉS
+======================================== */
+.carnes-section {
+    padding: 100px 50px;
+    background-color: #fff;
+}
+
+.carnes-header {
+    max-width: 1000px;
+    margin: 0 auto 60px;
+    text-align: center;
+}
+
+.carnes-header h2 {
+    font-size: 42px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.carnes-header p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.carnes-image {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 400px;
+    overflow: hidden;
+}
+
+.carnes-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carnes-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 20px;
+}
+
+/* SEPARADOR EJEMPLOS */
+.examples-separator {
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.examples-separator h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.separator-line-bottom {
+    width: 60px;
+    height: 2px;
+    background-color: #333;
+    margin: 0 auto;
+}
+
+/* GALERÍA DE EJEMPLOS CARNÉS */
+.carnes-examples {
+    padding: 50px 50px 100px;
+    background-color: #f9f9f9;
+}
+
+.examples-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+}
+
+.example-card {
+    text-align: center;
+}
+
+.example-image {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 30px;
+}
+
+.example-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.example-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 18px;
+}
+
+.example-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.example-card p {
+    font-size: 14px;
+    color: #999;
+}
+
+/* SECCIÓN CTA CARNÉS */
+.carnes-cta-section {
+    padding: 100px 50px;
+    background-color: #333;
+    text-align: center;
+}
+
+.cta-button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 18px 60px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.cta-button:hover {
+    background-color: #555;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* RESPONSIVE CARNÉS */
+@media (max-width: 1024px) {
+    .examples-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .example-image {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .carnes-section {
+        padding: 60px 30px;
+    }
+
+    .carnes-header h2 {
+        font-size: 28px;
+    }
+
+    .carnes-image {
+        height: 250px;
+    }
+
+    .examples-separator {
+        padding: 50px 30px;
+    }
+
+    .examples-separator h2 {
+        font-size: 32px;
+    }
+
+    .examples-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        padding: 0 30px;
+    }
+
+    .example-image {
+        height: 350px;
+    }
+
+    .carnes-examples {
+        padding: 30px 0 60px;
+    }
+
+    .carnes-cta-section {
+        padding: 60px 30px;
+    }
+
+    .cta-button {
+        padding: 15px 40px;
+        font-size: 14px;
+    }
+}
+
+/* ========================================
    RESPONSIVE
 ======================================== */
 @media (max-width: 1024px) {

@@ -234,3 +234,17 @@ document.querySelectorAll('.about-content, .gallery-item, .contact-info').forEac
     observer.observe(el);
 });
 */
+
+// ========================================
+// SCROLL A SECCIÓN CONTACTO
+// ========================================
+function scrollToContacto() {
+    const contactoSection = document.getElementById('contacto');
+    const headerHeight = document.getElementById('header').offsetHeight;
+    const targetPosition = contactoSection.offsetTop - headerHeight;
+    
+    window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+    });
+}
