@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Modric Estudio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- HEADER FIJO (igual al del inicio) -->
+    <header id="header">
+        <!-- LOGO - IZQUIERDA -->
+        <div class="logo">
+            <a href="index.html">
+                <img src="imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+
+        <!-- NAVEGACIÓN - CENTRO -->
+        <nav>
+            <ul>
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="panel.html" class="active">PANEL</a></li>
+            </ul>
+        </nav>
+
+        <!-- BOTÓN LOGOUT - DERECHA -->
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO DEL PANEL -->
+    <section class="panel-section">
+        <div class="panel-container">
+            <!-- HEADER DEL PANEL -->
+            <div class="panel-header">
+                <div class="welcome-message">
+                    <h1>Bienvenido, <span id="userName"></span></h1>
+                    <p>Panel de <span id="userRole"></span></p>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE ACCESO RÁPIDO -->
+            <div class="panel-grid">
+                <!-- TARJETA 1 - Dashboard -->
+                <div class="panel-card">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <h3>Dashboard</h3>
+                    <p>Ver estadísticas generales</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Acceder</button>
+                </div>
+
+                <!-- TARJETA 2 - Gestionar Vendedores (solo CEO) -->
+                <div class="panel-card" id="vendedoresCard">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>Gestionar Vendedores</h3>
+                    <p>Agregar, editar o eliminar vendedores</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Gestionar</button>
+                </div>
+
+                <!-- TARJETA 3 - Configurar Servicios -->
+                <div class="panel-card">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m-7-7h6m6 0h6"></path>
+                        </svg>
+                    </div>
+                    <h3>Configurar Servicios</h3>
+                    <p>Combos, Carnés, Textil</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Configurar</button>
+                </div>
+
+                <!-- TARJETA 4 - Graduaciones -->
+                <div class="panel-card">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <h3>Activar/Desactivar Graduaciones</h3>
+                    <p>Control de temporada</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Gestionar</button>
+                </div>
+
+                <!-- TARJETA 5 - Ver Historial (Vendedor) -->
+                <div class="panel-card vendedor-only">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Ver Historial de Ventas</h3>
+                    <p>Mis comisiones y ventas</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Ver historial</button>
+                </div>
+
+                <!-- TARJETA 6 - Recibir Pedido (Vendedor) -->
+                <div class="panel-card vendedor-only">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <h3>Recibir Pedido</h3>
+                    <p>Procesar nuevo pedido</p>
+                    <button class="panel-btn" onclick="alert('Función en desarrollo')">Nuevo pedido</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script-auth.js"></script>
+    <script>
+
+        // Verificar que el usuario esté autenticado
+        const user = checkSession();
+        
+        if (!user) {
+            // Si no hay sesión, redirigir al login
+            globalThis.location.href = 'login.html';
+        } else {
+            // Mostrar información del usuario
+            document.getElementById('userName').textContent = user.nombre;
+            document.getElementById('userRole').textContent = user.tipo;
+            
+            // Mostrar/ocultar opciones según el rol
+            if (user.tipo === 'Vendedor') {
+                // Ocultar tarjetas solo para CEO
+                document.getElementById('vendedoresCard').style.display = 'none';
+            } else if (user.tipo === 'CEO') {
+                // Ocultar tarjetas solo para Vendedor
+                const vendedorCards = document.querySelectorAll('.vendedor-only');
+                vendedorCards.forEach(card => card.style.display = 'none');
+            }
+        }
+    </script>
+</body>
+</html>

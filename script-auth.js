@@ -51,9 +51,9 @@ function handleLoginSubmit(event) {
             
             // Redirigir según el tipo de usuario
             if (data.user.TipoUsuario === 'CEO' || data.user.TipoUsuario === 'Vendedor') {
-                window.location.href = 'panel.html';
+                globalThis.location.href = 'panel.html';
             } else if (data.user.TipoUsuario === 'Cliente') {
-                window.location.href = 'cliente-panel.html';
+                globalThis.location.href = 'cliente-panel.html';
             }
         } else {
             // Mostrar error
