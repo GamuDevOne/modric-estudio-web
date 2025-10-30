@@ -1,7 +1,7 @@
 // ========================================
 // ARRAY DE IMÁGENES PARA EL LIGHTBOX
 // ========================================
-// AGREGA AQUÍ LAS RUTAS DE TUS IMÁGENES DE LA GALERÍA
+// AQUÍ VAN LAS RUTAS DE LAS IMÁGENES DE LA GALERÍA
 const galleryImages = [
     'imagenes/galeria/foto1.jpg',
     'imagenes/galeria/foto2.jpg',
@@ -9,7 +9,6 @@ const galleryImages = [
     'imagenes/galeria/foto4.jpg',
     'imagenes/galeria/foto5.jpg',
     'imagenes/galeria/foto6.jpg'
-    // Agrega más imágenes según necesites
 ];
 
 let currentImageIndex = 0;
@@ -174,7 +173,7 @@ function handleSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
     
-    // Aquí puedes implementar el envío del formulario
+    // Aquí se implementará el envío del formulario
     // Por ejemplo, usando fetch para enviar a un servidor:
     /*
     fetch('tu-endpoint-de-servidor.php', {

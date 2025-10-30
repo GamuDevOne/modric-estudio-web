@@ -1,0 +1,346 @@
+/* ========================================
+   SECCIÓN CARNÉS
+======================================== */
+.carnes-section {
+    padding: 100px 50px;
+    background-color: #fff;
+}
+
+.carnes-header {
+    max-width: 1000px;
+    margin: 0 auto 60px;
+    text-align: center;
+}
+
+.carnes-header h2 {
+    font-size: 42px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.carnes-header p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.carnes-image {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 400px;
+    overflow: hidden;
+}
+
+.carnes-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carnes-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 20px;
+}
+
+/* SEPARADOR EJEMPLOS */
+.examples-separator {
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.examples-separator h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.separator-line-bottom {
+    width: 60px;
+    height: 2px;
+    background-color: #333;
+    margin: 0 auto;
+}
+
+/* GALERÍA DE EJEMPLOS CARNÉS */
+.carnes-examples {
+    padding: 50px 50px 100px;
+    background-color: #f9f9f9;
+}
+
+.examples-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+}
+
+.example-card {
+    text-align: center;
+}
+
+.example-image {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 30px;
+}
+
+.example-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.example-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 18px;
+}
+
+.example-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.example-card p {
+    font-size: 14px;
+    color: #999;
+}
+
+/* SECCIÓN CTA CARNÉS */
+.carnes-cta-section {
+    padding: 100px 50px;
+    background-color: #333;
+    text-align: center;
+}
+
+.cta-button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 18px 60px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.cta-button:hover {
+    background-color: #555;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* RESPONSIVE CARNÉS */
+@media (max-width: 1024px) {
+    .examples-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .example-image {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .carnes-section {
+        padding: 60px 30px;
+    }
+
+    .carnes-header h2 {
+        font-size: 28px;
+    }
+
+    .carnes-image {
+        height: 250px;
+    }
+
+    .examples-separator {
+        padding: 50px 30px;
+    }
+
+    .examples-separator h2 {
+        font-size: 32px;
+    }
+
+    .examples-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        padding: 0 30px;
+    }
+
+    .example-image {
+        height: 350px;
+    }
+
+    .carnes-examples {
+        padding: 30px 0 60px;
+    }
+
+    .carnes-cta-section {
+        padding: 60px 30px;
+    }
+
+    .cta-button {
+        padding: 15px 40px;
+        font-size: 14px;
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 1024px) {
+    .about-container,
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-image,
+    .contact-image {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+    }
+
+    nav ul {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav ul li a {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+        letter-spacing: 8px;
+    }
+
+    .hero-subtitle {
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+
+    .social-icons {
+        left: 15px;
+        gap: 15px;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
+    }
+
+    .login-btn button {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+
+    .about-section,
+    .contact-section {
+        padding: 60px 30px;
+    }
+
+    .about-content,
+    .contact-info {
+        padding: 20px;
+    }
+
+    .about-content h2,
+    .contact-info h2 {
+        font-size: 32px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .gallery-section {
+        padding: 30px 20px;
+    }
+
+    .separator-title {
+        font-size: 20px;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 50px;
+        height: 50px;
+        font-size: 30px;
+    }
+
+    .lightbox-prev {
+        left: 20px;
+    }
+
+    .lightbox-next {
+        right: 20px;
+    }
+
+    .lightbox-close {
+        top: 20px;
+        right: 20px;
+        font-size: 40px;
+    }
+}
+
+/* RESPONSIVE HEADER */
+@media (max-width: 1200px) {
+    nav ul {
+        gap: 15px;
+    }
+    
+    nav ul li a {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    header {
+        padding: 15px 30px;
+    }
+    
+    nav ul {
+        gap: 10px;
+    }
+    
+    nav ul li a {
+        font-size: 11px;
+        padding: 8px 8px;
+    }
+}

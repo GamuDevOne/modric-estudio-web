@@ -51,9 +51,9 @@ function handleLoginSubmit(event) {
             
             // Redirigir según el tipo de usuario
             if (data.user.TipoUsuario === 'CEO' || data.user.TipoUsuario === 'Vendedor') {
-                globalThis.location.href = 'panel.html';
+                globalThis.location.href = '/administracion/administracion.html';
             } else if (data.user.TipoUsuario === 'Cliente') {
-                globalThis.location.href = 'cliente-panel.html';
+                globalThis.location.href = 'index.html';
             }
         } else {
             // Mostrar error
@@ -114,7 +114,7 @@ function addPanelOption() {
             
             if (!existingPanel) {
                 const panelItem = document.createElement('li');
-                panelItem.innerHTML = '<a href="panel.html">Panel de Administración</a>';
+                panelItem.innerHTML = '<a href="/administracion/administracion.html">Panel de Administración</a>';
                 dropdownMenu.insertBefore(panelItem, dropdownMenu.firstChild);
             }
         }
