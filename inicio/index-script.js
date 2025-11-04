@@ -14,82 +14,6 @@ const galleryImages = [
 let currentImageIndex = 0;
 
 // ========================================
-// EFECTO SCROLL EN EL HEADER
-// ========================================
-window.addEventListener('scroll', function() {
-    const header = document.getElementById('header');
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
-
-// ========================================
-// NAVEGACIÓN SUAVE
-// ========================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            const headerHeight = document.getElementById('header').offsetHeight;
-            const targetPosition = target.offsetTop - headerHeight;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// ========================================
-// TOGGLE MENÚ DE LOGIN
-// ========================================
-function toggleLoginMenu() {
-    const loginMenu = document.getElementById('loginMenu');
-    loginMenu.classList.toggle('active');
-}
-
-// Cerrar menú de login al hacer clic fuera
-document.addEventListener('click', function(e) {
-    const loginBtn = document.querySelector('.login-btn');
-    const loginMenu = document.getElementById('loginMenu');
-    
-    if (!loginBtn.contains(e.target)) {
-        loginMenu.classList.remove('active');
-    }
-});
-
-// ========================================
-// ACTIVAR LINK SEGÚN SECCIÓN
-// ========================================
-window.addEventListener('scroll', function() {
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('nav a');
-    
-    let current = '';
-    
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        const headerHeight = document.getElementById('header').offsetHeight;
-        
-        if (window.scrollY >= (sectionTop - headerHeight - 200)) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + current) {
-            link.classList.add('active');
-        }
-    });
-});
-
-// ========================================
 // LIGHTBOX/CARRUSEL FUNCIONES
 // ========================================
 
@@ -195,15 +119,6 @@ function handleSubmit(event) {
     form.reset();
 }
 
-// ========================================
-// SCROLL TO TOP
-// ========================================
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-}
 
 // ========================================
 // ANIMACIONES AL HACER SCROLL (idea opcional de momento)
