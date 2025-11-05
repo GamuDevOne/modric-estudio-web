@@ -1,0 +1,133 @@
+/* ==== ESTILO GENERAL ==== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff;
+    color: #000;
+    padding: 40px 60px;
+}
+
+/* ==== CONTENEDOR ==== */
+.contenedor-factura {
+    max-width: 900px;
+    margin: auto;
+}
+
+/* ==== ENCABEZADO ==== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 25px;
+}
+
+.logo img {
+    width: 120px;
+    opacity: 0.9;
+}
+
+.info-empresa {
+    flex: 1;
+    margin-left: 30px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.info-empresa h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.info-factura {
+    text-align: right;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.info-factura p strong {
+    font-weight: 600;
+}
+
+/* ==== DATOS CLIENTE ==== */
+section.datos {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+section.datos .col {
+    width: 45%;
+}
+
+section.datos h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+section.datos p {
+    line-height: 1.5;
+}
+
+/* ==== TABLA ==== */
+.tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.tabla-productos thead {
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+
+.tabla-productos th {
+    text-align: left;
+    padding: 10px 5px;
+    font-weight: 600;
+}
+
+.tabla-productos td {
+    padding: 10px 5px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.tabla-productos td:nth-child(2),
+.tabla-productos td:nth-child(3),
+.tabla-productos td:nth-child(4) {
+    text-align: right;
+}
+
+/* ==== TOTAL ==== */
+.total {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.total p {
+    border-top: 1px solid #000;
+    padding-top: 8px;
+}
+
+/* ==== PIE DE PÁGINA ==== */
+footer {
+    font-size: 12px;
+    color: #555;
+    margin-top: 40px;
+    line-height: 1.4;
+    text-align: left;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura - Modric Estudio</title>
+    <link rel="stylesheet" href="formato_fac.css">
+</head>
+<body>
+    <div class="contenedor-factura">
+        <header>
+            <div class="logo">
+                <!-- Aquí colocarás la imagen definitiva -->
+                <img src="logo-provisional.png" alt="Logo Modric Estudio">
+            </div>
+            <div class="info-empresa">
+                <h1>MODRIC ESTUDIO</h1>
+                <p><strong>Borcelle</strong></p>
+                <p>Calle Cualquiera 123,<br>Cualquier Lugar, CP: 12345</p>
+                <p>hola@unsitiogenial.es</p>
+                <p>91-1234-567</p>
+            </div>
+            <div class="info-factura">
+                <p><strong>FACTURA Nº:</strong> <span id="numeroFactura"></span></p>
+                <p><strong>Fecha:</strong> <span id="fechaFactura"></span></p>
+                <p><strong>Vendedor:</strong> <span id="facturaVendedor"></span></p> 
+
+            </div>
+        </header>
+
+        <section class="datos">
+            <div class="col">
+                <h3>Datos cliente</h3>
+                <p id="clienteNombre"></p>
+                <p id="clienteDireccion"></p>
+                <p id="clienteCorreo"></p>
+                <p id="clienteTelefono"></p>
+            </div>
+        </section>
+
+        <table class="tabla-productos">
+            <thead>
+                <tr>
+                    <th>Descripción / Producto</th>
+                    <th>Base</th>
+                    <th>ITBMS</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="tablaProductos"></tbody>
+        </table>
+
+        <div class="total">
+            <p><strong>Total:</strong> <span id="totalFactura"></span></p>
+        </div>
+
+        <footer>
+            <p>El pago se realizará en un plazo de tres meses desde la emisión de esta factura,<br>
+            se realizará mediante transferencia bancaria.</p>
+        </footer>
+    </div>
+
+    <script src="app_fac.js"></script>
+</body>
+</html>

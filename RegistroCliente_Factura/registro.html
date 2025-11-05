@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Facturación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de Facturación</h1>
+            <p>Modric Estudio</p>
+        </div>
+
+        <div class="form-container">
+            <form id="facturaForm">
+                <!-- Información del Cliente -->
+                <div class="form-section">
+                    <h2>Información del Cliente</h2>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre *</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                            <span class="error" id="nombreError">Por favor ingrese el nombre</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellido">Apellido *</label>
+                            <input type="text" id="apellido" name="apellido" required>
+                            <span class="error" id="apellidoError">Por favor ingrese el apellido</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="grupo">Grupo</label>
+                            <input type="text" id="grupo" name="grupo" placeholder="Ej: 10-A">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono Celular * <span class="info-icon" title="Formato: 6XXX-XXXX">i</span></label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="6XXX-XXXX" maxlength="9" required>
+                            <span class="error" id="telefonoError">Formato inválido. Use: 6XXX-XXXX</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="escuela">Escuela *</label>
+                        <select id="escuela" name="escuela" required>
+                            <option value="">Seleccione una escuela</option>
+                            <option value="Instituto Nacional">Instituto Nacional</option>
+                            <option value="Colegio San Agustín">Colegio San Agustín</option>
+                            <option value="Colegio Javier">Colegio Javier</option>
+                            <option value="Instituto Justo Arosemena">Instituto Justo Arosemena</option>
+                            <option value="Colegio Internacional de María">Colegio Internacional de María</option>
+                            <option value="Balboa Academy">Balboa Academy</option>
+                            <option value="Oxford International School">Oxford International School</option>
+                            <option value="Otra">Otra</option>
+                        </select>
+                        <span class="error" id="escuelaError">Por favor seleccione una escuela</span>
+                    </div>
+                </div>
+
+                <!-- Paquete de Fotos -->
+                <div class="form-section">
+                    <h2>Paquete de Fotos</h2>
+                    
+                    <div class="form-group">
+                        <label for="paquete">Seleccione el paquete *</label>
+                        <select id="paquete" name="paquete" required>
+                            <option value="">Seleccione un paquete</option>
+                            <option value="basico">Paquete Básico - $50.00</option>
+                            <option value="estandar">Paquete Estándar - $100.00</option>
+                            <option value="premium">Paquete Premium - $200.00</option>
+                        </select>
+                        <span class="error" id="paqueteError">Por favor seleccione un paquete</span>
+                    </div>
+                </div>
+
+                <!-- Información de Pago -->
+                <div class="form-section">
+                    <h2>Información de Pago</h2>
+                    
+                    <div class="form-group">
+                        <label>Método de Pago *</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="yappy" name="metodoPago" value="yappy" required>
+                                <label for="yappy">Yappy</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="efectivo" name="metodoPago" value="efectivo">
+                                <label for="efectivo">Efectivo</label>
+                            </div>
+                        </div>
+                        <span class="error" id="metodoPagoError">Por favor seleccione un método de pago</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Pago *</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="completo" name="tipoPago" value="completo" required>
+                                <label for="completo">Pago Completo</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="abono" name="tipoPago" value="abono">
+                                <label for="abono">Abono</label>
+                            </div>
+                        </div>
+                        <span class="error" id="tipoPagoError">Por favor seleccione un tipo de pago</span>
+                    </div>
+
+                    <div class="abono-section" id="abonoSection">
+                        <div class="form-group">
+                            <label for="cantidadAbono">Cantidad Abonada *</label>
+                            <input type="text" id="cantidadAbono" name="cantidadAbono" placeholder="$0.00">
+                            <span class="error" id="abonoError">Por favor ingrese una cantidad válida</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Generar Factura</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
