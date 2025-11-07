@@ -158,5 +158,36 @@ if (document.readyState === 'loading') {
     addPanelOption();
 }
 
+// Reemplazar la función de transparencia de iconos sociales
+document.addEventListener('DOMContentLoaded', function() {
+    const socialIcons = document.querySelector('.social-icons');
+    const contactSection = document.getElementById('contacto');
+
+    if (socialIcons && contactSection) {
+        window.addEventListener('scroll', function() {
+            const contactRect = contactSection.getBoundingClientRect();
+            
+            // Si la sección de contacto está visible
+            if (contactRect.top < window.innerHeight && contactRect.bottom > 0) {
+                socialIcons.style.opacity = '0.2';
+            } else {
+                socialIcons.style.opacity = '1';
+            }
+        });
+
+        // Efecto hover
+        socialIcons.addEventListener('mouseenter', function() {
+            this.style.opacity = '1';
+        });
+
+        socialIcons.addEventListener('mouseleave', function() {
+            const contactRect = contactSection.getBoundingClientRect();
+            if (contactRect.top < window.innerHeight && contactRect.bottom > 0) {
+                this.style.opacity = '0.2';
+            }
+        });
+    }
+});
+
 
 

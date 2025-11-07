@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Modric Estudio</title>
+    <link rel="stylesheet" href="../../css/global-styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header id="header">
+        <!-- LOGO - IZQUIERDA -->
+        <div class="logo">
+            <a href="../../index.html">
+                <img src="../../imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+
+        <!-- NAVEGACIÓN - CENTRO -->
+        <nav>
+            <ul>
+                <li><a href="../../index.html">INICIO</a></li>
+                <li><a href="../administracion.html">PANEL</a></li>
+                <li><a href="dashboard.html" class="active">DASHBOARD</a></li>
+            </ul>
+        </nav>
+
+        <!-- BOTÓN LOGOUT - DERECHA -->
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO DASHBOARD -->
+    <section class="dashboard-section">
+        <div class="dashboard-container">
+            
+            <!-- HEADER DEL DASHBOARD -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1>Dashboard</h1>
+                    <p>Resumen general del negocio</p>
+                </div>
+                <div class="header-actions">
+                    <button class="refresh-btn" onclick="refreshDashboard()" title="Actualizar datos">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE ESTADÍSTICAS -->
+            <div class="stats-grid">
+                <!-- TARJETA 1 - VENTAS DEL MES -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e8f5e9;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Ventas del Mes</p>
+                        <h2 class="stat-value" id="ventasMes">$0.00</h2>
+                        <p class="stat-change positive" id="ventasMesCambio">+0% vs mes anterior</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 2 - PEDIDOS ACTIVOS -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e3f2fd;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Pedidos Activos</p>
+                        <h2 class="stat-value" id="pedidosActivos">0</h2>
+                        <p class="stat-change" id="pedidosPendientes">0 pendientes de pago</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 3 - CLIENTES -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f3e5f5;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9c27b0" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Clientes</p>
+                        <h2 class="stat-value" id="totalClientes">0</h2>
+                        <p class="stat-change" id="clientesNuevos">0 nuevos este mes</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 4 - INGRESOS TOTALES -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fff3e0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Ingresos Totales</p>
+                        <h2 class="stat-value" id="ingresosTotales">$0.00</h2>
+                        <p class="stat-change" id="ingresosInfo">Desde el inicio</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS -->
+            <div class="charts-grid">
+                <!-- GRÁFICO DE VENTAS MENSUALES -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Ventas Mensuales</h3>
+                        <p>Últimos 6 meses</p>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="ventasChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO DE SERVICIOS -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Servicios Más Vendidos</h3>
+                        <p>Top 5 servicios</p>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="serviciosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA DE ÚLTIMOS PEDIDOS -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>Últimos Pedidos</h3>
+                    <button class="view-all-btn" onclick="alert('Función en desarrollo')">Ver todos</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Servicio</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPedidos">
+                            <tr>
+                                <td colspan="6" class="loading">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLA DE PEDIDOS PENDIENTES -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>Pedidos Pendientes de Pago</h3>
+                    <span class="badge" id="badgePendientes">0</span>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Días Pendiente</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPendientes">
+                            <tr>
+                                <td colspan="5" class="loading">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL DE CARGA -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Cargando datos...</p>
+        </div>
+    </div>
+
+    <script src="../../js/global-script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,205 +1,230 @@
- CREATE DATABASE ModricEstudio00;
+/* =====================================================
+   BASE DE DATOS COMPLETA: ModricEstudio00
+   Versi√≥n: actualizada con Categor√≠as y Agenda
+   Autor: Proyecto Modric Estudio
+===================================================== */
 
+CREATE DATABASE IF NOT EXISTS ModricEstudio00;
 USE ModricEstudio00;
 
-/* ===========================================
+/* =====================================================
    TABLA USUARIO
-=========================================== */
-CREATE TABLE dbo.Usuario (
-    ID_Usuario        INT IDENTITY(1,1) PRIMARY KEY,
-    NombreCompleto    NVARCHAR(100) NOT NULL,
-    Correo            NVARCHAR(100) NULL,
-    Contrasena        NVARCHAR(100) NULL,  -- sin tilde
-    TipoUsuario       NVARCHAR(20)  NOT NULL 
-        CHECK (TipoUsuario IN ('CEO','Vendedor','Cliente')),
-    GrupoGrado        NVARCHAR(50)  NULL,
-    CorreoCorporativo NVARCHAR(100) NULL,
-    Foto              NVARCHAR(255) NULL
+===================================================== */
+CREATE TABLE Usuario (
+    ID_Usuario        INT AUTO_INCREMENT PRIMARY KEY,
+    NombreCompleto    VARCHAR(100) NOT NULL,
+    Correo            VARCHAR(100) NULL,
+    Contrasena        VARCHAR(100) NULL,
+    TipoUsuario       VARCHAR(20)  NOT NULL,
+    GrupoGrado        VARCHAR(50)  NULL,
+    CorreoCorporativo VARCHAR(100) NULL,
+    Foto              VARCHAR(255) NULL,
+    UNIQUE KEY UQ_Usuario_Correo (Correo),
+    UNIQUE KEY UQ_Usuario_CorreoCorp (CorreoCorporativo)
 );
--- Evita correos duplicados si los usas para login
-CREATE UNIQUE INDEX UQ_Usuario_Correo ON dbo.Usuario(Correo) WHERE Correo IS NOT NULL;
-CREATE UNIQUE INDEX UQ_Usuario_CorreoCorp ON dbo.Usuario(CorreoCorporativo) WHERE CorreoCorporativo IS NOT NULL;
 
-/* ===========================================
+/* =====================================================
    TABLA SERVICIO
-=========================================== */
-CREATE TABLE dbo.Servicio (
-    ID_Servicio     INT IDENTITY(1,1) PRIMARY KEY,
-    NombreServicio  NVARCHAR(100) NOT NULL,
-    Descripcion     NVARCHAR(MAX) NULL,
-    Precio          DECIMAL(10,2) NOT NULL CHECK (Precio >= 0),
-    Estado          NVARCHAR(20)  NOT NULL CHECK (Estado IN ('Activo','Inactivo')) DEFAULT 'Activo',
-    Tipo            NVARCHAR(50)  NULL
+===================================================== */
+CREATE TABLE Servicio (
+    ID_Servicio     INT AUTO_INCREMENT PRIMARY KEY,
+    NombreServicio  VARCHAR(100) NOT NULL,
+    Descripcion     TEXT NULL,
+    Precio          DECIMAL(10,2) NOT NULL DEFAULT 0,
+    Estado          VARCHAR(20)  NOT NULL DEFAULT 'Activo',
+    Tipo            VARCHAR(50)  NULL
 );
 
-/* ===========================================
-   TABLA PAQUETE (siempre ligado a un Servicio)
-=========================================== */
-CREATE TABLE dbo.Paquete (
-    ID_Paquete     INT IDENTITY(1,1) PRIMARY KEY,
-    NombrePaquete  NVARCHAR(100) NOT NULL,
-    Contenido      NVARCHAR(MAX) NULL,
-    Precio         DECIMAL(10,2) NOT NULL CHECK (Precio >= 0),
+/* =====================================================
+   TABLA PAQUETE
+===================================================== */
+CREATE TABLE Paquete (
+    ID_Paquete     INT AUTO_INCREMENT PRIMARY KEY,
+    NombrePaquete  VARCHAR(100) NOT NULL,
+    Contenido      TEXT NULL,
+    Precio         DECIMAL(10,2) NOT NULL DEFAULT 0,
     ID_Servicio    INT NOT NULL,
     CONSTRAINT FK_Paquete_Servicio FOREIGN KEY (ID_Servicio)
-        REFERENCES dbo.Servicio(ID_Servicio)
+        REFERENCES Servicio(ID_Servicio)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION
+        ON DELETE RESTRICT
 );
 
-/* ===========================================
-   TABLA PRODUCTO (siempre ligado a un Servicio)
-=========================================== */
-CREATE TABLE dbo.Producto (
-    ID_Producto  INT IDENTITY(1,1) PRIMARY KEY,
-    Nombre       NVARCHAR(100) NOT NULL,
-    Talla        NVARCHAR(20)  NULL,
-    Color        NVARCHAR(20)  NULL,
-    Precio       DECIMAL(10,2) NOT NULL CHECK (Precio >= 0),
+/* =====================================================
+   TABLA PRODUCTO
+===================================================== */
+CREATE TABLE Producto (
+    ID_Producto  INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre       VARCHAR(100) NOT NULL,
+    Talla        VARCHAR(20)  NULL,
+    Color        VARCHAR(20)  NULL,
+    Precio       DECIMAL(10,2) NOT NULL DEFAULT 0,
     ID_Servicio  INT NOT NULL,
     CONSTRAINT FK_Producto_Servicio FOREIGN KEY (ID_Servicio)
-        REFERENCES dbo.Servicio(ID_Servicio)
+        REFERENCES Servicio(ID_Servicio)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION
+        ON DELETE RESTRICT
 );
 
-/* ===========================================
-   TABLA PEDIDO (encabezado)
-   - Cliente y Vendedor obligatorios
-   - Servicio/Paquete opcionales (si vendes eso "al vuelo")
-=========================================== */
-CREATE TABLE dbo.Pedido (
-    ID_Pedido   INT IDENTITY(1,1) PRIMARY KEY,
-    Fecha       DATETIME     NOT NULL DEFAULT GETDATE(),
-    Estado      NVARCHAR(20) NOT NULL CHECK (Estado IN ('Pendiente','Confirmado','Cancelado')) DEFAULT 'Pendiente',
-    ID_Usuario  INT NOT NULL,  -- Cliente
-    ID_Vendedor INT NOT NULL,  -- Vendedor
+/* =====================================================
+   TABLA PEDIDO
+===================================================== */
+CREATE TABLE Pedido (
+    ID_Pedido   INT AUTO_INCREMENT PRIMARY KEY,
+    Fecha       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Estado      VARCHAR(20)  NOT NULL DEFAULT 'Pendiente',
+    ID_Usuario  INT NOT NULL,
+    ID_Vendedor INT NOT NULL,
     ID_Servicio INT NULL,
     ID_Paquete  INT NULL,
-    Total       DECIMAL(10,2) NOT NULL DEFAULT 0 CHECK (Total >= 0),
-
+    Total       DECIMAL(10,2) NOT NULL DEFAULT 0,
+    
     CONSTRAINT FK_Pedido_Cliente  FOREIGN KEY (ID_Usuario)
-        REFERENCES dbo.Usuario(ID_Usuario)
+        REFERENCES Usuario(ID_Usuario)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION,
-
+        ON DELETE RESTRICT,
+    
     CONSTRAINT FK_Pedido_Vendedor FOREIGN KEY (ID_Vendedor)
-        REFERENCES dbo.Usuario(ID_Usuario)
+        REFERENCES Usuario(ID_Usuario)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION,
-
+        ON DELETE RESTRICT,
+    
     CONSTRAINT FK_Pedido_Servicio FOREIGN KEY (ID_Servicio)
-        REFERENCES dbo.Servicio(ID_Servicio)
+        REFERENCES Servicio(ID_Servicio)
         ON UPDATE CASCADE
         ON DELETE SET NULL,
-
+    
     CONSTRAINT FK_Pedido_Paquete FOREIGN KEY (ID_Paquete)
-        REFERENCES dbo.Paquete(ID_Paquete)
+        REFERENCES Paquete(ID_Paquete)
         ON UPDATE CASCADE
         ON DELETE SET NULL
 );
 
-/* ===========================================
-   TABLA DETALLEPEDIDO (renglones de productos)
-=========================================== */
-CREATE TABLE dbo.DetallePedido (
-    ID_Detalle  INT IDENTITY(1,1) PRIMARY KEY,
+/* =====================================================
+   TABLA DETALLEPEDIDO
+===================================================== */
+CREATE TABLE DetallePedido (
+    ID_Detalle  INT AUTO_INCREMENT PRIMARY KEY,
     ID_Pedido   INT NOT NULL,
     ID_Producto INT NOT NULL,
-    Cantidad    INT NOT NULL CHECK (Cantidad > 0),
-    -- precio capturado al momento (opcional, pero es buena pr·ctica)
-    PrecioUnitario DECIMAL(10,2) NOT NULL CHECK (PrecioUnitario >= 0),
-
+    Cantidad    INT NOT NULL,
+    PrecioUnitario DECIMAL(10,2) NOT NULL DEFAULT 0,
+    
     CONSTRAINT FK_Detalle_Pedido FOREIGN KEY (ID_Pedido)
-        REFERENCES dbo.Pedido(ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-
+    
     CONSTRAINT FK_Detalle_Producto FOREIGN KEY (ID_Producto)
-        REFERENCES dbo.Producto(ID_Producto)
+        REFERENCES Producto(ID_Producto)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION
+        ON DELETE RESTRICT,
+    
+    INDEX IX_Detalle_Pedido (ID_Pedido),
+    INDEX IX_Detalle_Producto (ID_Producto)
 );
 
-CREATE INDEX IX_Detalle_Pedido   ON dbo.DetallePedido(ID_Pedido);
-CREATE INDEX IX_Detalle_Producto ON dbo.DetallePedido(ID_Producto);
-
-/* ===========================================
+/* =====================================================
    TABLA PAGO
-=========================================== */
-CREATE TABLE dbo.Pago (
-    ID_Pago     INT IDENTITY(1,1) PRIMARY KEY,
-    Monto       DECIMAL(10,2) NOT NULL CHECK (Monto > 0),
-    Metodo      NVARCHAR(20)  NOT NULL CHECK (Metodo IN ('Transferencia','Efectivo','Yappy')),
-    Fecha       DATETIME      NOT NULL DEFAULT GETDATE(),
-    Comprobante NVARCHAR(255) NULL,
-    Estado      NVARCHAR(20)  NOT NULL CHECK (Estado IN ('Confirmado','No confirmado')) DEFAULT 'No confirmado',
+===================================================== */
+CREATE TABLE Pago (
+    ID_Pago     INT AUTO_INCREMENT PRIMARY KEY,
+    Monto       DECIMAL(10,2) NOT NULL,
+    Metodo      VARCHAR(20)  NOT NULL,
+    Fecha       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Comprobante VARCHAR(255) NULL,
+    Estado      VARCHAR(20)  NOT NULL DEFAULT 'No confirmado',
     ID_Pedido   INT NOT NULL,
-
+    
     CONSTRAINT FK_Pago_Pedido FOREIGN KEY (ID_Pedido)
-        REFERENCES dbo.Pedido(ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    
+    INDEX IX_Pago_Pedido (ID_Pedido)
 );
 
-CREATE INDEX IX_Pago_Pedido ON dbo.Pago(ID_Pedido);
-
-/* ===========================================
-   TABLA FACTURA (1 a 1 con Pedido)
-=========================================== */
-CREATE TABLE dbo.Factura (
-    ID_Factura  INT IDENTITY(1,1) PRIMARY KEY,
-    NumeroOrden NVARCHAR(50) NOT NULL,
-    Fecha       DATETIME     NOT NULL DEFAULT GETDATE(),
-    MedioEnvio  NVARCHAR(20) NOT NULL CHECK (MedioEnvio IN ('Email','WhatsApp')),
-    ID_Pedido   INT NOT NULL UNIQUE,  -- asegura 1 factura por pedido
-
+/* =====================================================
+   TABLA FACTURA
+===================================================== */
+CREATE TABLE Factura (
+    ID_Factura  INT AUTO_INCREMENT PRIMARY KEY,
+    NumeroOrden VARCHAR(50) NOT NULL,
+    Fecha       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    MedioEnvio  VARCHAR(20) NOT NULL,
+    ID_Pedido   INT NOT NULL UNIQUE,
+    
     CONSTRAINT FK_Factura_Pedido FOREIGN KEY (ID_Pedido)
-        REFERENCES dbo.Pedido(ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION
+        ON DELETE RESTRICT,
+    
+    UNIQUE KEY UQ_Factura_NumeroOrden (NumeroOrden)
 );
 
-CREATE UNIQUE INDEX UQ_Factura_NumeroOrden ON dbo.Factura(NumeroOrden);
+/* =====================================================
+   TABLA CATEGORIA (para temporadas o agenda)
+===================================================== */
+CREATE TABLE Categoria (
+    ID_Categoria INT AUTO_INCREMENT PRIMARY KEY,
+    NombreCategoria VARCHAR(100) NOT NULL,
+    Descripcion TEXT NULL,
+    FechaInicio DATE NOT NULL,
+    FechaFin DATE NOT NULL,
+    Estado VARCHAR(20) DEFAULT 'Activa'
+        CHECK (Estado IN ('Activa','Inactiva'))
+);
 
- /*1 .Crea usuarios (uno ìClienteî, otro ìVendedorî):*/
-INSERT dbo.Usuario (NombreCompleto, Correo, TipoUsuario)
-VALUES ('Ana Cliente','ana@x.com','Cliente'),
-       ('Luis Vendedor','luis@x.com','Vendedor');
-/*2.  Crea un servicio y un producto:*/
-INSERT dbo.Servicio (NombreServicio, Descripcion, Precio, Estado, Tipo)
-VALUES ('DiseÒo de logo','Logo b·sico',150,'Activo','DiseÒo');
-INSERT dbo.Producto (Nombre, Talla, Color, Precio, ID_Servicio)
-VALUES ('Camiseta b·sica','M','Negro',12.50, 1);
-/*3. (Opcional) Crea un paquete: */
-INSERT dbo.Paquete (NombrePaquete, Contenido, Precio, ID_Servicio)
-VALUES ('Pack Branding','Logo + guÌa b·sica',160, 1);
-/*4. Crea un pedido (cliente y vendedor obligatorios; servicio/paquete son opcionales):*/
--- Pedido que incluye un servicio Y adem·s tendr· productos en el detalle
-INSERT dbo.Pedido (ID_Usuario, ID_Vendedor, ID_Servicio)
-VALUES (1, 2, 1);
-/*5. Agrega productos al detalle:*/
-INSERT dbo.DetallePedido (ID_Pedido, ID_Producto, Cantidad, PrecioUnitario)
-VALUES (1, 1, 2, 12.50); -- 2 camisetas
- /*6. Actualiza el total (suma servicio+paquete+detalle):*/
- -- Suma de productos del detalle
-WITH Sumas AS (
-  SELECT ID_Pedido, SUM(Cantidad * PrecioUnitario) AS SumaDetalle
-  FROM dbo.DetallePedido
-  GROUP BY ID_Pedido
-)
-UPDATE p
-SET p.Total = ISNULL(s.SumaDetalle,0)
-            + ISNULL(sv.Precio,0)
-            + ISNULL(pk.Precio,0)
-FROM dbo.Pedido p
-LEFT JOIN Sumas s       ON s.ID_Pedido = p.ID_Pedido
-LEFT JOIN dbo.Servicio sv ON sv.ID_Servicio = p.ID_Servicio
-LEFT JOIN dbo.Paquete  pk ON pk.ID_Paquete  = p.ID_Paquete
-WHERE p.ID_Pedido = 1;
- /*7. Registra un pago:*/   
- INSERT dbo.Pago (ID_Pedido, Monto, Metodo, Estado)
-VALUES (1, 50.00, 'Yappy', 'Confirmado');
- /*8. Genera la factura (1 por pedido):*/
- INSERT dbo.Factura (NumeroOrden, ID_Pedido, MedioEnvio)
-VALUES ('FAC-0001', 1, 'Email');
+/* =====================================================
+   TABLA INTERMEDIA CATEGORIA - PEDIDO - CLIENTE
+===================================================== */
+CREATE TABLE CategoriaPedido (
+    ID_CategoriaPedido INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Categoria INT NOT NULL,
+    ID_Pedido INT NOT NULL,
+    ID_Cliente INT NOT NULL,
+    Notas TEXT NULL,
+    FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT FK_CatPed_Categoria FOREIGN KEY (ID_Categoria)
+        REFERENCES Categoria(ID_Categoria)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    
+    CONSTRAINT FK_CatPed_Pedido FOREIGN KEY (ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    
+    CONSTRAINT FK_CatPed_Cliente FOREIGN KEY (ID_Cliente)
+        REFERENCES Usuario(ID_Usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+/* =====================================================
+   DATOS DE PRUEBA (usuarios, servicio, producto, paquete)
+===================================================== */
+INSERT INTO Usuario (NombreCompleto, Correo, Contrasena, TipoUsuario)
+VALUES 
+    ('CEO Admin', 'ceo@modric.com', 'admin123', 'CEO'),
+    ('Luis Vendedor', 'vendedor@modric.com', 'vend123', 'Vendedor'),
+    ('Ana Cliente', 'ana@cliente.com', 'cliente123', 'Cliente');
+
+INSERT INTO Servicio (NombreServicio, Descripcion, Precio, Estado, Tipo)
+VALUES ('Fotograf√≠a de bodas', 'Servicio completo de fotograf√≠a', 500.00, 'Activo', 'Fotograf√≠a');
+
+INSERT INTO Producto (Nombre, Talla, Color, Precio, ID_Servicio)
+VALUES ('Camiseta b√°sica', 'M', 'Negro', 12.50, 1);
+
+INSERT INTO Paquete (NombrePaquete, Contenido, Precio, ID_Servicio)
+VALUES ('Pack Graduaci√≥n', 'Fotos + diplomas', 150.00, 1);
+
+/* =====================================================
+   DATOS DE CATEGOR√çAS Y RELACIONES DE PRUEBA
+===================================================== */
+INSERT INTO Categoria (NombreCategoria, Descripcion, FechaInicio, FechaFin, Estado)
+VALUES 
+('Temporada de Bodas', 'Promoci√≥n especial para bodas', '2025-02-01', '2025-03-31', 'Activa'),
+('Graduaciones 2025', 'Sesiones de graduaci√≥n con descuento', '2025-04-01', '2025-05-31', 'Activa'),
+('Navidad 2025', 'Sesiones familiares y tem√°ticas', '2025-11-15', '2025-12-31', 'Inactiva');
