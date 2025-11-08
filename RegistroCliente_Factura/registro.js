@@ -16,10 +16,10 @@ const cantidadAbonoInput = document.getElementById('cantidadAbono');
 tipoPagoRadios.forEach(radio => {
     radio.addEventListener('change', function () {
         if (this.value === 'abono') {
-            abonoSection.classList.add('active');
+            abonoSection.style.display = 'block';
             cantidadAbonoInput.required = true;
         } else {
-            abonoSection.classList.remove('active');
+            abonoSection.style.display = 'none';
             cantidadAbonoInput.required = false;
             cantidadAbonoInput.value = '';
         }
@@ -40,7 +40,6 @@ document.getElementById('facturaForm').addEventListener('submit', function (e) {
     e.preventDefault();
     let isValid = true;
 
-    // Validaciones
     const nombre = document.getElementById('nombre');
     const apellido = document.getElementById('apellido');
     const telefono = document.getElementById('telefono');
@@ -48,13 +47,14 @@ document.getElementById('facturaForm').addEventListener('submit', function (e) {
     const paquete = document.getElementById('paquete');
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
     const tipoPago = document.querySelector('input[name="tipoPago"]:checked');
+    const comentario = document.getElementById('comentario');
 
     const telefonoPattern = /^6\d{3}-\d{4}$/;
 
     if (!nombre.value.trim()) { showError('nombre'); isValid = false; } else hideError('nombre');
     if (!apellido.value.trim()) { showError('apellido'); isValid = false; } else hideError('apellido');
     if (!telefonoPattern.test(telefono.value)) { showError('telefono'); isValid = false; } else hideError('telefono');
-    if (!escuela.value) { showError('escuela'); isValid = false; } else hideError('escuela');
+    if (!escuela.value.trim()) { showError('escuela'); isValid = false; } else hideError('escuela');
     if (!paquete.value) { showError('paquete'); isValid = false; } else hideError('paquete');
     if (!metodoPago) { showError('metodoPago'); isValid = false; } else hideError('metodoPago');
     if (!tipoPago) { showError('tipoPago'); isValid = false; } else hideError('tipoPago');
@@ -78,11 +78,15 @@ document.getElementById('facturaForm').addEventListener('submit', function (e) {
             paquete: paquete.options[paquete.selectedIndex].text,
             metodoPago: metodoPago.value,
             tipoPago: tipoPago.value,
-            cantidadAbono: tipoPago.value === 'abono' ? document.getElementById('cantidadAbono').value : 'N/A'
+            cantidadAbono: tipoPago.value === 'abono' ? document.getElementById('cantidadAbono').value : 'N/A',
+            comentario: comentario.value.trim() || "Sin comentarios"
         };
 
-        console.log('Datos de la factura:', formData);
+        localStorage.setItem('facturaData', JSON.stringify(formData));
+
         alert(`Factura generada exitosamente!\n\nCliente: ${formData.nombre} ${formData.apellido}\nEscuela: ${formData.escuela}\nPaquete: ${formData.paquete}\nMétodo: ${formData.metodoPago.toUpperCase()}`);
+
+        window.location.href = "factura.html";
     }
 });
 
@@ -100,7 +104,7 @@ function hideError(fieldName) {
     if (error) error.classList.remove('active');
 }
 
-document.querySelectorAll('input, select').forEach(element => {
+document.querySelectorAll('input, select, textarea').forEach(element => {
     element.addEventListener('input', function () {
         hideError(this.id);
     });

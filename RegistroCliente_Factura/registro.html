@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Facturación</title>
-    <link rel="stylesheet" href="registro.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -45,6 +45,11 @@
                             <span class="error" id="telefonoError">Formato inválido. Use: 6XXX-XXXX</span>
                         </div>
                     </div>
+                <!-- Campo para comentario -->
+                <div class="form-group">
+                    <label for="comentario">Comentario del cliente (opcional):</label>
+                    <textarea id="comentario" name="comentario" rows="3" placeholder="Escribe aquí cualquier observación..."></textarea>
+                </div>
 
                     <div class="form-group">
                         <label for="escuela">Escuela *</label>
@@ -127,6 +132,6 @@
         </div>
     </div>
 
-    <script src="registro.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

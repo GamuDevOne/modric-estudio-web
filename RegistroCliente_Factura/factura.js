@@ -49,7 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
             tabla.appendChild(fila);
             total += parseFloat(p.total);
         });
-
+        // Nuevo: comentario del cliente
+        document.getElementById("comentarioCliente").textContent =
+            datosFactura.comentario && datosFactura.comentario !== ""
+                ? datosFactura.comentario
+                : "Sin comentarios";
         document.getElementById("totalFactura").textContent = total.toFixed(2) + " €";
     } else {
         // Si no hay datos del formulario, igual muestra la fecha y número generados
