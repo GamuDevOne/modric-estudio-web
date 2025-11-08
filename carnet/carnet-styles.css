@@ -1,208 +1,169 @@
-/* ========================================
-   SECCIÓN CARNÉS
-======================================== */
+/* ---------- SECCIÓN CARNÉS ---------- */
 .carnes-section {
-    padding: 100px 50px;
-    background-color: #fff;
+  position: relative;
+  padding: 100px 20px;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+  background-color: #000;
 }
 
+/* 🔳 COLLAGE DE FONDO */
+.carnes-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    url("../imagenes/foto1.jpg"),
+    url("../imagenes/foto2.jpg"),
+    url("../imagenes/foto3.jpg"),
+    url("../imagenes/foto4.jpg"),
+    url("../imagenes/foto5.jpg"),
+    url("../imagenes/foto6.jpg");
+  background-size: 33% 50%, 33% 50%, 33% 50%, 33% 50%, 33% 50%, 33% 50%;
+  background-position: 
+    top left, top center, top right, 
+    bottom left, bottom center, bottom right;
+  background-repeat: no-repeat;
+  filter: grayscale(100%) brightness(35%) blur(2px);
+  opacity: 0.7;
+}
+
+/* 🔳 CAPA NEGRA DIFUMINADA PARA CONTRASTE */
+.carnes-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+/* ---------- CONTENIDO ---------- */
 .carnes-header {
-    max-width: 1000px;
-    margin: 0 auto 60px;
-    text-align: center;
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  padding: 40px 20px;
+  border-radius: 20px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .carnes-header h2 {
-    font-size: 42px;
-    font-weight: 300;
-    color: #333;
-    margin-bottom: 30px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .carnes-header p {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #666;
-    margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #ddd;
+  line-height: 1.6;
 }
 
-.carnes-image {
-    max-width: 1400px;
-    margin: 0 auto;
-    height: 400px;
-    overflow: hidden;
+/* ---------- TARJETAS ---------- */
+.carnes-wrapper {
+  margin-top: -100px; /* súbelo o bájalo ajustando este valor */
+  position: relative;
+  z-index: 2;
 }
 
-.carnes-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.carnes-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
 }
 
-.carnes-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-    display: flex;
+.carne-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 20px;
+  width: 360px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carne-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+}
+
+.carne-card h3 {
+  font-size: 1.3rem;
+  color: #111;
+  margin-bottom: 12px;
+}
+
+.carne-img-wrap {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.carne-img-wrap img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.carne-desc {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.btn-cotizar {
+  display: inline-block;
+  background: #25d366;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+  transition: background 0.3s ease;
+}
+
+.btn-cotizar:hover {
+  background: #20b457;
+}
+
+/* ---------- ANIMACIÓN ---------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 800px) {
+  .carnes-grid {
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    color: #999;
-    font-size: 20px;
+  }
+
+  .carne-card {
+    width: 90%;
+  }
+
+  .carnes-header h2 {
+    font-size: 1.7rem;
+  }
 }
-
-/* SEPARADOR EJEMPLOS */
-.examples-separator {
-    padding: 80px 50px;
-    text-align: center;
-}
-
-.examples-separator h2 {
-    font-size: 48px;
-    font-weight: 300;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.separator-line-bottom {
-    width: 60px;
-    height: 2px;
-    background-color: #333;
-    margin: 0 auto;
-}
-
-/* GALERÍA DE EJEMPLOS CARNÉS */
-.carnes-examples {
-    padding: 50px 50px 100px;
-    background-color: #f9f9f9;
-}
-
-.examples-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 50px;
-}
-
-.example-card {
-    text-align: center;
-}
-
-.example-image {
-    width: 100%;
-    height: 400px;
-    margin-bottom: 30px;
-}
-
-.example-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.example-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #999;
-    font-size: 18px;
-}
-
-.example-card h3 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-}
-
-.example-card p {
-    font-size: 14px;
-    color: #999;
-}
-
-/* SECCIÓN CTA CARNÉS */
-.carnes-cta-section {
-    padding: 100px 50px;
-    background-color: #333;
-    text-align: center;
-}
-
-.cta-button {
-    background-color: #000;
-    color: #fff;
-    border: none;
-    padding: 18px 60px;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-.cta-button:hover {
-    background-color: #555;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-/* RESPONSIVE CARNÉS */
-@media (max-width: 1024px) {
-    .examples-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
-
-    .example-image {
-        height: 300px;
-    }
-}
-
-@media (max-width: 768px) {
-    .carnes-section {
-        padding: 60px 30px;
-    }
-
-    .carnes-header h2 {
-        font-size: 28px;
-    }
-
-    .carnes-image {
-        height: 250px;
-    }
-
-    .examples-separator {
-        padding: 50px 30px;
-    }
-
-    .examples-separator h2 {
-        font-size: 32px;
-    }
-
-    .examples-grid {
-        grid-template-columns: 1fr;
-        gap: 50px;
-        padding: 0 30px;
-    }
-
-    .example-image {
-        height: 350px;
-    }
-
-    .carnes-examples {
-        padding: 30px 0 60px;
-    }
-
-    .carnes-cta-section {
-        padding: 60px 30px;
-    }
-
-    .cta-button {
-        padding: 15px 40px;
-        font-size: 14px;
-    }
-}
-
