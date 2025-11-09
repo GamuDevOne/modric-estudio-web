@@ -308,6 +308,23 @@
     gap: 12px;
 }
 
+/* Modal específico de estadísticas */
+#modalEstadisticas .modal-content {
+    transform-origin: center;
+    animation: modalZoom 0.3s ease;
+}
+
+@keyframes modalZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* ========================================
    FORMULARIO
 ======================================== */
@@ -432,6 +449,65 @@
     font-weight: 600;
     color: #333;
     margin: 0;
+}
+
+/* Sección de Actividad */
+.activity-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.activity-section h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.activity-item {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.activity-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.activity-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* Ajuste responsive para actividad */
+@media (max-width: 768px) {
+    .activity-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity-section {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
 }
 
 /* ========================================

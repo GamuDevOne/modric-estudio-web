@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurar Servicios - Admin</title>
+<link rel="stylesheet" href="../../css/global-styles.css">
+<link rel="stylesheet" href="config-servicios.css">
+</head>
+<body>
+
+<!-- HEADER FIJO -->
+<header id="header">
+    <!-- LOGO - IZQUIERDA -->
+    <div class="logo">
+        <a href="../../index.html">
+            <img src="../../imagenes/logo.png" alt="Modric Estudio">
+        </a>
+    </div>
+
+    <!-- NAVEGACIÓN - CENTRO -->
+    <nav>
+        <ul>
+            <li><a href="../../index.html">INICIO</a></li>
+            <li><a href="../administracion.html">PANEL</a></li>
+            <li><a href="../dashboard/dashboard.html">DASHBOARD</a></li>
+            <li><a href="../gestionVendedores/gest-vendedores.html">VENDEDORES</a></li>
+            <li><a href="config-servicios.html" class="active">SERVICIOS</a></li>
+        </ul>
+    </nav>
+
+    <!-- BOTÓN LOGOUT - DERECHA -->
+    <div class="login-btn">
+        <button onclick="logout()" class="login-icon-btn" aria-label="Cerrar sesión" title="Cerrar sesión" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<section class="panel-section">
+    <div class="panel-container">
+        <div class="panel-header">
+            <h1>Configurar Servicios</h1>
+            <p>Administra los apartados que estarán activos en la web</p>
+        </div>
+
+        <div class="panel-grid">
+            <!-- CUADRO TEXTIL -->
+            <div class="panel-card" id="textil-cuadro">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m-7-7h6m6 0h6"></path>
+                    </svg>
+                </div>
+                <h3>Textil</h3>
+                <p>Estado actual: <span id="estado-textil">Desactivado</span></p>
+                <button class="panel-btn" id="activar-textil">Activar Textil</button>
+            </div>
+
+            <!-- CUADRO CARNÉS -->
+            <div class="panel-card" id="carnes-cuadro">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                </div>
+                <h3>Carnés</h3>
+                <p>Estado actual: <span id="estado-carnes">Activo</span></p>
+                <button class="panel-btn" id="activar-carnes">Desactivar Carnés</button>
+            </div>
+
+            <!-- CUADRO COMBOS -->
+            <div class="panel-card" id="combos-cuadro">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <h3>Combos de Graduación</h3>
+                <p>Estado actual: <span id="estado-combos">Activo</span></p>
+                <button class="panel-btn" id="activar-combos">Desactivar Combos</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="../../js/global-script.js"></script>
+<script src="config-servicios.js"></script>
+
+<!-- Script de verificación de sesión -->
+<script>
+    // Verificar que el usuario esté autenticado y sea CEO
+    document.addEventListener('DOMContentLoaded', function() {
+        const user = checkSession();
+        
+        if (!user) {
+            window.location.href = '../../login/login.html';
+            return;
+        }
+        
+        if (user.tipo !== 'CEO') {
+            alert('Acceso denegado. Solo el CEO puede acceder a esta página.');
+            window.location.href = '../administracion.html';
+            return;
+        }
+    });
+</script>
+</body>
+</html>

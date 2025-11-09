@@ -67,19 +67,25 @@ try {
 // ========================================
 function getAllVendedores($pdo) {
     try {
+        // Primero verificar si la columna LugarTrabajo existe
+        $stmt = $pdo->query("SHOW COLUMNS FROM Usuario LIKE 'LugarTrabajo'");
+        $columnExists = $stmt->rowCount() > 0;
+        
+        // Si no existe, crearla
+        if (!$columnExists) {
+            $pdo->exec("ALTER TABLE Usuario ADD COLUMN LugarTrabajo VARCHAR(100) NULL AFTER GrupoGrado");
+        }
+        
+        // Obtener vendedores
         $stmt = $pdo->query("
             SELECT 
                 u.ID_Usuario,
                 u.NombreCompleto,
                 u.Correo,
-                u.CorreoCorporativo,
                 u.GrupoGrado,
-                u.Foto,
-                COALESCE(SUM(p.Total), 0) as VentasTotales
+                u.LugarTrabajo
             FROM Usuario u
-            LEFT JOIN Pedido p ON u.ID_Usuario = p.ID_Vendedor AND p.Estado != 'Cancelado'
             WHERE u.TipoUsuario = 'Vendedor'
-            GROUP BY u.ID_Usuario
             ORDER BY u.NombreCompleto ASC
         ");
         
@@ -112,6 +118,14 @@ function createVendedor($pdo, $data) {
             return;
         }
         
+        if (empty($data['correo'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El correo es requerido'
+            ]);
+            return;
+        }
+        
         if (empty($data['contrasena']) || strlen($data['contrasena']) < 6) {
             echo json_encode([
                 'success' => false,
@@ -121,29 +135,14 @@ function createVendedor($pdo, $data) {
         }
         
         // Verificar si el correo ya existe
-        if (!empty($data['correo'])) {
-            $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo");
-            $stmt->execute([':correo' => $data['correo']]);
-            if ($stmt->fetch()) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'El correo ya está registrado'
-                ]);
-                return;
-            }
-        }
-        
-        // Verificar si el correo corporativo ya existe
-        if (!empty($data['correoCorporativo'])) {
-            $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE CorreoCorporativo = :correoCorp");
-            $stmt->execute([':correoCorp' => $data['correoCorporativo']]);
-            if ($stmt->fetch()) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'El correo corporativo ya está registrado'
-                ]);
-                return;
-            }
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo");
+        $stmt->execute([':correo' => $data['correo']]);
+        if ($stmt->fetch()) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El correo ya está registrado'
+            ]);
+            return;
         }
         
         // Insertar vendedor
@@ -151,29 +150,26 @@ function createVendedor($pdo, $data) {
             INSERT INTO Usuario (
                 NombreCompleto, 
                 Correo, 
-                CorreoCorporativo, 
                 Contrasena, 
                 TipoUsuario, 
-                GrupoGrado, 
-                Foto
+                GrupoGrado,
+                LugarTrabajo
             ) VALUES (
                 :nombreCompleto,
                 :correo,
-                :correoCorporativo,
                 :contrasena,
                 'Vendedor',
                 :grupoGrado,
-                :foto
+                :lugarTrabajo
             )
         ");
         
         $stmt->execute([
             ':nombreCompleto' => $data['nombreCompleto'],
-            ':correo' => !empty($data['correo']) ? $data['correo'] : null,
-            ':correoCorporativo' => !empty($data['correoCorporativo']) ? $data['correoCorporativo'] : null,
+            ':correo' => $data['correo'],
             ':contrasena' => $data['contrasena'], // TODO: Implementar hash
             ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-            ':foto' => !empty($data['foto']) ? $data['foto'] : null
+            ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null
         ]);
         
         echo json_encode([
@@ -212,6 +208,14 @@ function updateVendedor($pdo, $data) {
             return;
         }
         
+        if (empty($data['correo'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El correo es requerido'
+            ]);
+            return;
+        }
+        
         // Verificar que el vendedor existe
         $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
         $stmt->execute([':id' => $data['id']]);
@@ -224,29 +228,14 @@ function updateVendedor($pdo, $data) {
         }
         
         // Verificar si el correo ya existe (excepto el actual)
-        if (!empty($data['correo'])) {
-            $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo AND ID_Usuario != :id");
-            $stmt->execute([':correo' => $data['correo'], ':id' => $data['id']]);
-            if ($stmt->fetch()) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'El correo ya está registrado'
-                ]);
-                return;
-            }
-        }
-        
-        // Verificar si el correo corporativo ya existe (excepto el actual)
-        if (!empty($data['correoCorporativo'])) {
-            $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE CorreoCorporativo = :correoCorp AND ID_Usuario != :id");
-            $stmt->execute([':correoCorp' => $data['correoCorporativo'], ':id' => $data['id']]);
-            if ($stmt->fetch()) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'El correo corporativo ya está registrado'
-                ]);
-                return;
-            }
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo AND ID_Usuario != :id");
+        $stmt->execute([':correo' => $data['correo'], ':id' => $data['id']]);
+        if ($stmt->fetch()) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El correo ya está registrado'
+            ]);
+            return;
         }
         
         // Actualizar vendedor
@@ -256,20 +245,18 @@ function updateVendedor($pdo, $data) {
                 UPDATE Usuario SET
                     NombreCompleto = :nombreCompleto,
                     Correo = :correo,
-                    CorreoCorporativo = :correoCorporativo,
                     Contrasena = :contrasena,
                     GrupoGrado = :grupoGrado,
-                    Foto = :foto
+                    LugarTrabajo = :lugarTrabajo
                 WHERE ID_Usuario = :id
             ");
             
             $stmt->execute([
                 ':nombreCompleto' => $data['nombreCompleto'],
-                ':correo' => !empty($data['correo']) ? $data['correo'] : null,
-                ':correoCorporativo' => !empty($data['correoCorporativo']) ? $data['correoCorporativo'] : null,
+                ':correo' => $data['correo'],
                 ':contrasena' => $data['contrasena'], // TODO: Implementar hash
                 ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-                ':foto' => !empty($data['foto']) ? $data['foto'] : null,
+                ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null,
                 ':id' => $data['id']
             ]);
         } else {
@@ -278,18 +265,16 @@ function updateVendedor($pdo, $data) {
                 UPDATE Usuario SET
                     NombreCompleto = :nombreCompleto,
                     Correo = :correo,
-                    CorreoCorporativo = :correoCorporativo,
                     GrupoGrado = :grupoGrado,
-                    Foto = :foto
+                    LugarTrabajo = :lugarTrabajo
                 WHERE ID_Usuario = :id
             ");
             
             $stmt->execute([
                 ':nombreCompleto' => $data['nombreCompleto'],
-                ':correo' => !empty($data['correo']) ? $data['correo'] : null,
-                ':correoCorporativo' => !empty($data['correoCorporativo']) ? $data['correoCorporativo'] : null,
+                ':correo' => $data['correo'],
                 ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-                ':foto' => !empty($data['foto']) ? $data['foto'] : null,
+                ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null,
                 ':id' => $data['id']
             ]);
         }
@@ -370,6 +355,11 @@ function getVendedorStats($pdo, $data) {
             return;
         }
         
+        // Obtener lugar de trabajo
+        $stmt = $pdo->prepare("SELECT LugarTrabajo FROM Usuario WHERE ID_Usuario = :id");
+        $stmt->execute([':id' => $data['id']]);
+        $lugarTrabajo = $stmt->fetch(PDO::FETCH_ASSOC)['LugarTrabajo'] ?? null;
+        
         // Total de ventas
         $stmt = $pdo->prepare("
             SELECT COALESCE(SUM(Total), 0) as totalVentas
@@ -379,34 +369,81 @@ function getVendedorStats($pdo, $data) {
         $stmt->execute([':id' => $data['id']]);
         $totalVentas = $stmt->fetch(PDO::FETCH_ASSOC)['totalVentas'];
         
-        // Pedidos completados
+        // Pedidos activos (no completados ni cancelados)
         $stmt = $pdo->prepare("
-            SELECT COUNT(*) as pedidosCompletados
+            SELECT COUNT(*) as pedidosActivos
             FROM Pedido
-            WHERE ID_Vendedor = :id AND Estado = 'Completado'
+            WHERE ID_Vendedor = :id AND Estado NOT IN ('Completado', 'Cancelado')
         ");
         $stmt->execute([':id' => $data['id']]);
-        $pedidosCompletados = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosCompletados'];
+        $pedidosActivos = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
         
-        // Comisión estimada (10% de las ventas)
-        $comisionEstimada = $totalVentas * 0.10;
-        
-        // Clientes únicos atendidos
+        // Último pedido
         $stmt = $pdo->prepare("
-            SELECT COUNT(DISTINCT ID_Usuario) as clientesAtendidos
+            SELECT 
+                p.ID_Pedido,
+                p.Fecha,
+                u.NombreCompleto as Cliente
+            FROM Pedido p
+            INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+            WHERE p.ID_Vendedor = :id
+            ORDER BY p.Fecha DESC
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $data['id']]);
+        $ultimoPedido = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $ultimoPedidoTexto = 'Sin pedidos';
+        if ($ultimoPedido) {
+            $fecha = date('d/m/Y', strtotime($ultimoPedido['Fecha']));
+            $ultimoPedidoTexto = "Pedido #{$ultimoPedido['ID_Pedido']} - {$ultimoPedido['Cliente']} ({$fecha})";
+        }
+        
+        // Estado de ventas por tipo
+        $stmt = $pdo->prepare("
+            SELECT 
+                Estado,
+                COUNT(*) as cantidad
             FROM Pedido
             WHERE ID_Vendedor = :id
+            GROUP BY Estado
         ");
         $stmt->execute([':id' => $data['id']]);
-        $clientesAtendidos = $stmt->fetch(PDO::FETCH_ASSOC)['clientesAtendidos'];
+        $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $estadoPendientes = 0;
+        $estadoProceso = 0;
+        $estadoCompletados = 0;
+        $estadoCancelados = 0;
+        
+        foreach ($estados as $estado) {
+            switch ($estado['Estado']) {
+                case 'Pendiente':
+                    $estadoPendientes = $estado['cantidad'];
+                    break;
+                case 'En Proceso':
+                    $estadoProceso = $estado['cantidad'];
+                    break;
+                case 'Completado':
+                    $estadoCompletados = $estado['cantidad'];
+                    break;
+                case 'Cancelado':
+                    $estadoCancelados = $estado['cantidad'];
+                    break;
+            }
+        }
         
         echo json_encode([
             'success' => true,
             'stats' => [
                 'totalVentas' => $totalVentas,
-                'pedidosCompletados' => $pedidosCompletados,
-                'comisionEstimada' => $comisionEstimada,
-                'clientesAtendidos' => $clientesAtendidos
+                'lugarTrabajo' => $lugarTrabajo,
+                'pedidosActivos' => $pedidosActivos,
+                'ultimoPedido' => $ultimoPedidoTexto,
+                'estadoPendientes' => $estadoPendientes,
+                'estadoProceso' => $estadoProceso,
+                'estadoCompletados' => $estadoCompletados,
+                'estadoCancelados' => $estadoCancelados
             ]
         ]);
         

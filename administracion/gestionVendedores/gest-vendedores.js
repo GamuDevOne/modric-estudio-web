@@ -24,11 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cargar vendedores
     cargarVendedores();
-    
-    // Mostrar ayuda de contraseña al hacer foco
-    document.getElementById('contrasena').addEventListener('focus', function() {
-        document.getElementById('passwordHelp').classList.add('show');
-    });
 });
 
 // ========================================
@@ -73,7 +68,7 @@ function mostrarVendedores(vendedores) {
     tabla.innerHTML = '';
     
     if (vendedores.length === 0) {
-        tabla.innerHTML = '<tr><td colspan="7" class="empty">No hay vendedores registrados</td></tr>';
+        tabla.innerHTML = '<tr><td colspan="5" class="empty">No hay vendedores registrados</td></tr>';
         return;
     }
     
@@ -83,23 +78,21 @@ function mostrarVendedores(vendedores) {
             <td>#${vendedor.ID_Usuario}</td>
             <td>${vendedor.NombreCompleto}</td>
             <td>${vendedor.Correo || 'N/A'}</td>
-            <td>${vendedor.CorreoCorporativo || 'N/A'}</td>
             <td>${vendedor.GrupoGrado || 'N/A'}</td>
-            <td>$${parseFloat(vendedor.VentasTotales || 0).toFixed(2)}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-icon stats" onclick="verEstadisticas(${vendedor.ID_Usuario})" title="Ver estadísticas">
+                    <button class="btn-icon stats" title="Ver estadísticas">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                         </svg>
                     </button>
-                    <button class="btn-icon edit" onclick="editarVendedor(${vendedor.ID_Usuario})" title="Editar">
+                    <button class="btn-icon edit" title="Editar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                     </button>
-                    <button class="btn-icon delete" onclick="eliminarVendedor(${vendedor.ID_Usuario}, '${vendedor.NombreCompleto}')" title="Eliminar">
+                    <button class="btn-icon delete" title="Eliminar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -111,28 +104,16 @@ function mostrarVendedores(vendedores) {
             </td>
         `;
         tabla.appendChild(row);
-    });
-}
 
-// ========================================
-// FILTRAR VENDEDORES
-// ========================================
-function filtrarVendedores() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
-    const vendedoresFiltrados = vendedoresData.filter(vendedor => {
-        const nombre = vendedor.NombreCompleto.toLowerCase();
-        const correo = (vendedor.Correo || '').toLowerCase();
-        const correoCorp = (vendedor.CorreoCorporativo || '').toLowerCase();
-        const grupo = (vendedor.GrupoGrado || '').toLowerCase();
-        
-        return nombre.includes(searchTerm) || 
-               correo.includes(searchTerm) || 
-               correoCorp.includes(searchTerm) ||
-               grupo.includes(searchTerm);
+        // Asignar listeners en vez de usar onclick inline (evita rotura por comillas en nombres)
+        const btnStats = row.querySelector('.stats');
+        const btnEdit = row.querySelector('.edit');
+        const btnDelete = row.querySelector('.delete');
+
+        if (btnStats) btnStats.addEventListener('click', () => verEstadisticas(vendedor.ID_Usuario));
+        if (btnEdit) btnEdit.addEventListener('click', () => editarVendedor(vendedor.ID_Usuario));
+        if (btnDelete) btnDelete.addEventListener('click', () => eliminarVendedor(vendedor.ID_Usuario, vendedor.NombreCompleto));
     });
-    
-    mostrarVendedores(vendedoresFiltrados);
 }
 
 // ========================================
@@ -144,6 +125,9 @@ function openModalAgregar() {
     document.getElementById('formVendedor').reset();
     document.getElementById('vendedorId').value = '';
     document.getElementById('contrasena').required = true;
+    document.getElementById('requiredStar').style.display = 'inline';
+    document.getElementById('passwordHelp').textContent = 'Mínimo 6 caracteres';
+    document.getElementById('passwordHelp').classList.remove('show');
     document.getElementById('modalVendedor').classList.add('active');
 }
 
@@ -163,11 +147,11 @@ function editarVendedor(id) {
     document.getElementById('vendedorId').value = vendedor.ID_Usuario;
     document.getElementById('nombreCompleto').value = vendedor.NombreCompleto;
     document.getElementById('correo').value = vendedor.Correo || '';
-    document.getElementById('correoCorporativo').value = vendedor.CorreoCorporativo || '';
     document.getElementById('grupoGrado').value = vendedor.GrupoGrado || '';
-    document.getElementById('foto').value = vendedor.Foto || '';
+    document.getElementById('lugarTrabajo').value = vendedor.LugarTrabajo || '';
     document.getElementById('contrasena').value = '';
     document.getElementById('contrasena').required = false;
+    document.getElementById('requiredStar').style.display = 'none';
     document.getElementById('passwordHelp').textContent = 'Dejar vacío para mantener la contraseña actual';
     document.getElementById('passwordHelp').classList.add('show');
     
@@ -185,10 +169,9 @@ function guardarVendedor(event) {
         id: document.getElementById('vendedorId').value,
         nombreCompleto: document.getElementById('nombreCompleto').value,
         correo: document.getElementById('correo').value,
-        correoCorporativo: document.getElementById('correoCorporativo').value,
-        contrasena: document.getElementById('contrasena').value,
         grupoGrado: document.getElementById('grupoGrado').value,
-        foto: document.getElementById('foto').value
+        lugarTrabajo: document.getElementById('lugarTrabajo').value,
+        contrasena: document.getElementById('contrasena').value
     };
     
     // Validación de contraseña
@@ -199,7 +182,7 @@ function guardarVendedor(event) {
     
     showLoadingModal();
     
-    fetch('../../php/vendedores.php', {
+    fetch('../../php/gest-vendedores.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -239,7 +222,7 @@ function confirmarEliminar() {
     
     showLoadingModal();
     
-    fetch('../../php/vendedores.php', {
+    fetch('../../php/gest-vendedores.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -281,7 +264,7 @@ function verEstadisticas(id) {
     
     showLoadingModal();
     
-    fetch('../../php/vendedores.php', {
+    fetch('../../php/gest-vendedores.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -297,11 +280,21 @@ function verEstadisticas(id) {
         
         if (data.success) {
             const stats = data.stats;
+            
+            // Información básica
             document.getElementById('estadisticasNombre').textContent = vendedor.NombreCompleto;
             document.getElementById('statVentas').textContent = '$' + parseFloat(stats.totalVentas || 0).toFixed(2);
-            document.getElementById('statPedidos').textContent = stats.pedidosCompletados || 0;
-            document.getElementById('statComision').textContent = '$' + parseFloat(stats.comisionEstimada || 0).toFixed(2);
-            document.getElementById('statClientes').textContent = stats.clientesAtendidos || 0;
+            document.getElementById('statLugar').textContent = stats.lugarTrabajo || 'No especificado';
+            
+            // Actividad actual
+            document.getElementById('statPedidosActivos').textContent = stats.pedidosActivos || 0;
+            document.getElementById('statUltimoPedido').textContent = stats.ultimoPedido || 'Sin pedidos';
+            
+            // Estado de las ventas
+            document.getElementById('statPendientes').textContent = stats.estadoPendientes || 0;
+            document.getElementById('statProceso').textContent = stats.estadoProceso || 0;
+            document.getElementById('statCompletados').textContent = stats.estadoCompletados || 0;
+            document.getElementById('statCancelados').textContent = stats.estadoCancelados || 0;
             
             document.getElementById('modalEstadisticas').classList.add('active');
         } else {

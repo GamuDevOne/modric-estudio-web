@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Textiles Personalizados - Modric Estudio</title>
-<link rel="stylesheet" href="texadmin.css">
+<link rel="stylesheet" href="text-activado.css">
 <link rel="stylesheet" href="../css/global-styles.css">
 </head>
 <body>
@@ -88,13 +88,13 @@
             <h3>Suéter personalizado</h3>
             <p>$25.00</p>
             <label>Talla:</label>
-            <select class="talla">
+            <select class="talla" title="Seleccione una talla">
                 <option>S</option>
                 <option>M</option>
                 <option>L</option>
             </select>
-            <label>Cantidad:</label>
-            <input type="number" class="cantidad" min="1" value="1">
+            <label for="cantidad1">Cantidad:</label>
+            <input id="cantidad1" type="number" class="cantidad" min="1" value="1" title="Cantidad de unidades" placeholder="1" aria-label="Cantidad">
             <button class="add-btn" data-nombre="Suéter personalizado" data-precio="25">Agregar</button>
         </div>
 
@@ -106,13 +106,13 @@
             <h3>Abrigo personalizado</h3>
             <p>$40.00</p>
             <label>Talla:</label>
-            <select class="talla">
+            <select class="talla" title="Seleccione una talla">
                 <option>S</option>
                 <option>M</option>
                 <option>L</option>
             </select>
-            <label>Cantidad:</label>
-            <input type="number" class="cantidad" min="1" value="1">
+            <label for="cantidad2">Cantidad:</label>
+            <input id="cantidad2" type="number" class="cantidad" min="1" value="1" title="Cantidad de unidades" placeholder="1" aria-label="Cantidad">
             <button class="add-btn" data-nombre="Abrigo personalizado" data-precio="40">Agregar</button>
         </div>
     </div>
@@ -122,6 +122,6 @@
     <p>©2025 - Modric Estudio</p>
 </footer>
 
-<script src="texadmin.js"></script>
+<script src="text-activado.js"></script>
 </body>
 </html>
