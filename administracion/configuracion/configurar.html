@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurar Servicios - Admin</title>
+<link rel="stylesheet" href="configurar.css">
+</head>
+<body>
+
+<section class="panel-section">
+    <div class="panel-container">
+        <div class="panel-header">
+            <h1>Configurar Servicios</h1>
+            <p>Administra los apartados que estarán activos en la web</p>
+        </div>
+
+        <div class="panel-grid">
+            <!-- CUADRO TEXTIL -->
+            <div class="panel-card" id="textil-cuadro">
+                <div class="card-icon">
+                    <!-- Icono SVG opcional -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m-7-7h6m6 0h6"></path>
+                    </svg>
+                </div>
+                <h3>Textil</h3>
+                <p>Estado actual: <span id="estado-textil">Desactivado</span></p>
+                <button class="panel-btn" id="activar-textil">Activar Textil</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="configurar.js"></script>
+</body>
+</html>

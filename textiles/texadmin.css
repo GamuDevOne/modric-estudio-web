@@ -1,0 +1,227 @@
+/* ===========================
+   ESTILO GENERAL
+=========================== */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+/* ===========================
+   SECCIÓN TEXTILES
+=========================== */
+.textiles-section {
+    padding: 100px 50px;
+}
+
+/* ENCABEZADO */
+.textiles-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.textiles-header h2 {
+    font-size: 38px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.textiles-header p {
+    color: #555;
+    font-size: 18px;
+    margin-top: 15px; 
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   CUADRÍCULA DE PRODUCTOS
+=========================== */
+.textiles-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 45px;
+    justify-content: center;
+}
+
+/* TARJETAS DE PRODUCTO */
+.producto {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    padding: 25px;
+    width: 340px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.producto:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* IMAGEN DEL PRODUCTO (ahora más alta) */
+.producto .imagen {
+    width: 100%;
+    height: 320px; /* ← más alto para que no se corten */
+    background-color: #eee;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Imagen dentro del contenedor */
+.producto .imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* mantiene proporción pero llena el espacio */
+    border-radius: 12px;
+}
+
+/* TEXTOS */
+.producto h3 {
+    margin: 15px 0 10px;
+    color: #222;
+    font-size: 21px;
+}
+
+.producto p {
+    margin: 5px 0 20px;
+    color: #333;
+    font-size: 16px;
+}
+
+/* SELECT Y INPUT */
+.producto select,
+.producto input[type=number] {
+    margin: 8px 0 12px;
+    width: 85%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* BOTÓN AÑADIR */
+.add-btn {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #333;
+}
+
+
+/* ===========================
+   CARRITO
+=========================== */
+.cart-panel {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    width: 320px;
+    background: #fff;
+    border-left: 2px solid #ccc;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+    padding: 20px;
+    display: none;
+    z-index: 100;
+}
+
+.cart-panel h3 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.cart-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.cart-panel li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.cart-btn {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.cart-btn:hover {
+    background-color: #333;
+}
+
+/* ===========================
+   ICONO CARRITO
+=========================== */
+.cart-icon {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: #000;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+@media (max-width: 1024px) {
+    .producto {
+        width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .textiles-section {
+        padding: 60px 20px;
+    }
+
+    .producto {
+        width: 90%;
+    }
+
+    .producto .imagen {
+        height: 250px; /* más alta también en móviles */
+    }
+
+    .cart-panel {
+        width: 100%;
+        top: 0;
+        height: 100vh;
+    }
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+.footer {
+    background-color: #000;   
+    color: #fff;           
+    text-align: center;
+    padding: 20px;
+    margin-top: 60px;        
+    position: relative;       
+    z-index: 1;
+}
