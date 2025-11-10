@@ -64,6 +64,43 @@
         </footer>
     </div>
 
+<script>
+document.getElementById("btnDescargarPDF").addEventListener("click", () => {
+    // Obtenemos todos los datos que ya están en pantalla
+    const facturaData = {
+        numero: document.getElementById("numeroFactura").textContent,
+        fecha: document.getElementById("fechaFactura").textContent,
+        clienteNombre: document.getElementById("clienteNombre").textContent,
+        clienteCorreo: document.getElementById("clienteCorreo").textContent,
+        metodoPago: document.getElementById("metodoPago").textContent,
+        paquete: document.getElementById("paqueteSeleccionado").textContent,
+        total: document.getElementById("totalFactura").textContent,
+        comentario: document.getElementById("comentarioFactura").textContent
+    };
+
+    // Enviamos los datos al PHP por POST
+    fetch("../php/factura_pdf.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(facturaData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            alert("Factura PDF generada correctamente");
+            window.open(data.url, "_blank");
+        } else {
+            alert("Error al generar el PDF");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+});
+</script>
+<div class="acciones-factura">
+    <button id="btnGenerarPDF" class="btn-pdf">📄 Generar PDF</button>
+    <button id="btnWhatsApp" class="btn-whatsapp" disabled>📱 Enviar por WhatsApp</button>
+</div>
+
     <script src="factura.js"></script>
 </body>
 </html>

@@ -131,3 +131,40 @@ footer {
     line-height: 1.4;
     text-align: left;
 }
+/* ==== BOTÓN DE DESCARGA PDF ==== */
+.btn-pdf {
+    display: inline-block;
+    background-color: #004aad;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 25px;
+}
+
+.btn-pdf:hover {
+    background-color: #002f70;
+    transform: scale(1.05);
+}
+
+/* ==== BOTÓN WHATSAPP (opcional futuro) ==== */
+.btn-whatsapp {
+    display: inline-block;
+    background-color: #25d366;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.btn-whatsapp:hover {
+    background-color: #1ca650;
+    transform: scale(1.05);
+}

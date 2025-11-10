@@ -1,5 +1,4 @@
 // Este archivo recibe datos del formulario usando localStorage
-
 document.addEventListener("DOMContentLoaded", () => {
     const datosFactura = JSON.parse(localStorage.getItem("facturaData"));
 
@@ -27,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // === 🧾 Mostrar datos ===
     if (datosFactura) {
-        // Si el formulario ya traía número o fecha, usamos esos; sino, los automáticos
         document.getElementById("numeroFactura").textContent = datosFactura.numero || numeroFactura;
         document.getElementById("fechaFactura").textContent = datosFactura.fecha || formatoFecha;
         document.getElementById("clienteNombre").textContent = datosFactura.cliente.nombre || "";
@@ -49,15 +47,68 @@ document.addEventListener("DOMContentLoaded", () => {
             tabla.appendChild(fila);
             total += parseFloat(p.total);
         });
+
         // Nuevo: comentario del cliente
         document.getElementById("comentarioCliente").textContent =
             datosFactura.comentario && datosFactura.comentario !== ""
                 ? datosFactura.comentario
                 : "Sin comentarios";
+
         document.getElementById("totalFactura").textContent = total.toFixed(2) + " €";
     } else {
-        // Si no hay datos del formulario, igual muestra la fecha y número generados
         document.getElementById("numeroFactura").textContent = numeroFactura;
         document.getElementById("fechaFactura").textContent = formatoFecha;
     }
+
+    // === 🧩 BOTÓN PARA GENERAR PDF ===
+    const btnPDF = document.getElementById("btnGenerarPDF");
+    const btnWhatsApp = document.getElementById("btnWhatsApp");
+
+    if (btnPDF) {
+        btnPDF.addEventListener("click", () => {
+            fetch("../php/factura_pdf.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datosFactura)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exito) {
+                    alert("Factura PDF generada correctamente");
+                    window.open(data.url, "_blank");
+
+                    // Guarda la URL generada
+                    window.pdfUrl = data.url;
+
+                    // Activa el botón de WhatsApp
+                    btnWhatsApp.disabled = false;
+                } else {
+                    alert("Error al generar el PDF");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    }
+
+    // === 💬 BOTÓN PARA ENVIAR POR WHATSAPP ===
+    if (btnWhatsApp) {
+        btnWhatsApp.addEventListener("click", () => {
+            const numero = datosFactura?.cliente?.telefono;
+
+            if (!numero) {
+                alert("No se encontró el número de teléfono del cliente en los datos.");
+                return;
+            }
+
+            if (!window.pdfUrl) {
+                alert("Primero genera el PDF antes de enviarlo por WhatsApp");
+                return;
+            }
+
+            const mensaje = `¡Hola ${datosFactura.cliente.nombre || 'cliente'}! 👋\nAquí tienes tu factura digital de Modric Estudio 📄:\n${window.location.origin}/${window.pdfUrl}`;
+            const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+            window.open(link, "_blank");
+        });
+    }
 });
+

@@ -1,4 +1,4 @@
-// Formateo automático del teléfono
+// === 📞 Formateo automático del teléfono ===
 const telefonoInput = document.getElementById('telefono');
 telefonoInput.addEventListener('input', function (e) {
     let value = e.target.value.replace(/\D/g, '');
@@ -8,7 +8,7 @@ telefonoInput.addEventListener('input', function (e) {
     e.target.value = value;
 });
 
-// Mostrar/ocultar sección de abono
+// === 💰 Mostrar/ocultar sección de abono ===
 const tipoPagoRadios = document.querySelectorAll('input[name="tipoPago"]');
 const abonoSection = document.getElementById('abonoSection');
 const cantidadAbonoInput = document.getElementById('cantidadAbono');
@@ -26,7 +26,7 @@ tipoPagoRadios.forEach(radio => {
     });
 });
 
-// Formateo de cantidad de abono
+// === 💵 Formateo de cantidad de abono ===
 cantidadAbonoInput.addEventListener('input', function (e) {
     let value = e.target.value.replace(/[^\d.]/g, '');
     const parts = value.split('.');
@@ -35,7 +35,7 @@ cantidadAbonoInput.addEventListener('input', function (e) {
     e.target.value = value ? '$' + value : '';
 });
 
-// Validación del formulario
+// === ✅ Validación del formulario ===
 document.getElementById('facturaForm').addEventListener('submit', function (e) {
     e.preventDefault();
     let isValid = true;
@@ -48,9 +48,11 @@ document.getElementById('facturaForm').addEventListener('submit', function (e) {
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
     const tipoPago = document.querySelector('input[name="tipoPago"]:checked');
     const comentario = document.getElementById('comentario');
+    const grupo = document.getElementById('grupo');
 
     const telefonoPattern = /^6\d{3}-\d{4}$/;
 
+    // === Validaciones básicas ===
     if (!nombre.value.trim()) { showError('nombre'); isValid = false; } else hideError('nombre');
     if (!apellido.value.trim()) { showError('apellido'); isValid = false; } else hideError('apellido');
     if (!telefonoPattern.test(telefono.value)) { showError('telefono'); isValid = false; } else hideError('telefono');
@@ -60,36 +62,46 @@ document.getElementById('facturaForm').addEventListener('submit', function (e) {
     if (!tipoPago) { showError('tipoPago'); isValid = false; } else hideError('tipoPago');
 
     if (tipoPago && tipoPago.value === 'abono') {
-        const cantidadAbono = document.getElementById('cantidadAbono');
-        const abonoValue = parseFloat(cantidadAbono.value.replace('$', ''));
+        const abonoValue = parseFloat(cantidadAbonoInput.value.replace('$', ''));
         if (!abonoValue || abonoValue <= 0) {
             showError('abono');
             isValid = false;
         } else hideError('abono');
     }
 
+    // === Si todo está bien, guardar datos ===
     if (isValid) {
         const formData = {
-            nombre: nombre.value,
-            apellido: apellido.value,
-            grupo: document.getElementById('grupo').value,
-            telefono: telefono.value,
-            escuela: escuela.value,
+            cliente: {
+                nombre: `${nombre.value} ${apellido.value}`,
+                telefono: telefono.value.replace('-', ''),
+                escuela: escuela.value,
+                grupo: grupo ? grupo.value : '',
+            },
             paquete: paquete.options[paquete.selectedIndex].text,
             metodoPago: metodoPago.value,
             tipoPago: tipoPago.value,
-            cantidadAbono: tipoPago.value === 'abono' ? document.getElementById('cantidadAbono').value : 'N/A',
-            comentario: comentario.value.trim() || "Sin comentarios"
+            cantidadAbono: tipoPago.value === 'abono' ? cantidadAbonoInput.value : 'N/A',
+            comentario: comentario.value.trim() || "Sin comentarios",
+            productos: [
+                {
+                    descripcion: paquete.options[paquete.selectedIndex].text,
+                    base: "50.00",  // 🔧 Ajusta según tus precios
+                    itbms: "3.50",
+                    total: "53.50"
+                }
+            ]
         };
 
+        // === 💾 Guardar datos de la factura en localStorage ===
         localStorage.setItem('facturaData', JSON.stringify(formData));
 
-        alert(`Factura generada exitosamente!\n\nCliente: ${formData.nombre} ${formData.apellido}\nEscuela: ${formData.escuela}\nPaquete: ${formData.paquete}\nMétodo: ${formData.metodoPago.toUpperCase()}`);
-
-        window.location.href = "factura.html";
+        // === 🔄 Redirigir automáticamente a factura.html ===
+        window.location.href = "../RegistroCliente_Factura/factura.html";
     }
 });
 
+// === 🚨 Funciones de error ===
 function showError(fieldName) {
     const field = document.getElementById(fieldName);
     const error = document.getElementById(fieldName + 'Error');
@@ -104,6 +116,7 @@ function hideError(fieldName) {
     if (error) error.classList.remove('active');
 }
 
+// === ✏️ Ocultar error al escribir ===
 document.querySelectorAll('input, select, textarea').forEach(element => {
     element.addEventListener('input', function () {
         hideError(this.id);
