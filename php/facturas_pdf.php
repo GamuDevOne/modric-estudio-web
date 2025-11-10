@@ -21,7 +21,7 @@ $paquete = htmlspecialchars($datos['paquete']);
 $total = htmlspecialchars($datos['total']);
 $comentario = htmlspecialchars($datos['comentario']);
 
-// Crear HTML con el mismo diseño que factura.html
+// Creacion HTML con el mismo diseño que factura.html
 $html = "
 <!DOCTYPE html>
 <html lang='es'>
