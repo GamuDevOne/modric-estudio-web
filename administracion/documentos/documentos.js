@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Cargar datos iniciales
     cargarClientes();
     cargarAlbums();
 });
@@ -35,7 +34,7 @@ function cargarClientes() {
     fetch('../../php/documentos.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             action: 'obtener_clientes'
@@ -100,7 +99,7 @@ function cargarAlbums() {
     fetch('../../php/documentos.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             action: 'obtener_albums'
@@ -133,11 +132,7 @@ function mostrarAlbums(albums) {
     grid.innerHTML = '';
     
     if (albums.length === 0) {
-        grid.innerHTML = `
-            <div class="loading-card">
-                <p>No hay álbumes para mostrar</p>
-            </div>
-        `;
+        grid.innerHTML = '<div class="loading-card"><p>No hay álbumes para mostrar</p></div>';
         return;
     }
     
@@ -157,6 +152,8 @@ function crearAlbumCard(album) {
     const estadoClass = album.Estado.toLowerCase();
     const diasRestantes = album.DiasRestantes > 0 ? album.DiasRestantes : 0;
     
+    const tituloEscapado = album.Titulo.replace(/'/g, "\\'");
+    
     card.innerHTML = `
         <div class="album-header">
             <h3 class="album-title">${album.Titulo}</h3>
@@ -170,7 +167,7 @@ function crearAlbumCard(album) {
         </div>
         
         <div class="album-body">
-            ${album.Descripcion ? `<p class="album-descripcion">${album.Descripcion}</p>` : ''}
+            ${album.Descripcion ? '<p class="album-descripcion">' + album.Descripcion + '</p>' : ''}
             
             <div class="album-info">
                 <div class="info-item">
@@ -196,7 +193,7 @@ function crearAlbumCard(album) {
             <span class="album-estado ${estadoClass}">${album.Estado}</span>
             <div class="album-actions">
                 ${album.Estado === 'Activo' ? `
-                    <button class="btn-icon" title="Subir fotos" onclick="abrirSubirFotos(${album.ID_Album}, '${album.Titulo}')">
+                    <button class="btn-icon" title="Subir fotos" onclick="abrirSubirFotos(${album.ID_Album}, '${tituloEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="17 8 12 3 7 8"></polyline>
@@ -213,7 +210,7 @@ function crearAlbumCard(album) {
                 </button>
                 
                 ${album.Estado === 'Activo' ? `
-                    <button class="btn-icon" title="Cerrar álbum" onclick="confirmarCerrarAlbum(${album.ID_Album}, '${album.Titulo}')">
+                    <button class="btn-icon" title="Cerrar álbum" onclick="confirmarCerrarAlbum(${album.ID_Album}, '${tituloEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -236,12 +233,10 @@ function filtrarAlbums() {
     
     let albumsFiltrados = albumsData;
     
-    // Filtrar por estado
     if (filtroEstado !== 'todos') {
         albumsFiltrados = albumsFiltrados.filter(a => a.Estado === filtroEstado);
     }
     
-    // Filtrar por cliente
     if (filtroCliente !== 'todos') {
         albumsFiltrados = albumsFiltrados.filter(a => a.ID_Cliente == filtroCliente);
     }
@@ -279,7 +274,7 @@ function crearAlbum(event) {
     fetch('../../php/documentos.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             action: 'crear_album',
@@ -332,7 +327,7 @@ function crearClienteTemporal(event) {
     fetch('../../php/documentos.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             action: 'crear_cliente_temporal',
@@ -345,20 +340,16 @@ function crearClienteTemporal(event) {
         hideLoadingModal();
         
         if (data.success) {
-            // Mostrar credenciales
             document.getElementById('usuarioGenerado').textContent = data.usuario;
             document.getElementById('contrasenaGenerada').textContent = data.contrasena;
             document.getElementById('credencialesPreview').style.display = 'block';
             
-            // Guardar para copiar
             window.credencialesTemp = {
                 usuario: data.usuario,
                 contrasena: data.contrasena
             };
             
-            // Recargar lista de clientes
             cargarClientes();
-            
             alert('Cliente temporal creado correctamente');
         } else {
             alert('Error: ' + data.message);
@@ -377,7 +368,7 @@ function crearClienteTemporal(event) {
 function copiarCredenciales() {
     if (!window.credencialesTemp) return;
     
-    const texto = `Usuario: ${window.credencialesTemp.usuario}\nContraseña: ${window.credencialesTemp.contrasena}`;
+    const texto = 'Usuario: ' + window.credencialesTemp.usuario + '\nContraseña: ' + window.credencialesTemp.contrasena;
     
     navigator.clipboard.writeText(texto).then(() => {
         alert('Credenciales copiadas al portapapeles');
@@ -391,7 +382,7 @@ function copiarCredenciales() {
 // CERRAR ÁLBUM
 // ========================================
 function confirmarCerrarAlbum(idAlbum, titulo) {
-    if (!confirm(`¿Estás seguro de cerrar el álbum "${titulo}"?\n\nEl cliente ya no podrá descargar más fotos.`)) {
+    if (!confirm('¿Estás seguro de cerrar el álbum "' + titulo + '"?\n\nEl cliente ya no podrá descargar más fotos.')) {
         return;
     }
     
@@ -400,7 +391,7 @@ function confirmarCerrarAlbum(idAlbum, titulo) {
     fetch('../../php/documentos.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             action: 'cerrar_album',
@@ -429,8 +420,167 @@ function confirmarCerrarAlbum(idAlbum, titulo) {
 // VER FOTOS DEL ÁLBUM
 // ========================================
 function verFotosAlbum(idAlbum) {
-    // Esta función se completará en la siguiente fase
-    alert('Función en desarrollo: Ver fotos del álbum #' + idAlbum);
+    const album = albumsData.find(a => a.ID_Album === idAlbum);
+    
+    if (!album) {
+        alert('Álbum no encontrado');
+        return;
+    }
+    
+    document.getElementById('tituloAlbumFotos').textContent = album.Titulo;
+    document.getElementById('modalVerFotos').classList.add('active');
+    
+    cargarFotosAlbum(idAlbum);
+}
+
+function closeModalVerFotos() {
+    document.getElementById('modalVerFotos').classList.remove('active');
+}
+
+// ========================================
+// CARGAR FOTOS DEL ÁLBUM
+// ========================================
+function cargarFotosAlbum(idAlbum) {
+    const galeria = document.getElementById('galeriaPreviews');
+    galeria.innerHTML = '<div class="loading-card"><div class="spinner"></div><p>Cargando fotos...</p></div>';
+    
+    fetch('../../php/documentos.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'obtener_fotos_album',
+            idAlbum: idAlbum
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarGaleriaFotos(data.fotos);
+            document.getElementById('totalFotosAlbum').textContent = data.fotos.length;
+        } else {
+            galeria.innerHTML = '<div class="loading-card"><p>Error al cargar fotos</p></div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        galeria.innerHTML = '<div class="loading-card"><p>Error de conexión</p></div>';
+    });
+}
+
+// ========================================
+// MOSTRAR GALERÍA DE FOTOS
+// ========================================
+function mostrarGaleriaFotos(fotos) {
+    const galeria = document.getElementById('galeriaPreviews');
+    galeria.innerHTML = '';
+    
+    if (fotos.length === 0) {
+        galeria.innerHTML = '<div class="loading-card"><p>No hay fotos en este álbum</p></div>';
+        return;
+    }
+    
+    fotos.forEach(foto => {
+        const card = document.createElement('div');
+        card.className = 'preview-card';
+        
+        const rutaImagen = foto.RutaArchivo.replace('../', '../../');
+        const nombreEscapado = foto.NombreArchivo.replace(/'/g, "\\'");
+        
+        card.innerHTML = `
+            <div class="preview-imagen">
+                <img src="${rutaImagen}" alt="${foto.NombreArchivo}" onclick="abrirImagenFullscreen('${rutaImagen}')">
+            </div>
+            <div class="preview-info">
+                <div class="preview-nombre" title="${foto.NombreArchivo}">${foto.NombreArchivo}</div>
+                <div class="preview-detalles">
+                    <span>${formatearTamano(foto.TamanoBytes)}</span>
+                    ${foto.Descargada == 1 ? '<span class="preview-descargada">Descargada</span>' : ''}
+                </div>
+            </div>
+            <div class="preview-actions">
+                <button class="btn-preview-action" onclick="descargarFoto('${rutaImagen}', '${nombreEscapado}')" title="Descargar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Descargar
+                </button>
+                <button class="btn-preview-action btn-preview-delete" onclick="eliminarFotoAlbum(${foto.ID_Foto}, '${nombreEscapado}')" title="Eliminar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        galeria.appendChild(card);
+    });
+}
+
+// ========================================
+// ABRIR IMAGEN EN PANTALLA COMPLETA
+// ========================================
+function abrirImagenFullscreen(ruta) {
+    window.open(ruta, '_blank');
+}
+
+// ========================================
+// DESCARGAR FOTO (ADMIN)
+// ========================================
+function descargarFoto(ruta, nombre) {
+    const link = document.createElement('a');
+    link.href = ruta;
+    link.download = nombre;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ========================================
+// ELIMINAR FOTO DEL ÁLBUM
+// ========================================
+function eliminarFotoAlbum(idFoto, nombreFoto) {
+    if (!confirm('¿Estás seguro de eliminar la foto "' + nombreFoto + '"?\n\nEsta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    showLoadingModal();
+    
+    fetch('../../php/documentos.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'eliminar_foto',
+            idFoto: idFoto
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            alert('Foto eliminada correctamente');
+            const tituloActual = document.getElementById('tituloAlbumFotos').textContent;
+            const album = albumsData.find(a => a.Titulo === tituloActual);
+            if (album) {
+                cargarFotosAlbum(album.ID_Album);
+            }
+            cargarAlbums();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        hideLoadingModal();
+        console.error('Error:', error);
+        alert('Error de conexión.');
+    });
 }
 
 // ========================================
@@ -442,7 +592,6 @@ function abrirSubirFotos(idAlbum, titulo) {
     document.getElementById('tituloAlbumActual').textContent = titulo;
     document.getElementById('modalSubirFotos').classList.add('active');
     
-    // Configurar dropzone
     configurarDropzone();
 }
 
@@ -459,10 +608,8 @@ function configurarDropzone() {
     const dropzone = document.getElementById('dropzone');
     const inputFotos = document.getElementById('inputFotos');
     
-    // Click para seleccionar archivos
     dropzone.onclick = () => inputFotos.click();
     
-    // Drag & Drop
     dropzone.ondragover = (e) => {
         e.preventDefault();
         dropzone.classList.add('dragover');
@@ -479,7 +626,6 @@ function configurarDropzone() {
         procesarArchivos(archivos);
     };
     
-    // Input change
     inputFotos.onchange = (e) => {
         procesarArchivos(e.target.files);
     };
@@ -492,15 +638,13 @@ function procesarArchivos(archivos) {
     for (let i = 0; i < archivos.length; i++) {
         const archivo = archivos[i];
         
-        // Validar que sea imagen
         if (!archivo.type.startsWith('image/')) {
-            alert(`${archivo.name} no es una imagen válida`);
+            alert(archivo.name + ' no es una imagen válida');
             continue;
         }
         
-        // Validar tamaño (máx 10MB)
         if (archivo.size > 10 * 1024 * 1024) {
-            alert(`${archivo.name} supera el tamaño máximo de 10MB`);
+            alert(archivo.name + ' supera el tamaño máximo de 10MB');
             continue;
         }
         
@@ -521,7 +665,6 @@ function mostrarListaFotos() {
         const item = document.createElement('div');
         item.className = 'foto-item';
         
-        // Crear preview
         const reader = new FileReader();
         reader.onload = (e) => {
             item.innerHTML = `
@@ -561,9 +704,77 @@ function subirFotos() {
         return;
     }
     
-    // Esta funcionalidad se completará en la siguiente fase
-    // con el upload.php
-    alert('Función en desarrollo: Subir ' + fotosSeleccionadas.length + ' fotos');
+    const idAlbum = document.getElementById('idAlbumActual').value;
+    
+    if (!idAlbum) {
+        alert('Error: No se encontró el ID del álbum');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('idAlbum', idAlbum);
+    
+    fotosSeleccionadas.forEach((foto) => {
+        formData.append('fotos[]', foto);
+    });
+    
+    showLoadingModal();
+    
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+            const porcentaje = Math.round((e.loaded / e.total) * 100);
+            actualizarProgresoSubida(porcentaje);
+        }
+    });
+    
+    xhr.addEventListener('load', function() {
+        hideLoadingModal();
+        
+        if (xhr.status === 200) {
+            try {
+                const response = JSON.parse(xhr.responseText);
+                
+                if (response.success) {
+                    let mensaje = response.message;
+                    
+                    if (response.errores && response.errores.length > 0) {
+                        mensaje += '\n\nErrores:\n' + response.errores.join('\n');
+                    }
+                    
+                    alert(mensaje);
+                    closeModalSubirFotos();
+                    cargarAlbums();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            } catch (e) {
+                console.error('Error al parsear respuesta:', e);
+                alert('Error al procesar la respuesta del servidor');
+            }
+        } else {
+            alert('Error del servidor: ' + xhr.status);
+        }
+    });
+    
+    xhr.addEventListener('error', function() {
+        hideLoadingModal();
+        alert('Error de conexión. Verifica que XAMPP esté activo.');
+    });
+    
+    xhr.open('POST', '../../php/upload_fotos.php', true);
+    xhr.send(formData);
+}
+
+// ========================================
+// ACTUALIZAR PROGRESO DE SUBIDA
+// ========================================
+function actualizarProgresoSubida(porcentaje) {
+    const loadingContent = document.querySelector('.loading-content p');
+    if (loadingContent) {
+        loadingContent.textContent = 'Subiendo fotos... ' + porcentaje + '%';
+    }
 }
 
 // ========================================
@@ -574,7 +785,7 @@ function formatearFecha(fecha) {
     const dia = String(date.getDate()).padStart(2, '0');
     const mes = String(date.getMonth() + 1).padStart(2, '0');
     const anio = date.getFullYear();
-    return `${dia}/${mes}/${anio}`;
+    return dia + '/' + mes + '/' + anio;
 }
 
 function formatearTamano(bytes) {
@@ -595,7 +806,6 @@ function mostrarError(mensaje) {
     alert(mensaje);
 }
 
-// Cerrar modales al hacer clic fuera
 window.onclick = function(event) {
     const modales = document.querySelectorAll('.modal');
     modales.forEach(modal => {

@@ -93,32 +93,36 @@
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <form id="formVendedor" onsubmit="guardarVendedor(event)">
-                <input type="hidden" id="vendedorId" name="vendedorId">
-                
-                <div class="form-group">
-                    <label for="nombreCompleto">Nombre Completo *</label>
-                    <input type="text" id="nombreCompleto" name="nombreCompleto" required>
-                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vendedorId" name="vendedorId">
+                    
+                    <div class="form-group">
+                        <label for="nombreCompleto">Nombre Completo *</label>
+                        <input type="text" id="nombreCompleto" name="nombreCompleto" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="correo">Correo *</label>
-                    <input type="email" id="correo" name="correo" required>
-                </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="correo">Correo *</label>
+                            <input type="email" id="correo" name="correo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="grupoGrado">Grupo/Grado</label>
+                            <input type="text" id="grupoGrado" name="grupoGrado" placeholder="Ej: Equipo A">
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="grupoGrado">Grupo/Grado</label>
-                    <input type="text" id="grupoGrado" name="grupoGrado" placeholder="Ej: Equipo A">
-                </div>
-
-                <div class="form-group">
-                    <label for="lugarTrabajo">Lugar de Trabajo</label>
-                    <input type="text" id="lugarTrabajo" name="lugarTrabajo" placeholder="Ej: Sucursal Centro">
-                </div>
-
-                <div class="form-group">
-                    <label for="contrasena">Contraseña <span id="requiredStar">*</span></label>
-                    <input type="password" id="contrasena" name="contrasena" required>
-                    <small id="passwordHelp">Mínimo 6 caracteres</small>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lugarTrabajo">Lugar de Trabajo</label>
+                            <input type="text" id="lugarTrabajo" name="lugarTrabajo" placeholder="Ej: Sucursal Centro">
+                        </div>
+                        <div class="form-group">
+                            <label for="contrasena">Contraseña <span id="requiredStar" aria-hidden="true">*</span></label>
+                            <input type="password" id="contrasena" name="contrasena" required minlength="6">
+                            <small id="passwordHelp">Mínimo 6 caracteres</small>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -156,7 +160,7 @@
             </div>
             <div class="modal-body" role="main">
                 <!-- Resumen de estadísticas -->
-                <div class="stats-summary" role="group" aria-label="Resumen de estadísticas">
+                <div class="stats-grid-modal" role="group" aria-label="Resumen de estadísticas">
                     <div class="stat-item">
                         <p class="stat-label" id="labelVentas">Ventas Totales</p>
                         <h3 class="stat-value" id="statVentas" aria-labelledby="labelVentas">$0.00</h3>
@@ -204,9 +208,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL DE CARGA -->
     <div id="loadingModal" class="loading-modal">

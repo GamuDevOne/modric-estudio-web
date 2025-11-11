@@ -610,3 +610,84 @@
         margin: 20px;
     }
 }
+
+/* ========================================
+   ESTADO DE VENTAS (COMPLEMENTO PARA MODAL)
+======================================== */
+.sales-status-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.sales-status-section h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas para los 4 estados */
+    gap: 15px;
+}
+
+/* Estilo para cada tarjeta de estado */
+.status-item {
+    background-color: #fff; /* Fondo blanco para diferenciar del modal body */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilo para la etiqueta (Pendientes, En Proceso, etc.) */
+.status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+/* Colores específicos para cada estado (badges) */
+.status-badge.pendiente {
+    background-color: #ff980020; /* Naranja claro */
+    color: #ff9800;
+}
+
+.status-badge.proceso {
+    background-color: #2196f320; /* Azul claro */
+    color: #2196f3;
+}
+
+.status-badge.completado {
+    background-color: #4caf5020; /* Verde claro */
+    color: #4caf50;
+}
+
+.status-badge.cancelado {
+    background-color: #f4433620; /* Rojo claro */
+    color: #f44336;
+}
+
+/* Estilo para el contador numérico */
+.status-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+/* Responsive para la cuadrícula de estado */
+@media (max-width: 768px) {
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil */
+    }
+}

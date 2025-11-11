@@ -69,6 +69,10 @@ try {
                 obtenerClientes($pdo);
                 break;
 
+            case 'subir_fotos':
+                subirFotos($pdo, $input);
+                break;
+            
             case 'eliminar_foto':
                 eliminarFoto($pdo, $input);
                 break;
@@ -76,6 +80,9 @@ try {
             default:
                 echo json_encode(['success' => false, 'message' => 'Acción no válida']);
         }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
+        // Para subida de archivos con FormData
+        handleFileUpload($pdo);
     }
     
 } catch (PDOException $e) {
@@ -459,42 +466,11 @@ function obtenerClientes($pdo) {
 }
 
 // ========================================
-// ELIMINAR FOTO
+// SUBIR ARCHIVOS (FormData)
 // ========================================
-function eliminarFoto($pdo, $data) {
-    try {
-        if (empty($data['idFoto'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de foto requerido']);
-            return;
-        }
-        
-        // Obtener ruta del archivo antes de eliminar
-        $stmt = $pdo->prepare("SELECT RutaArchivo FROM FotoAlbum WHERE ID_Foto = :idFoto");
-        $stmt->execute([':idFoto' => $data['idFoto']]);
-        $foto = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$foto) {
-            echo json_encode(['success' => false, 'message' => 'Foto no encontrada']);
-            return;
-        }
-        
-        // Eliminar archivo físico
-        if (file_exists($foto['RutaArchivo'])) {
-            unlink($foto['RutaArchivo']);
-        }
-        
-        // Eliminar registro de BD (los logs se eliminan en cascada)
-        $stmt = $pdo->prepare("DELETE FROM FotoAlbum WHERE ID_Foto = :idFoto");
-        $stmt->execute([':idFoto' => $data['idFoto']]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Foto eliminada correctamente'
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
+function handleFileUpload($pdo) {
+    // Esta función se completará en la siguiente fase
+    // con el manejo de subida de archivos
+    echo json_encode(['success' => false, 'message' => 'Función en desarrollo']);
 }
-
 ?>

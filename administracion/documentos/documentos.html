@@ -223,6 +223,30 @@
         </div>
     </div>
 
+    <!-- MODAL: VER FOTOS DEL ÁLBUM -->
+    <div id="modalVerFotos" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Fotos - <span id="tituloAlbumFotos"></span></h2>
+                <button class="modal-close" onclick="closeModalVerFotos()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="fotos-info-bar">
+                    <span>Total de fotos: <strong id="totalFotosAlbum">0</strong></span>
+                </div>
+                <div id="galeriaPreviews" class="galeria-previews">
+                    <div class="loading-card">
+                        <div class="spinner"></div>
+                        <p>Cargando fotos...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalVerFotos()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CARGA -->
     <div id="loadingModal" class="loading-modal">
         <div class="loading-content">
