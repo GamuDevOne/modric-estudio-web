@@ -291,10 +291,17 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .modal.active {
     display: flex;
+}
+
+/* Bloquear scroll del body cuando modal está activo */
+body.modal-open {
+    overflow: hidden;
+    padding-right: 15px; /* Compensar barra de scroll */
 }
 
 .modal-content {
@@ -652,6 +659,30 @@
     margin-bottom: 20px;
     font-size: 14px;
     color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-download-all {
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.btn-download-all:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .galeria-previews {

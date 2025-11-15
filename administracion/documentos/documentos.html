@@ -223,6 +223,45 @@
         </div>
     </div>
 
+    <!-- MODAL: EDITAR ÁLBUM -->
+    <div id="modalEditarAlbum" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Álbum</h2>
+                <button class="modal-close" onclick="closeModalEditarAlbum()">&times;</button>
+            </div>
+            <form id="formEditarAlbum" onsubmit="guardarEdicionAlbum(event)">
+                <input type="hidden" id="editAlbumId" name="editAlbumId">
+                
+                <div class="modal-body">
+                    <!-- Título del Álbum -->
+                    <div class="form-group">
+                        <label for="editTituloAlbum">Título del Álbum *</label>
+                        <input type="text" id="editTituloAlbum" required>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group">
+                        <label for="editDescripcionAlbum">Descripción</label>
+                        <textarea id="editDescripcionAlbum" rows="3"></textarea>
+                    </div>
+
+                    <!-- Fecha de Caducidad -->
+                    <div class="form-group">
+                        <label for="editFechaCaducidad">Fecha de Caducidad *</label>
+                        <input type="datetime-local" id="editFechaCaducidad" required>
+                        <small>Después de esta fecha, el cliente no podrá descargar las fotos</small>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModalEditarAlbum()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: VER FOTOS DEL ÁLBUM -->
     <div id="modalVerFotos" class="modal">
         <div class="modal-content modal-large">
@@ -233,6 +272,14 @@
             <div class="modal-body">
                 <div class="fotos-info-bar">
                     <span>Total de fotos: <strong id="totalFotosAlbum">0</strong></span>
+                    <button class="btn-download-all" onclick="descargarTodasLasFotos()" title="Descargar todas las fotos como ZIP">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Descargar todas (ZIP)
+                    </button>
                 </div>
                 <div id="galeriaPreviews" class="galeria-previews">
                     <div class="loading-card">

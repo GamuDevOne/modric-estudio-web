@@ -210,6 +210,13 @@ function crearAlbumCard(album) {
                 </button>
                 
                 ${album.Estado === 'Activo' ? `
+                    <button class="btn-icon" title="Editar álbum" onclick="abrirEditarAlbum(${album.ID_Album})">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    
                     <button class="btn-icon" title="Cerrar álbum" onclick="confirmarCerrarAlbum(${album.ID_Album}, '${tituloEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -249,11 +256,13 @@ function filtrarAlbums() {
 // ========================================
 function openModalCrearAlbum() {
     document.getElementById('modalCrearAlbum').classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 function closeModalCrearAlbum() {
     document.getElementById('modalCrearAlbum').classList.remove('active');
     document.getElementById('formCrearAlbum').reset();
+    document.body.classList.remove('modal-open');
 }
 
 function crearAlbum(event) {
@@ -308,12 +317,14 @@ function crearAlbum(event) {
 // ========================================
 function openModalCrearCliente() {
     document.getElementById('modalCrearCliente').classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 function closeModalCrearCliente() {
     document.getElementById('modalCrearCliente').classList.remove('active');
     document.getElementById('formCrearCliente').reset();
     document.getElementById('credencialesPreview').style.display = 'none';
+    document.body.classList.remove('modal-open');
 }
 
 function crearClienteTemporal(event) {
@@ -417,24 +428,110 @@ function confirmarCerrarAlbum(idAlbum, titulo) {
 }
 
 // ========================================
-// VER FOTOS DEL ÁLBUM
+// EDITAR ÁLBUM
 // ========================================
-function verFotosAlbum(idAlbum) {
-    const album = albumsData.find(a => a.ID_Album === idAlbum);
+function abrirEditarAlbum(idAlbum) {
+    const album = albumsData.find(a => parseInt(a.ID_Album) === parseInt(idAlbum));
     
     if (!album) {
         alert('Álbum no encontrado');
         return;
     }
     
+    // Llenar formulario
+    document.getElementById('editAlbumId').value = album.ID_Album;
+    document.getElementById('editTituloAlbum').value = album.Titulo;
+    document.getElementById('editDescripcionAlbum').value = album.Descripcion || '';
+    
+    // Convertir fecha para input datetime-local
+    const fecha = new Date(album.FechaCaducidad);
+    const fechaLocal = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    document.getElementById('editFechaCaducidad').value = fechaLocal;
+    
+    document.getElementById('modalEditarAlbum').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeModalEditarAlbum() {
+    document.getElementById('modalEditarAlbum').classList.remove('active');
+    document.getElementById('formEditarAlbum').reset();
+    document.body.classList.remove('modal-open');
+}
+
+function guardarEdicionAlbum(event) {
+    event.preventDefault();
+    
+    const idAlbum = document.getElementById('editAlbumId').value;
+    const titulo = document.getElementById('editTituloAlbum').value;
+    const descripcion = document.getElementById('editDescripcionAlbum').value;
+    const fechaCaducidad = document.getElementById('editFechaCaducidad').value;
+    
+    // Convertir datetime-local a formato MySQL
+    const fecha = new Date(fechaCaducidad);
+    const fechaMySQL = fecha.getFullYear() + '-' + 
+                       String(fecha.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(fecha.getDate()).padStart(2, '0') + ' ' +
+                       String(fecha.getHours()).padStart(2, '0') + ':' + 
+                       String(fecha.getMinutes()).padStart(2, '0') + ':00';
+    
+    showLoadingModal();
+    
+    fetch('../../php/documentos.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'editar_album',
+            idAlbum: idAlbum,
+            titulo: titulo,
+            descripcion: descripcion,
+            fechaCaducidad: fechaMySQL
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            alert('Álbum actualizado correctamente');
+            closeModalEditarAlbum();
+            cargarAlbums();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        hideLoadingModal();
+        console.error('Error:', error);
+        alert('Error de conexión. Intenta nuevamente.');
+    });
+}
+
+// ========================================
+// VER FOTOS DEL ÁLBUM
+// ========================================
+function verFotosAlbum(idAlbum) {
+    // Convertir a número para comparación
+    const album = albumsData.find(a => parseInt(a.ID_Album) === parseInt(idAlbum));
+    
+    if (!album) {
+        console.error('Álbum no encontrado. ID buscado:', idAlbum);
+        console.log('Álbumes disponibles:', albumsData);
+        alert('Álbum no encontrado');
+        return;
+    }
+    
     document.getElementById('tituloAlbumFotos').textContent = album.Titulo;
     document.getElementById('modalVerFotos').classList.add('active');
+    document.body.classList.add('modal-open');
     
     cargarFotosAlbum(idAlbum);
 }
 
 function closeModalVerFotos() {
     document.getElementById('modalVerFotos').classList.remove('active');
+    document.body.classList.remove('modal-open');
 }
 
 // ========================================
@@ -541,6 +638,33 @@ function descargarFoto(ruta, nombre) {
 }
 
 // ========================================
+// DESCARGAR TODAS LAS FOTOS (ZIP)
+// ========================================
+function descargarTodasLasFotos() {
+    const tituloActual = document.getElementById('tituloAlbumFotos').textContent;
+    const album = albumsData.find(a => a.Titulo === tituloActual);
+    
+    if (!album) {
+        alert('No se pudo identificar el álbum');
+        return;
+    }
+    
+    const totalFotos = parseInt(document.getElementById('totalFotosAlbum').textContent);
+    
+    if (totalFotos === 0) {
+        alert('No hay fotos para descargar');
+        return;
+    }
+    
+    if (!confirm('¿Descargar ' + totalFotos + ' fotos como archivo ZIP?')) {
+        return;
+    }
+    
+    // Abrir URL de descarga
+    window.location.href = '../../php/download_album_zip.php?idAlbum=' + album.ID_Album;
+}
+
+// ========================================
 // ELIMINAR FOTO DEL ÁLBUM
 // ========================================
 function eliminarFotoAlbum(idFoto, nombreFoto) {
@@ -591,6 +715,7 @@ function abrirSubirFotos(idAlbum, titulo) {
     document.getElementById('idAlbumActual').value = idAlbum;
     document.getElementById('tituloAlbumActual').textContent = titulo;
     document.getElementById('modalSubirFotos').classList.add('active');
+    document.body.classList.add('modal-open');
     
     configurarDropzone();
 }
@@ -599,6 +724,7 @@ function closeModalSubirFotos() {
     document.getElementById('modalSubirFotos').classList.remove('active');
     fotosSeleccionadas = [];
     document.getElementById('listaFotos').innerHTML = '';
+    document.body.classList.remove('modal-open');
 }
 
 // ========================================
@@ -745,12 +871,15 @@ function subirFotos() {
                     
                     alert(mensaje);
                     closeModalSubirFotos();
+                    
+                    // Recargar álbumes para actualizar el contador
                     cargarAlbums();
                 } else {
                     alert('Error: ' + response.message);
                 }
             } catch (e) {
                 console.error('Error al parsear respuesta:', e);
+                console.log('Respuesta recibida:', xhr.responseText);
                 alert('Error al procesar la respuesta del servidor');
             }
         } else {
@@ -811,6 +940,7 @@ window.onclick = function(event) {
     modales.forEach(modal => {
         if (event.target === modal) {
             modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
         }
     });
 };

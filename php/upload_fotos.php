@@ -1,5 +1,5 @@
 <?php
-// php/documentos.php
+// php/upload_fotos.php
 
 // Configuración de la base de datos
 $host = 'localhost';
@@ -7,470 +7,188 @@ $dbname = 'ModricEstudio00';
 $username = 'root';
 $password = '';
 
-// Headers para permitir CORS y JSON
+// Headers para permitir CORS
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET');
+header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Manejar preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+// Configuración de subida
+define('UPLOAD_DIR', '../uploads/clientes/');
+define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
+define('ALLOWED_TYPES', ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']);
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Determinar acción
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $action = $input['action'] ?? '';
-        
-        switch ($action) {
-            case 'crear_album':
-                crearAlbum($pdo, $input);
-                break;
-            
-            case 'obtener_albums':
-                obtenerAlbums($pdo);
-                break;
-            
-            case 'obtener_albums_cliente':
-                obtenerAlbumsCliente($pdo, $input);
-                break;
-            
-            case 'cerrar_album':
-                cerrarAlbum($pdo, $input);
-                break;
-            
-            case 'editar_album':
-                editarAlbum($pdo, $input);
-                break;
-            
-            case 'eliminar_album':
-                eliminarAlbum($pdo, $input);
-                break;
-            
-            case 'obtener_fotos_album':
-                obtenerFotosAlbum($pdo, $input);
-                break;
-            
-            case 'registrar_descarga':
-                registrarDescarga($pdo, $input);
-                break;
-            
-            case 'crear_cliente_temporal':
-                crearClienteTemporal($pdo, $input);
-                break;
-            
-            case 'obtener_clientes':
-                obtenerClientes($pdo);
-                break;
-
-            case 'subir_fotos':
-                subirFotos($pdo, $input);
-                break;
-            
-            case 'eliminar_foto':
-                eliminarFoto($pdo, $input);
-                break;
-            
-            default:
-                echo json_encode(['success' => false, 'message' => 'Acción no válida']);
-        }
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
-        // Para subida de archivos con FormData
-        handleFileUpload($pdo);
+    // Verificar que sea una petición POST con archivos
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new Exception('Método no permitido');
     }
     
-} catch (PDOException $e) {
+    if (!isset($_POST['idAlbum']) || empty($_POST['idAlbum'])) {
+        throw new Exception('ID de álbum no proporcionado');
+    }
+    
+    $idAlbum = intval($_POST['idAlbum']);
+    
+    // Verificar que el álbum existe y está activo
+    $stmt = $pdo->prepare("
+        SELECT a.ID_Album, a.ID_Cliente, a.Estado, u.ID_Usuario
+        FROM AlbumCliente a
+        INNER JOIN Usuario u ON a.ID_Cliente = u.ID_Usuario
+        WHERE a.ID_Album = :idAlbum
+    ");
+    $stmt->execute([':idAlbum' => $idAlbum]);
+    $album = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$album) {
+        throw new Exception('Álbum no encontrado');
+    }
+    
+    if ($album['Estado'] !== 'Activo') {
+        throw new Exception('El álbum no está activo');
+    }
+    
+    // Verificar que se enviaron archivos
+    if (!isset($_FILES['fotos']) || empty($_FILES['fotos']['name'][0])) {
+        throw new Exception('No se recibieron archivos');
+    }
+    
+    // Crear directorio si no existe
+    $clienteDir = UPLOAD_DIR . $album['ID_Cliente'] . '/';
+    if (!is_dir($clienteDir)) {
+        mkdir($clienteDir, 0755, true);
+    }
+    
+    $albumDir = $clienteDir . 'album_' . $idAlbum . '/';
+    if (!is_dir($albumDir)) {
+        mkdir($albumDir, 0755, true);
+    }
+    
+    // Procesar cada archivo
+    $fotosSubidas = [];
+    $errores = [];
+    
+    $totalArchivos = count($_FILES['fotos']['name']);
+    
+    for ($i = 0; $i < $totalArchivos; $i++) {
+        $archivo = [
+            'name' => $_FILES['fotos']['name'][$i],
+            'type' => $_FILES['fotos']['type'][$i],
+            'tmp_name' => $_FILES['fotos']['tmp_name'][$i],
+            'error' => $_FILES['fotos']['error'][$i],
+            'size' => $_FILES['fotos']['size'][$i]
+        ];
+        
+        // Validar archivo
+        $validacion = validarArchivo($archivo);
+        if ($validacion !== true) {
+            $errores[] = $archivo['name'] . ': ' . $validacion;
+            continue;
+        }
+        
+        // Generar nombre único
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        $nombreUnico = uniqid('foto_', true) . '.' . $extension;
+        $rutaDestino = $albumDir . $nombreUnico;
+        
+        // Mover archivo
+        if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
+            // Guardar en base de datos
+            try {
+                $stmt = $pdo->prepare("
+                    INSERT INTO FotoAlbum (
+                        ID_Album, 
+                        NombreArchivo, 
+                        RutaArchivo, 
+                        TamanoBytes
+                    ) VALUES (
+                        :idAlbum,
+                        :nombreArchivo,
+                        :rutaArchivo,
+                        :tamanoBytes
+                    )
+                ");
+                
+                $stmt->execute([
+                    ':idAlbum' => $idAlbum,
+                    ':nombreArchivo' => $archivo['name'],
+                    ':rutaArchivo' => $rutaDestino,
+                    ':tamanoBytes' => $archivo['size']
+                ]);
+                
+                $fotosSubidas[] = [
+                    'id' => $pdo->lastInsertId(),
+                    'nombre' => $archivo['name'],
+                    'nombreUnico' => $nombreUnico,
+                    'tamano' => $archivo['size']
+                ];
+                
+            } catch (PDOException $e) {
+                // Si falla la BD, eliminar archivo
+                unlink($rutaDestino);
+                $errores[] = $archivo['name'] . ': Error al guardar en BD';
+            }
+        } else {
+            $errores[] = $archivo['name'] . ': Error al mover archivo';
+        }
+    }
+    
+    // Respuesta
+    $response = [
+        'success' => true,
+        'fotosSubidas' => count($fotosSubidas),
+        'fotos' => $fotosSubidas,
+        'errores' => $errores
+    ];
+    
+    if (count($errores) > 0) {
+        $response['message'] = count($fotosSubidas) . ' fotos subidas correctamente. ' . count($errores) . ' errores.';
+    } else {
+        $response['message'] = 'Todas las fotos se subieron correctamente';
+    }
+    
+    echo json_encode($response);
+    
+} catch (Exception $e) {
+    http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => 'Error de conexión: ' . $e->getMessage()
+        'message' => $e->getMessage()
     ]);
 }
 
 // ========================================
-// CREAR ÁLBUM
+// FUNCIÓN: VALIDAR ARCHIVO
 // ========================================
-function crearAlbum($pdo, $data) {
-    try {
-        if (empty($data['idCliente']) || empty($data['titulo']) || empty($data['diasCaducidad'])) {
-            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
-            return;
-        }
-        
-        // Calcular fecha de caducidad
-        $fechaCaducidad = date('Y-m-d H:i:s', strtotime("+{$data['diasCaducidad']} days"));
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO AlbumCliente (ID_Cliente, Titulo, Descripcion, FechaCaducidad, Estado)
-            VALUES (:idCliente, :titulo, :descripcion, :fechaCaducidad, 'Activo')
-        ");
-        
-        $stmt->execute([
-            ':idCliente' => $data['idCliente'],
-            ':titulo' => $data['titulo'],
-            ':descripcion' => $data['descripcion'] ?? '',
-            ':fechaCaducidad' => $fechaCaducidad
-        ]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Álbum creado correctamente',
-            'idAlbum' => $pdo->lastInsertId()
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+function validarArchivo($archivo) {
+    // Verificar errores de subida
+    if ($archivo['error'] !== UPLOAD_ERR_OK) {
+        return 'Error al subir archivo (código: ' . $archivo['error'] . ')';
     }
-}
-
-// ========================================
-// OBTENER TODOS LOS ÁLBUMES (ADMIN)
-// ========================================
-function obtenerAlbums($pdo) {
-    try {
-        $stmt = $pdo->query("
-            SELECT 
-                a.ID_Album,
-                a.Titulo,
-                a.Descripcion,
-                a.FechaSubida,
-                a.FechaCaducidad,
-                a.Estado,
-                u.NombreCompleto as Cliente,
-                u.ID_Usuario as ID_Cliente,
-                COUNT(f.ID_Foto) as TotalFotos,
-                DATEDIFF(a.FechaCaducidad, NOW()) as DiasRestantes
-            FROM AlbumCliente a
-            INNER JOIN Usuario u ON a.ID_Cliente = u.ID_Usuario
-            LEFT JOIN FotoAlbum f ON a.ID_Album = f.ID_Album
-            GROUP BY a.ID_Album
-            ORDER BY a.FechaSubida DESC
-        ");
-        
-        $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo json_encode([
-            'success' => true,
-            'albums' => $albums
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    
+    // Verificar tamaño
+    if ($archivo['size'] > MAX_FILE_SIZE) {
+        return 'Archivo supera el tamaño máximo de 10MB';
     }
-}
-
-// ========================================
-// OBTENER ÁLBUMES DE UN CLIENTE ESPECÍFICO
-// ========================================
-function obtenerAlbumsCliente($pdo, $data) {
-    try {
-        if (empty($data['idCliente'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de cliente requerido']);
-            return;
-        }
-        
-        $stmt = $pdo->prepare("
-            SELECT 
-                a.ID_Album,
-                a.Titulo,
-                a.Descripcion,
-                a.FechaSubida,
-                a.FechaCaducidad,
-                a.Estado,
-                COUNT(f.ID_Foto) as TotalFotos,
-                DATEDIFF(a.FechaCaducidad, NOW()) as DiasRestantes
-            FROM AlbumCliente a
-            LEFT JOIN FotoAlbum f ON a.ID_Album = f.ID_Album
-            WHERE a.ID_Cliente = :idCliente
-            AND a.Estado = 'Activo'
-            GROUP BY a.ID_Album
-            ORDER BY a.FechaSubida DESC
-        ");
-        
-        $stmt->execute([':idCliente' => $data['idCliente']]);
-        $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo json_encode([
-            'success' => true,
-            'albums' => $albums
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    
+    if ($archivo['size'] === 0) {
+        return 'Archivo vacío';
     }
-}
-
-// ========================================
-// CERRAR ÁLBUM
-// ========================================
-function cerrarAlbum($pdo, $data) {
-    try {
-        if (empty($data['idAlbum'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de álbum requerido']);
-            return;
-        }
-        
-        $stmt = $pdo->prepare("
-            UPDATE AlbumCliente 
-            SET Estado = 'Cerrado'
-            WHERE ID_Album = :idAlbum
-        ");
-        
-        $stmt->execute([':idAlbum' => $data['idAlbum']]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Álbum cerrado correctamente'
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    
+    // Verificar tipo MIME
+    if (!in_array($archivo['type'], ALLOWED_TYPES)) {
+        return 'Tipo de archivo no permitido. Solo se permiten imágenes (JPG, PNG, GIF, WEBP)';
     }
-}
-
-// ========================================
-// EDITAR ÁLBUM
-// ========================================
-function editarAlbum($pdo, $data) {
-    try {
-        if (empty($data['idAlbum'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de álbum requerido']);
-            return;
-        }
-        
-        $stmt = $pdo->prepare("
-            UPDATE AlbumCliente 
-            SET Titulo = :titulo,
-                Descripcion = :descripcion,
-                FechaCaducidad = :fechaCaducidad
-            WHERE ID_Album = :idAlbum
-        ");
-        
-        $stmt->execute([
-            ':titulo' => $data['titulo'],
-            ':descripcion' => $data['descripcion'] ?? '',
-            ':fechaCaducidad' => $data['fechaCaducidad'],
-            ':idAlbum' => $data['idAlbum']
-        ]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Álbum actualizado correctamente'
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    
+    // Verificación adicional: comprobar que realmente es una imagen
+    $imageInfo = @getimagesize($archivo['tmp_name']);
+    if ($imageInfo === false) {
+        return 'El archivo no es una imagen válida';
     }
-}
-
-// ========================================
-// ELIMINAR ÁLBUM
-// ========================================
-function eliminarAlbum($pdo, $data) {
-    try {
-        if (empty($data['idAlbum'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de álbum requerido']);
-            return;
-        }
-        
-        // Obtener fotos para eliminar archivos físicos
-        $stmt = $pdo->prepare("SELECT RutaArchivo FROM FotoAlbum WHERE ID_Album = :idAlbum");
-        $stmt->execute([':idAlbum' => $data['idAlbum']]);
-        $fotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // Eliminar archivos físicos
-        foreach ($fotos as $foto) {
-            if (file_exists($foto['RutaArchivo'])) {
-                unlink($foto['RutaArchivo']);
-            }
-        }
-        
-        // Eliminar álbum (las fotos se eliminan en cascada)
-        $stmt = $pdo->prepare("DELETE FROM AlbumCliente WHERE ID_Album = :idAlbum");
-        $stmt->execute([':idAlbum' => $data['idAlbum']]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Álbum eliminado correctamente'
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
-}
-
-// ========================================
-// OBTENER FOTOS DE UN ÁLBUM
-// ========================================
-function obtenerFotosAlbum($pdo, $data) {
-    try {
-        if (empty($data['idAlbum'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de álbum requerido']);
-            return;
-        }
-        
-        $stmt = $pdo->prepare("
-            SELECT 
-                ID_Foto,
-                NombreArchivo,
-                RutaArchivo,
-                TamanoBytes,
-                FechaSubida,
-                Descargada,
-                FechaDescarga
-            FROM FotoAlbum
-            WHERE ID_Album = :idAlbum
-            ORDER BY FechaSubida DESC
-        ");
-        
-        $stmt->execute([':idAlbum' => $data['idAlbum']]);
-        $fotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo json_encode([
-            'success' => true,
-            'fotos' => $fotos
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
-}
-
-// ========================================
-// REGISTRAR DESCARGA
-// ========================================
-function registrarDescarga($pdo, $data) {
-    try {
-        if (empty($data['idFoto']) || empty($data['idCliente'])) {
-            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
-            return;
-        }
-        
-        // Actualizar estado de la foto
-        $stmt = $pdo->prepare("
-            UPDATE FotoAlbum 
-            SET Descargada = TRUE, FechaDescarga = NOW()
-            WHERE ID_Foto = :idFoto
-        ");
-        $stmt->execute([':idFoto' => $data['idFoto']]);
-        
-        // Registrar en log
-        $stmt = $pdo->prepare("
-            INSERT INTO LogDescarga (ID_Foto, ID_Cliente, IPCliente)
-            VALUES (:idFoto, :idCliente, :ip)
-        ");
-        
-        $stmt->execute([
-            ':idFoto' => $data['idFoto'],
-            ':idCliente' => $data['idCliente'],
-            ':ip' => $_SERVER['REMOTE_ADDR'] ?? null
-        ]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Descarga registrada'
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
-}
-
-// ========================================
-// CREAR CLIENTE TEMPORAL
-// ========================================
-function crearClienteTemporal($pdo, $data) {
-    try {
-        if (empty($data['nombreCompleto'])) {
-            echo json_encode(['success' => false, 'message' => 'Nombre requerido']);
-            return;
-        }
-        
-        // Generar contraseña temporal
-        $contrasenaTemporal = 'temp' . rand(1000, 9999);
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO Usuario (
-                NombreCompleto, 
-                Correo, 
-                Contrasena, 
-                TipoUsuario, 
-                EsUsuarioTemporal, 
-                ContrasenaTemporal,
-                FechaCreacionTemp
-            ) VALUES (
-                :nombre,
-                :correo,
-                :contrasena,
-                'Cliente',
-                TRUE,
-                :contrasenaTemporal,
-                NOW()
-            )
-        ");
-        
-        $correo = $data['correo'] ?? strtolower(str_replace(' ', '', $data['nombreCompleto'])) . '@temp.com';
-        
-        $stmt->execute([
-            ':nombre' => $data['nombreCompleto'],
-            ':correo' => $correo,
-            ':contrasena' => $contrasenaTemporal,
-            ':contrasenaTemporal' => $contrasenaTemporal
-        ]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Cliente temporal creado',
-            'idCliente' => $pdo->lastInsertId(),
-            'usuario' => $correo,
-            'contrasena' => $contrasenaTemporal
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
-}
-
-// ========================================
-// OBTENER CLIENTES (PARA SELECCIÓN)
-// ========================================
-function obtenerClientes($pdo) {
-    try {
-        $stmt = $pdo->query("
-            SELECT 
-                ID_Usuario,
-                NombreCompleto,
-                Correo,
-                EsUsuarioTemporal,
-                FechaCreacionTemp
-            FROM Usuario
-            WHERE TipoUsuario = 'Cliente'
-            ORDER BY EsUsuarioTemporal DESC, NombreCompleto ASC
-        ");
-        
-        $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo json_encode([
-            'success' => true,
-            'clientes' => $clientes
-        ]);
-        
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    }
-}
-
-// ========================================
-// SUBIR ARCHIVOS (FormData)
-// ========================================
-function handleFileUpload($pdo) {
-    // Esta función se completará en la siguiente fase
-    // con el manejo de subida de archivos
-    echo json_encode(['success' => false, 'message' => 'Función en desarrollo']);
+    
+    return true;
 }
 ?>
