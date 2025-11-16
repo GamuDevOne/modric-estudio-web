@@ -46,6 +46,7 @@
   max-width: 800px;
   margin: 0 auto 50px;
   background: rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   padding: 40px 20px;
   border-radius: 20px;
@@ -152,7 +153,7 @@
   }
 }
 
-/* ---------- RESPONSIVO ---------- */
+/* ---------- RESPONSIVO (tal vez se quite al testearLa vista de movil)---------- */
 @media (max-width: 800px) {
   .carnes-grid {
     flex-direction: column;
@@ -166,4 +167,103 @@
   .carnes-header h2 {
     font-size: 1.7rem;
   }
+}
+
+/* ========================================
+   RESPONSIVE - CARNÉS
+======================================== */
+
+/* TABLET (1024px y menor) */
+@media (max-width: 1024px) {
+    .carnes-section {
+        padding: 90px 30px 80px;
+    }
+    
+    .carnes-header h2 {
+        font-size: 1.9rem;
+    }
+    
+    .carnes-grid {
+        gap: 25px;
+    }
+    
+    .carne-card {
+        width: 320px;
+    }
+}
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .carnes-section {
+        padding: 80px 20px 60px;
+    }
+    
+    .carnes-header {
+        padding: 30px 15px;
+        margin-bottom: 40px;
+    }
+    
+    .carnes-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .carnes-header p {
+        font-size: 0.95rem;
+    }
+    
+    .carnes-grid {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .carne-card {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .carne-img-wrap {
+        height: 220px;
+    }
+    
+    .btn-cotizar {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .carnes-section {
+        padding: 70px 15px 50px;
+    }
+    
+    .carnes-header {
+        padding: 25px 10px;
+    }
+    
+    .carnes-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .carnes-header p {
+        font-size: 0.9rem;
+    }
+    
+    .carne-card {
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .carne-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .carne-desc {
+        font-size: 0.9rem;
+    }
+    
+    .carne-img-wrap {
+        height: 200px;
+    }
 }

@@ -21,19 +21,52 @@
 <body>
   <!-- HEADER (idéntico al de index.html) -->
   <header id="header">
+    <!-- LOGO - IZQUIERDA -->
     <div class="logo">
-      <img src="../imagenes/logo.png" alt="Modric Estudio" class="logo-img">
+        <a href="..index.html">
+            <img src="..imagenes/logo.png" alt="Modric Estudio" class="logo-img">
+        </a>
     </div>
-    <nav>
-      <ul>
-        <li><a href="../index.html">INICIO</a></li>
-        <li><a href="#biografia">CARNÉ</a></li>
-        <li><a href="../index.html#fotografias">FOTOGRAFÍAS</a></li>
-         <li><a href="../textiles/textiles.html">TEXTIL</a></li>
-        <li><a href="../index.html#contacto">CONTACTO</a></li>
-      </ul>
+
+    <!-- BOTÓN HAMBURGUESA (solo visible en móvil) -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menú">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- NAVEGACIÓN - CENTRO -->
+    <nav id="mainNav" class="main-nav">
+        <ul>
+            <li><a href="../index.html" class="active">INICIO</a></li>
+            <li><a href="../index.html#sobre-nosotros">SOBRE NOSOTROS</a></li>
+            <li><a href="../index.html#fotografias">FOTOGRAFÍAS</a></li>
+            <li><a href="../carnet/carnes.html">CARNÉS</a></li>
+            <li><a href="../textiles/text-activado.html">TEXTIL</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropdown-toggle">MÁS</a>
+                <ul class="dropdown-menu">
+                    <li><a href="../index.html#combos">Combos de graduación</a></li>
+                    <li><a href="../index.html#contacto">CONTACTO</a></li>
+                </ul>
+            </li>
+        </ul>
     </nav>
-  </header>
+
+    <!-- BOTÓN LOGIN - DERECHA -->
+    <div class="login-btn">
+        <button onclick="toggleLoginMenu()" class="login-icon-btn" aria-label="Abrir menú de usuario" title="Abrir menú de usuario" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </button>
+        
+        <div id="loginMenu" class="login-menu">
+            <a href="./login/login.html">Iniciar Sesión</a>
+        </div>
+    </div>
+</header>
   
 
 

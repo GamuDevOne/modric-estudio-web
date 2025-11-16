@@ -384,12 +384,26 @@ function crearClienteTemporal($pdo, $data) {
             return;
         }
         
+        // Generar usuario temporal único
+        $nombreLimpio = strtolower(str_replace(' ', '', $data['nombreCompleto']));
+        $usuarioTemporal = $nombreLimpio . rand(100, 999);
+        
+        // Verificar que el usuario no exista
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Usuario = :usuario");
+        $stmt->execute([':usuario' => $usuarioTemporal]);
+        
+        while ($stmt->fetch()) {
+            $usuarioTemporal = $nombreLimpio . rand(100, 999);
+            $stmt->execute([':usuario' => $usuarioTemporal]);
+        }
+        
         // Generar contraseña temporal
         $contrasenaTemporal = 'temp' . rand(1000, 9999);
         
         $stmt = $pdo->prepare("
             INSERT INTO Usuario (
                 NombreCompleto, 
+                Usuario,
                 Correo, 
                 Contrasena, 
                 TipoUsuario, 
@@ -398,6 +412,7 @@ function crearClienteTemporal($pdo, $data) {
                 FechaCreacionTemp
             ) VALUES (
                 :nombre,
+                :usuario,
                 :correo,
                 :contrasena,
                 'Cliente',
@@ -407,10 +422,11 @@ function crearClienteTemporal($pdo, $data) {
             )
         ");
         
-        $correo = $data['correo'] ?? strtolower(str_replace(' ', '', $data['nombreCompleto'])) . '@temp.com';
+        $correo = $data['correo'] ?? $usuarioTemporal . '@temp.com';
         
         $stmt->execute([
             ':nombre' => $data['nombreCompleto'],
+            ':usuario' => $usuarioTemporal,
             ':correo' => $correo,
             ':contrasena' => $contrasenaTemporal,
             ':contrasenaTemporal' => $contrasenaTemporal
@@ -420,7 +436,7 @@ function crearClienteTemporal($pdo, $data) {
             'success' => true,
             'message' => 'Cliente temporal creado',
             'idCliente' => $pdo->lastInsertId(),
-            'usuario' => $correo,
+            'usuario' => $usuarioTemporal,
             'contrasena' => $contrasenaTemporal
         ]);
         

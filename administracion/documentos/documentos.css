@@ -376,6 +376,246 @@ body.modal-open {
 }
 
 /* ========================================
+   RESPONSIVE - MODALES (SERAN COMUNES)
+   estaran agregadas a cada archivo con modalesss.
+======================================== */
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .modal {
+        padding: 15px;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    
+    .modal-content {
+        width: 100%;
+        max-height: 90vh;
+        margin: 0;
+    }
+    
+    .modal-content.modal-small {
+        max-width: 100%;
+    }
+    
+    .modal-content.modal-large {
+        max-width: 100%;
+    }
+    
+    .modal-header {
+        padding: 20px 15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 20px;
+    }
+    
+    .modal-close {
+        font-size: 28px;
+    }
+    
+    .modal-body {
+        padding: 20px 15px;
+    }
+    
+    .modal-footer {
+        padding: 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+    }
+    
+    /* Formularios en modal */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .form-group label {
+        font-size: 12px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 11px 14px;
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+    
+    .form-group small {
+        font-size: 11px;
+    }
+    
+    /* Estadísticas en modal */
+    .stats-grid-modal {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        padding: 15px;
+    }
+    
+    .stat-item .stat-label {
+        font-size: 11px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 24px;
+    }
+    
+    /* Activity section en modal */
+    .activity-section {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+    
+    .activity-section h3 {
+        font-size: 16px;
+    }
+    
+    .activity-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .activity-item {
+        padding: 15px;
+    }
+    
+    .activity-label {
+        font-size: 11px;
+    }
+    
+    .activity-value {
+        font-size: 20px;
+    }
+    
+    /* Estado de ventas en modal */
+    .sales-status-section {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+    
+    .sales-status-section h3 {
+        font-size: 16px;
+    }
+    
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .status-item {
+        padding: 12px;
+    }
+    
+    .status-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+    
+    .status-count {
+        font-size: 18px;
+    }
+    
+    /* Cliente select group */
+    .cliente-select-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-secondary-small {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Dropzone en modal */
+    .dropzone {
+        padding: 40px 20px;
+    }
+    
+    .dropzone svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .dropzone p {
+        font-size: 14px;
+    }
+    
+    /* Lista de fotos */
+    .lista-fotos {
+        max-height: 250px;
+    }
+    
+    .foto-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .foto-item img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .foto-nombre {
+        font-size: 13px;
+    }
+    
+    .foto-tamano {
+        font-size: 11px;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .modal {
+        padding: 10px;
+        padding-top: 15px;
+    }
+    
+    .modal-header {
+        padding: 15px 12px;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .modal-close {
+        font-size: 26px;
+    }
+    
+    .modal-body {
+        padding: 15px 12px;
+    }
+    
+    .modal-footer {
+        padding: 12px;
+    }
+    
+    .stats-grid-modal {
+        gap: 12px;
+    }
+    
+    .stat-item {
+        padding: 12px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 20px;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+}     /*punto de vista*/
+
+/* ========================================
    FORMULARIO
 ======================================== */
 .form-group {
@@ -805,7 +1045,7 @@ body.modal-open {
 }
 
 /* ========================================
-   RESPONSIVE
+   RESPONSIVE  tal ves se quite before testeo
 ======================================== */
 @media (max-width: 768px) {
     .documentos-section {
@@ -838,5 +1078,227 @@ body.modal-open {
 
     .cliente-select-group {
         flex-direction: column;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - DOCUMENTOS/ÁLBUMES
+======================================== */
+
+/* TABLET (1024px y menor) */
+@media (max-width: 1024px) {
+    .documentos-section {
+        padding: 100px 30px 80px;
+    }
+    
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .documentos-section {
+        padding: 80px 15px 60px;
+    }
+    
+    /* Header */
+    .page-header {
+        padding: 20px 15px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .header-content h1 {
+        font-size: 22px;
+    }
+    
+    .header-content p {
+        font-size: 13px;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Filtros */
+    .filtros-card {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .filtro-grupo {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .filtro-grupo label {
+        font-size: 13px;
+    }
+    
+    .filtro-grupo select {
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    /* Grid de álbumes */
+    .albums-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .album-card {
+        width: 100%;
+    }
+    
+    .album-header {
+        padding: 15px;
+    }
+    
+    .album-title {
+        font-size: 16px;
+    }
+    
+    .album-cliente {
+        font-size: 13px;
+    }
+    
+    .album-body {
+        padding: 15px;
+    }
+    
+    .album-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .info-label {
+        font-size: 11px;
+    }
+    
+    .info-value {
+        font-size: 14px;
+    }
+    
+    .album-descripcion {
+        font-size: 12px;
+        max-height: 50px;
+    }
+    
+    .album-footer {
+        padding: 12px 15px;
+    }
+    
+    .album-estado {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+    
+    .album-actions {
+        gap: 6px;
+    }
+    
+    .btn-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .btn-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* Galería de fotos */
+    .galeria-previews {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .preview-imagen {
+        height: 150px;
+    }
+    
+    .preview-info {
+        padding: 10px;
+    }
+    
+    .preview-nombre {
+        font-size: 12px;
+    }
+    
+    .preview-detalles {
+        font-size: 10px;
+    }
+    
+    .preview-actions {
+        padding: 8px;
+        gap: 6px;
+        flex-direction: column;
+    }
+    
+    .btn-preview-action {
+        width: 100%;
+        justify-content: center;
+        font-size: 11px;
+        padding: 8px;
+    }
+    
+    .fotos-info-bar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .btn-download-all {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .documentos-section {
+        padding: 70px 10px 50px;
+    }
+    
+    .page-header {
+        padding: 15px 10px;
+    }
+    
+    .header-content h1 {
+        font-size: 20px;
+    }
+    
+    .filtros-card {
+        padding: 12px;
+    }
+    
+    .album-card {
+        border-radius: 8px;
+    }
+    
+    .album-header,
+    .album-body,
+    .album-footer {
+        padding: 12px;
+    }
+    
+    .album-title {
+        font-size: 15px;
+    }
+    
+    .galeria-previews {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .preview-imagen {
+        height: 200px;
     }
 }

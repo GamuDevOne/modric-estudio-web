@@ -81,6 +81,7 @@ function getAllVendedores($pdo) {
             SELECT 
                 u.ID_Usuario,
                 u.NombreCompleto,
+                u.Usuario,
                 u.Correo,
                 u.GrupoGrado,
                 u.LugarTrabajo
@@ -149,6 +150,7 @@ function createVendedor($pdo, $data) {
         $stmt = $pdo->prepare("
             INSERT INTO Usuario (
                 NombreCompleto, 
+                Usuario,
                 Correo, 
                 Contrasena, 
                 TipoUsuario, 
@@ -156,6 +158,7 @@ function createVendedor($pdo, $data) {
                 LugarTrabajo
             ) VALUES (
                 :nombreCompleto,
+                :usuario,
                 :correo,
                 :contrasena,
                 'Vendedor',
@@ -166,6 +169,7 @@ function createVendedor($pdo, $data) {
         
         $stmt->execute([
             ':nombreCompleto' => $data['nombreCompleto'],
+            ':usuario' => $data['usuario'],
             ':correo' => $data['correo'],
             ':contrasena' => $data['contrasena'], // TODO: Implementar hash
             ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
@@ -237,13 +241,34 @@ function updateVendedor($pdo, $data) {
             ]);
             return;
         }
-        
+
+        // Verificar si el usuario ya existe (excepto el actual)
+        $stmt = $pdo->prepare("
+            SELECT ID_Usuario 
+            FROM Usuario 
+            WHERE Usuario = :usuario 
+            AND ID_Usuario != :id
+        ");
+        $stmt->execute([
+            ':usuario' => $data['usuario'], 
+            ':id' => $data['id']
+        ]);
+
+        if ($stmt->fetch()) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'El nombre de usuario ya está registrado'
+            ]);
+            return;
+        }
+                
         // Actualizar vendedor
         if (!empty($data['contrasena'])) {
             // Actualizar con contraseña nueva
             $stmt = $pdo->prepare("
                 UPDATE Usuario SET
                     NombreCompleto = :nombreCompleto,
+                    Usuario = :usuario,
                     Correo = :correo,
                     Contrasena = :contrasena,
                     GrupoGrado = :grupoGrado,
@@ -253,6 +278,7 @@ function updateVendedor($pdo, $data) {
             
             $stmt->execute([
                 ':nombreCompleto' => $data['nombreCompleto'],
+                ':usuario' => $data['usuario'],
                 ':correo' => $data['correo'],
                 ':contrasena' => $data['contrasena'], // TODO: Implementar hash
                 ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
@@ -264,6 +290,7 @@ function updateVendedor($pdo, $data) {
             $stmt = $pdo->prepare("
                 UPDATE Usuario SET
                     NombreCompleto = :nombreCompleto,
+                    Usuario = :usuario,
                     Correo = :correo,
                     GrupoGrado = :grupoGrado,
                     LugarTrabajo = :lugarTrabajo
@@ -272,6 +299,7 @@ function updateVendedor($pdo, $data) {
             
             $stmt->execute([
                 ':nombreCompleto' => $data['nombreCompleto'],
+                ':usuario' => $data['usuario'],
                 ':correo' => $data['correo'],
                 ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
                 ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null,

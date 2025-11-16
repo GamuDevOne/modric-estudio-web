@@ -53,6 +53,19 @@ function toggleLoginMenu() {
 }
 
 // ========================================
+// TOGGLE MENÚ DROPDOWN "MÁS"
+// ========================================
+function toggleDropdownMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const dropdown = event.target.closest('.dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
+}
+
+// ========================================
 // VERIFICAR SESIÓN ACTIVA
 // ========================================
 function checkSession() {
@@ -70,7 +83,7 @@ function checkSession() {
 // ========================================
 function logout() {
     localStorage.removeItem('userSession');
-    globalThis.location.href = '/PaginaWebMS/index.html';
+    window.location.href = '/PaginaWebMS/index.html';
 }
 
 // ========================================
@@ -111,13 +124,22 @@ function addPanelOption() {
     }
 }
 
-// Cerrar menú de login al hacer clic fuera
+// ========================================
+// CERRAR MENÚS AL HACER CLIC FUERA
+// ========================================
 document.addEventListener('click', function(e) {
+    // Cerrar menú de login
     const loginBtn = document.querySelector('.login-btn');
     const loginMenu = document.getElementById('loginMenu');
     
     if (loginBtn && loginMenu && !loginBtn.contains(e.target)) {
         loginMenu.classList.remove('active');
+    }
+    
+    // Cerrar menú dropdown "MÁS"
+    const dropdown = document.querySelector('.dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
     }
 });
 
@@ -151,14 +173,35 @@ window.addEventListener('scroll', function() {
 });
 
 
-// Ejecutar al cargar la página
+// ========================================
+// INICIALIZAR AL CARGAR LA PÁGINA
+// ========================================
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addPanelOption);
+    document.addEventListener('DOMContentLoaded', function() {
+        addPanelOption();
+        initDropdownMenu();
+    });
 } else {
     addPanelOption();
+    initDropdownMenu();
 }
 
-// Reemplazar la función de transparencia de iconos sociales
+// ========================================
+// INICIALIZAR MENÚ DROPDOWN
+// ========================================
+function initDropdownMenu() {
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    if (dropdownToggle) {
+        // Remover comportamiento onclick inline si existe
+        dropdownToggle.removeAttribute('onclick');
+        // Agregar event listener
+        dropdownToggle.addEventListener('click', toggleDropdownMenu);
+    }
+}
+
+// ========================================
+// EFECTO DE TRANSPARENCIA EN ICONOS SOCIALES
+// ========================================
 document.addEventListener('DOMContentLoaded', function() {
     const socialIcons = document.querySelector('.social-icons');
     const contactSection = document.getElementById('contacto');
@@ -189,5 +232,78 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ========================================
+// MENÚ MÓVIL HAMBURGUESA
+// ========================================
+function toggleMobileMenu() {
+    const nav = document.getElementById('mainNav');
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const body = document.body;
+    
+    if (nav && menuToggle) {
+        nav.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+        body.classList.toggle('menu-open');
+    }
+}
 
+// Cerrar menú móvil al hacer click en un link
+function closeMobileMenuOnClick() {
+    const navLinks = document.querySelectorAll('#mainNav a');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Si es un link interno (no dropdown toggle)
+            if (!this.classList.contains('dropdown-toggle')) {
+                const nav = document.getElementById('mainNav');
+                const menuToggle = document.getElementById('mobileMenuToggle');
+                const body = document.body;
+                
+                if (window.innerWidth <= 768) {
+                    nav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+        });
+    });
+}
 
+// Cerrar menú al hacer click en el overlay
+document.addEventListener('click', function(e) {
+    const nav = document.getElementById('mainNav');
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const body = document.body;
+    
+    // Si el menú está abierto y se hace click fuera
+    if (nav && nav.classList.contains('active')) {
+        if (!nav.contains(e.target) && !menuToggle.contains(e.target)) {
+            nav.classList.remove('active');
+            menuToggle.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+    }
+});
+
+// Cerrar menú al cambiar tamaño de ventana
+window.addEventListener('resize', function() {
+    const nav = document.getElementById('mainNav');
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const body = document.body;
+    
+    if (window.innerWidth > 768) {
+        if (nav) nav.classList.remove('active');
+        if (menuToggle) menuToggle.classList.remove('active');
+        body.classList.remove('menu-open');
+    }
+});
+
+// Inicializar menú móvil
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleMobileMenu);
+    }
+    
+    closeMobileMenuOnClick();
+});

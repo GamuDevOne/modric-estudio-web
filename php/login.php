@@ -2,8 +2,8 @@
 // Configuración de la base de datos
 $host = 'localhost';
 $dbname = 'ModricEstudio00';
-$username = 'root';  // Usuario por defecto de XAMPP
-$password = '';      // Contraseña vacía por defecto en XAMPP
+$username = 'root';
+$password = '';
 
 // Headers para permitir CORS y JSON
 header('Content-Type: application/json');
@@ -25,26 +25,27 @@ try {
     // Obtener datos del POST
     $input = json_decode(file_get_contents('php://input'), true);
     
-    if (!isset($input['correo']) || !isset($input['contrasena'])) {
+    if (!isset($input['usuarioCorreo']) || !isset($input['contrasena'])) {
         echo json_encode([
             'success' => false,
-            'message' => 'Correo y contraseña son requeridos'
+            'message' => 'Usuario/Correo y contraseña son requeridos'
         ]);
         exit();
     }
     
-    $correo = trim($input['correo']);
+    $usuarioCorreo = trim($input['usuarioCorreo']);
     $contrasena = trim($input['contrasena']);
     
-    // Buscar usuario en la base de datos
+    // Buscar usuario por USUARIO o CORREO
     $stmt = $pdo->prepare("
-        SELECT ID_Usuario, NombreCompleto, Correo, TipoUsuario, Foto 
+        SELECT ID_Usuario, NombreCompleto, Correo, Usuario, TipoUsuario, Foto 
         FROM Usuario 
-        WHERE Correo = :correo AND Contrasena = :contrasena
+        WHERE (Usuario = :usuarioCorreo OR Correo = :usuarioCorreo) 
+        AND Contrasena = :contrasena
     ");
     
     $stmt->execute([
-        ':correo' => $correo,
+        ':usuarioCorreo' => $usuarioCorreo,
         ':contrasena' => $contrasena
     ]);
     
@@ -61,7 +62,7 @@ try {
         // Credenciales incorrectas
         echo json_encode([
             'success' => false,
-            'message' => 'Correo o contraseña incorrectos'
+            'message' => 'Usuario/Correo o contraseña incorrectos'
         ]);
     }
     

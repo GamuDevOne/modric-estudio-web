@@ -185,7 +185,7 @@ body {
 }
 
 /* ===========================
-   RESPONSIVO
+   RESPONSIVO   (tal vez se quite al testear la vista de movil)
 =========================== */
 @media (max-width: 1024px) {
     .producto {
@@ -210,6 +210,147 @@ body {
         width: 100%;
         top: 0;
         height: 100vh;
+    }
+}   
+
+/* ========================================
+   RESPONSIVE - TEXTILES
+======================================== */
+
+/* TABLET (1024px y menor) */
+@media (max-width: 1024px) {
+    .textiles-section {
+        padding: 90px 30px 80px;
+    }
+    
+    .textiles-header h2 {
+        font-size: 34px;
+    }
+    
+    .producto {
+        width: 310px;
+    }
+}
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .textiles-section {
+        padding: 80px 20px 60px;
+    }
+    
+    .textiles-header {
+        margin-bottom: 40px;
+    }
+    
+    .textiles-header h2 {
+        font-size: 28px;
+    }
+    
+    .textiles-header p {
+        font-size: 16px;
+    }
+    
+    .textiles-grid {
+        gap: 30px;
+    }
+    
+    .producto {
+        width: 100%;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+    
+    .producto .imagen {
+        height: 280px;
+    }
+    
+    .producto h3 {
+        font-size: 19px;
+    }
+    
+    .producto p {
+        font-size: 15px;
+    }
+    
+    /* Carrito móvil - Pantalla completa */
+    .cart-panel {
+        width: 100%;
+        top: 0;
+        height: 100vh;
+        border-radius: 0;
+        border-left: none;
+        box-shadow: none;
+    }
+    
+    .cart-panel h3 {
+        font-size: 18px;
+    }
+    
+    .cart-icon {
+        top: 12px;
+        right: 12px;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .textiles-section {
+        padding: 70px 15px 50px;
+    }
+    
+    .textiles-header h2 {
+        font-size: 24px;
+    }
+    
+    .textiles-header p {
+        font-size: 14px;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .producto {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .producto .imagen {
+        height: 250px;
+    }
+    
+    .producto h3 {
+        font-size: 18px;
+    }
+    
+    .producto p {
+        font-size: 14px;
+    }
+    
+    .producto select,
+    .producto input[type=number] {
+        width: 90%;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .add-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 90%;
+    }
+    
+    .cart-panel {
+        padding: 15px;
+    }
+    
+    .cart-panel h3 {
+        font-size: 16px;
+    }
+    
+    .cart-btn {
+        padding: 10px;
+        font-size: 14px;
     }
 }
 

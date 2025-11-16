@@ -146,6 +146,7 @@ function editarVendedor(id) {
     document.getElementById('modalTitle').textContent = 'Editar Vendedor';
     document.getElementById('vendedorId').value = vendedor.ID_Usuario;
     document.getElementById('nombreCompleto').value = vendedor.NombreCompleto;
+    document.getElementById('usuario').value = vendedor.Usuario || '';
     document.getElementById('correo').value = vendedor.Correo || '';
     document.getElementById('grupoGrado').value = vendedor.GrupoGrado || '';
     document.getElementById('lugarTrabajo').value = vendedor.LugarTrabajo || '';
@@ -168,6 +169,7 @@ function guardarVendedor(event) {
         action: modoEdicion ? 'update' : 'create',
         id: document.getElementById('vendedorId').value,
         nombreCompleto: document.getElementById('nombreCompleto').value,
+        usuario: document.getElementById('usuario').value,
         correo: document.getElementById('correo').value,
         grupoGrado: document.getElementById('grupoGrado').value,
         lugarTrabajo: document.getElementById('lugarTrabajo').value,

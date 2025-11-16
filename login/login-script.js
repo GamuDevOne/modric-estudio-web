@@ -1,11 +1,11 @@
 // ========================================
-// MANEJO DE LOGIN - VERSIÓN CORREGIDA
+// MANEJO DE LOGIN - VERSIÓN CON USUARIO O CORREO
 // ========================================
 
 function handleLoginSubmit(event) {
     event.preventDefault();
     
-    const correo = document.getElementById('correo').value.trim();
+    const usuarioCorreo = document.getElementById('usuarioCorreo').value.trim();
     const contrasena = document.getElementById('contrasena').value;
     const errorMessage = document.getElementById('errorMessage');
     const buttonText = document.getElementById('buttonText');
@@ -13,7 +13,7 @@ function handleLoginSubmit(event) {
     const loginButton = document.querySelector('.login-button');
     
     // Validación básica
-    if (!correo || !contrasena) {
+    if (!usuarioCorreo || !contrasena) {
         errorMessage.textContent = 'Por favor, completa todos los campos';
         errorMessage.classList.add('show');
         return;
@@ -35,7 +35,7 @@ function handleLoginSubmit(event) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            correo: correo,
+            usuarioCorreo: usuarioCorreo,
             contrasena: contrasena
         })
     })
@@ -56,6 +56,7 @@ function handleLoginSubmit(event) {
                 id: data.user.ID_Usuario,
                 nombre: data.user.NombreCompleto,
                 correo: data.user.Correo,
+                usuario: data.user.Usuario,
                 tipo: data.user.TipoUsuario,
                 foto: data.user.Foto
             };

@@ -89,7 +89,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) {  /* tal vez quite este responsive luego del testeo */
     .panel-section {
         padding: 100px 20px 60px;
     }
@@ -104,5 +104,100 @@
 
     .panel-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - PANEL ADMIN
+======================================== */
+
+/* TABLET (1024px y menor) */
+@media (max-width: 1024px) {
+    .panel-section {
+        padding: 100px 30px 80px;
+    }
+    
+    .panel-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+}
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .panel-section {
+        padding: 80px 20px 60px;
+    }
+    
+    .panel-header {
+        padding: 25px 20px;
+        text-align: center;
+    }
+    
+    .welcome-message h1 {
+        font-size: 24px;
+    }
+    
+    .welcome-message p {
+        font-size: 14px;
+    }
+    
+    .panel-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .panel-card {
+        padding: 30px 20px;
+    }
+    
+    .card-icon svg {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .panel-card h3 {
+        font-size: 18px;
+    }
+    
+    .panel-card p {
+        font-size: 13px;
+    }
+    
+    .panel-btn {
+        padding: 10px 25px;
+        font-size: 13px;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .panel-section {
+        padding: 70px 15px 50px;
+    }
+    
+    .panel-header {
+        padding: 20px 15px;
+    }
+    
+    .welcome-message h1 {
+        font-size: 22px;
+    }
+    
+    .panel-card {
+        padding: 25px 15px;
+    }
+    
+    .card-icon {
+        margin-bottom: 15px;
+    }
+    
+    .card-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .panel-card h3 {
+        font-size: 17px;
     }
 }
