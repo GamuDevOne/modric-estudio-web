@@ -366,95 +366,249 @@ nav ul li a.active {
     }
 }
 
+/* ========================================
+   MÓVIL GRANDE (768px y menor) - CON FIXES
+======================================== */
 @media (max-width: 768px) {
+    /* HEADER MÓVIL */
     header {
-        padding: 15px 20px;
-        flex-wrap: wrap;
+        padding: 12px 20px;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        position: relative;
     }
-
+    
+    /* Mostrar botón hamburguesa */
+    .mobile-menu-toggle {
+        display: flex;
+        order: 2;
+        z-index: 1002; /* Adelante del logo */
+    }
+    
+    /* Logo - DETRÁS */
+    .logo {
+        order: 1;
+        z-index: 1000; /* Detrás del hamburguesa y login */
+        flex-shrink: 0;
+    }
+    
+    .logo img {
+        height: 40px;
+    }
+    
+    /* Login button - ADELANTE Y TAMAÑO FIJO */
+    .login-btn {
+        order: 3;
+        z-index: 1002; /* Mismo nivel que hamburguesa */
+        flex-shrink: 0; /* No se comprime */
+    }
+    
+    .login-icon-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px; /* Tamaño mínimo fijo */
+        min-height: 40px; /* Tamaño mínimo fijo */
+        flex-shrink: 0; /* No se comprime */
+    }
+    
+    /* SVG del botón login - TAMAÑO FIJO */
+    .login-icon-btn svg {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+    
+    /* Navegación móvil */
+    nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background-color: #fff;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 80px 20px 20px;
+        transition: right 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    
+    nav.active {
+        right: 0;
+    }
+    
     nav ul {
-        gap: 15px;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        gap: 0;
+        align-items: flex-start;
     }
-
+    
+    nav ul li {
+        width: 100%;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
     nav ul li a {
-        font-size: 12px;
-        padding: 6px 10px;
+        display: block;
+        padding: 15px 10px;
+        font-size: 14px;
+        width: 100%;
     }
-
+    
+    /* Dropdown en móvil */
+    .dropdown-menu {
+        position: static;
+        transform: none;
+        box-shadow: none;
+        background-color: #f8f9fa;
+        margin-top: 0;
+        padding: 0;
+    }
+    
+    .dropdown-menu::before {
+        display: none;
+    }
+    
+    .dropdown-menu li {
+        border-bottom: none;
+    }
+    
+    .dropdown-menu li a {
+        padding-left: 30px;
+        font-size: 13px;
+    }
+    
+    /* Overlay oscuro cuando el menú está abierto */
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 999;
+    }
+    
+    body.menu-open::after {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    body.menu-open {
+        overflow: hidden;
+    }
+    
+    /* HERO */
     .hero-content h1 {
-        font-size: 36px;
-        letter-spacing: 8px;
+        font-size: 32px;
+        letter-spacing: 6px;
     }
-
+    
     .hero-subtitle {
         font-size: 14px;
         letter-spacing: 2px;
+        padding: 0 30px;
     }
-
+    
+    .hero-subtitle::before,
+    .hero-subtitle::after {
+        width: 30px;
+    }
+    
+    /* ICONOS SOCIALES */
     .social-icons {
-        left: 15px;
-        gap: 15px;
+        left: 10px;
+        gap: 12px;
     }
-
+    
     .social-icons a {
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
     }
-
-    .login-btn button {
-        padding: 8px 15px;
-        font-size: 12px;
+    
+    .social-icons a svg {
+        width: 20px;
+        height: 20px;
     }
-
+    
+    /* SECCIONES */
     .about-section,
-    .contact-section {
-        padding: 60px 30px;
+    .contact-section,
+    .gallery-section {
+        padding: 60px 20px;
     }
-
+    
     .about-content,
     .contact-info {
         padding: 20px;
     }
-
+    
     .about-content h2,
     .contact-info h2 {
-        font-size: 32px;
+        font-size: 28px;
     }
-
+    
+    .about-content p,
+    .contact-info p {
+        font-size: 15px;
+    }
+    
+    /* GALERÍA */
     .gallery-grid {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-
-    .gallery-section {
-        padding: 30px 20px;
+    
+    .gallery-separator {
+        padding: 40px 20px;
+        gap: 15px;
     }
-
+    
     .separator-title {
         font-size: 20px;
     }
-
+    
+    /* LIGHTBOX */
     .lightbox-prev,
     .lightbox-next {
-        width: 50px;
-        height: 50px;
-        font-size: 30px;
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
     }
-
+    
     .lightbox-prev {
-        left: 20px;
+        left: 15px;
     }
-
+    
     .lightbox-next {
-        right: 20px;
+        right: 15px;
     }
-
+    
     .lightbox-close {
-        top: 20px;
-        right: 20px;
-        font-size: 40px;
+        top: 15px;
+        right: 15px;
+        font-size: 36px;
+    }
+    
+    /* FORMULARIO CONTACTO */
+    .contact-form input,
+    .contact-form textarea {
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+    
+    /* FOOTER */
+    .footer {
+        padding: 40px 20px;
+    }
+    
+    .back-to-top {
+        padding: 10px 20px;
+        font-size: 13px;
     }
 }
 
@@ -1289,5 +1443,20 @@ nav ul li a.active {
     
     .mb-mobile {
         margin-bottom: 20px;
+    }
+}
+
+/* FIX ESPECÍFICO PARA LOGO EN MÓVIL */
+@media (max-width: 768px) {
+    header .logo {
+        z-index: 1 !important;
+    }
+    
+    header .mobile-menu-toggle {
+        z-index: 1003 !important;
+    }
+    
+    header .login-btn {
+        z-index: 1003 !important;
     }
 }
