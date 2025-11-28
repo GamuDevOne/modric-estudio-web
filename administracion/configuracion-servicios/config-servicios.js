@@ -1,38 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // ========================================
-    // TEXTIL
-    // ========================================
+
     const botonTextil = document.getElementById("activar-textil");
+    const botonEditar = document.getElementById("editar-textil");
     const estadoTextil = document.getElementById("estado-textil");
 
-    // Mostrar estado actual de Textil
-    if (localStorage.getItem("textilActivo") === "true") {
-        estadoTextil.textContent = "Activo";
-        estadoTextil.style.color = "#4caf50";
-        botonTextil.textContent = "Desactivar Textil";
-    } else {
-        estadoTextil.textContent = "Desactivado";
-        estadoTextil.style.color = "#f44336";
-        botonTextil.textContent = "Activar Textil";
+    // Inicializa localStorage
+    if (!localStorage.getItem("textilActivo")) {
+        localStorage.setItem("textilActivo", "false");
     }
 
+    function actualizarEstado() {
+        const activo = localStorage.getItem("textilActivo") === "true";
+        estadoTextil.textContent = activo ? "Activo" : "Desactivado";
+        estadoTextil.style.color = activo ? "#4caf50" : "#f44336";
+        botonTextil.textContent = activo ? "Desactivar Textiles" : "Activar Textiles";
+    }
+
+    // Eventos
     botonTextil.addEventListener("click", () => {
         const activo = localStorage.getItem("textilActivo") === "true";
-
-        if (activo) {
-            localStorage.setItem("textilActivo", "false");
-            estadoTextil.textContent = "Desactivado";
-            estadoTextil.style.color = "#f44336";
-            botonTextil.textContent = "Activar Textil";
-            alert("Textil desactivado correctamente");
-        } else {
-            localStorage.setItem("textilActivo", "true");
-            estadoTextil.textContent = "Activo";
-            estadoTextil.style.color = "#4caf50";
-            botonTextil.textContent = "Desactivar Textil";
-            alert("Textil activado correctamente");
-        }
+        localStorage.setItem("textilActivo", (!activo).toString());
+        actualizarEstado();
+        alert(`Textil ${!activo ? "activado" : "desactivado"} correctamente`);
     });
+
+
+botonEditar.addEventListener("click", () => {
+    window.location.href = "Editar-Textiles/editar-textiles.html";
+});
+
+    actualizarEstado();
+});
+
 
     // ========================================
     // CARNÉS
@@ -103,4 +102,4 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Combos activado correctamente");
         }
     });
-});
+
