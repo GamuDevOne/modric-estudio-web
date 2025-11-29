@@ -92,36 +92,45 @@ function logout() {
 function addPanelOption() {
     const user = checkSession();
     
-    if (user && (user.tipo === 'CEO' || user.tipo === 'Vendedor')) {
-        const dropdownMenu = document.querySelector('.dropdown-menu');
-        
-        if (dropdownMenu) {
-            // Verificar si ya existe la opción
-            const existingPanel = Array.from(dropdownMenu.querySelectorAll('a')).find(
-                a => a.textContent.includes('administracion')
-            );
-            
-            if (!existingPanel) {
-                const panelItem = document.createElement('li');
-                panelItem.innerHTML = '<a href="administracion/administracion.html">Panel de Administración</a>';
-                dropdownMenu.insertBefore(panelItem, dropdownMenu.firstChild);
-            }
-        }
-        
-        // Cambiar botón de login por logout
-        const loginBtn = document.querySelector('.login-btn');
-        if (loginBtn) {
-            loginBtn.innerHTML = `
-                <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </button>
-            `;
-        }
+    // Validar que existe sesión
+    if (!user || !user.tipo) {
+        return;
     }
+    
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const loginBtn = document.querySelector('.login-btn');
+    
+    if (!dropdownMenu || !loginBtn) {
+        return;
+    }
+
+    // Verificar si ya existe la opción de panel
+    const existingPanel = Array.from(dropdownMenu.querySelectorAll('a')).find(
+        a => a.textContent.includes('Panel') || a.textContent.includes('Vista')
+    );
+    
+    if (!existingPanel) {
+        const panelItem = document.createElement('li');
+        
+        if (user.tipo === 'CEO') {
+            panelItem.innerHTML = '<a href="./administracion/administracion.html">Panel de Administración</a>';
+        } else if (user.tipo === 'Vendedor') {
+            panelItem.innerHTML = '<a href="./administracion/vistaVendedor/vendedor.html">Panel de vendedor</a>';
+        }
+        
+        dropdownMenu.insertBefore(panelItem, dropdownMenu.firstChild);
+    }
+
+    // Cambiar botón de login por logout (una sola vez)
+    loginBtn.innerHTML = `
+        <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión" aria-label="Cerrar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
+    `;
 }
 
 // ========================================
