@@ -107,6 +107,7 @@ function registrarVenta($pdo, $data) {
                 ID_Usuario,
                 ID_Vendedor,
                 ID_Colegio,
+                NombreCliente,
                 ID_Servicio,
                 ID_Paquete,
                 Total,
@@ -116,6 +117,7 @@ function registrarVenta($pdo, $data) {
                 :idUsuario,
                 :idVendedor,
                 :idColegio,
+                :nombreCliente,
                 :idServicio,
                 :idPaquete,
                 :total,
@@ -128,6 +130,7 @@ function registrarVenta($pdo, $data) {
             ':idUsuario' => $idUsuario,
             ':idVendedor' => $data['idVendedor'],
             ':idColegio' => $data['idColegio'],
+            ':nombreCliente' => $data['nombreCliente'],
             ':idServicio' => $data['idServicio'] ?? null,
             ':idPaquete' => $data['idPaquete'] ?? null,
             ':total' => $data['total']

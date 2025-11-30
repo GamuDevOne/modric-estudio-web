@@ -182,13 +182,15 @@ function getPedidos($pdo) {
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
-            u.NombreCompleto as Cliente,
+            COALESCE(p.NombreCliente, u.NombreCompleto) as Cliente,
             s.NombreServicio as Servicio,
             p.Fecha,
             p.Total,
-            p.Estado
+            p.Estado,
+            v.NombreCompleto as Vendedor
         FROM Pedido p
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
         ORDER BY p.Fecha DESC
         LIMIT 10
@@ -199,11 +201,13 @@ function getPedidos($pdo) {
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
-            u.NombreCompleto as Cliente,
+            COALESCE(p.NombreCliente, u.NombreCompleto) as Cliente,
             p.Total,
-            DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente
+            DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
+            v.NombreCompleto as Vendedor
         FROM Pedido p
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         WHERE p.Estado = 'Pendiente'
         ORDER BY p.Fecha ASC
     ");
