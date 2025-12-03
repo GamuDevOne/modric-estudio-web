@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Colegios - Modric Estudio</title>
     <link rel="stylesheet" href="../../css/global-styles.css">
-    <link rel="stylesheet" href="colegios.css">
+    <link rel="stylesheet" href="lugar.css">
 </head>
 <body>
     <!-- HEADER -->
@@ -20,7 +20,7 @@
                 <li><a href="../../index.html">INICIO</a></li>
                 <li><a href="../administracion.html">PANEL</a></li>
                 <li><a href="../dashboard/dashboard.html">DASHBOARD</a></li>
-                <li><a href="colegios.html" class="active">COLEGIOS</a></li>
+                <li><a href="lugar.html" class="active">LUGARES</a></li>
             </ul>
         </nav>
         <div class="login-btn">
@@ -41,8 +41,8 @@
             <!-- HEADER DE LA PÁGINA -->
             <div class="page-header">
                 <div class="header-content">
-                    <h1>Gestión de Colegios</h1>
-                    <p>Administra colegios y asigna vendedores</p>
+                    <h1>Gestión de Lugares</h1>
+                    <p>Administra los lugares de trabajo y asigna vendedores</p>
                 </div>
                 <div class="header-actions">
                     <button class="btn-primary" onclick="openModalCrearColegio()">
@@ -50,7 +50,7 @@
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Nuevo Colegio
+                        Nuevo Lugar
                     </button>
                 </div>
             </div>
@@ -71,25 +71,25 @@
             <div id="colegiosGrid" class="colegios-grid">
                 <div class="loading-card">
                     <div class="spinner"></div>
-                    <p>Cargando colegios...</p>
+                    <p>Cargando Lugares...</p>
                 </div>
             </div>
 
         </div>
     </section>
 
-    <!-- MODAL: CREAR/EDITAR COLEGIO -->
+    <!-- MODAL: CREAR/EDITAR COLEGIO/lugar -->
     <div id="modalColegio" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalColegioTitle">Nuevo Colegio</h2>
+                <h2 id="modalColegioTitle">Nuevo Lugar</h2>
                 <button class="modal-close" onclick="closeModalColegio()">&times;</button>
             </div>
             <form id="formColegio" onsubmit="guardarColegio(event)">
                 <input type="hidden" id="colegioId">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="nombreColegio">Nombre del Colegio *</label>
+                        <label for="nombreColegio">Nombre del Lugar *</label>
                         <input type="text" id="nombreColegio" placeholder="Ej: Instituto Nacional" required>
                     </div>
                     <div class="form-group">
@@ -101,8 +101,8 @@
                         <input type="text" id="telefonoColegio" placeholder="Ej: 6000-0000">
                     </div>
                     <div class="form-group">
-                        <label for="notasColegio">Notas</label>
-                        <textarea id="notasColegio" rows="3" placeholder="Notas adicionales..."></textarea>
+                        <label for="notasColegio">Notas Adicionales</label>
+                        <textarea id="notasColegio" name="notasColegio" rows="4" placeholder="Notas adicionales..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,6 +202,6 @@
     </div>
 
     <script src="../../js/global-script.js"></script>
-    <script src="colegios.js"></script>
+    <script src="lugar.js"></script>
 </body>
 </html>

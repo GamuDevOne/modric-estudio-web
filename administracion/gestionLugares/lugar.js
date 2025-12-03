@@ -70,7 +70,7 @@ function mostrarColegios(colegios) {
     grid.innerHTML = '';
     
     if (colegios.length === 0) {
-        grid.innerHTML = '<div class="loading-card"><p>No hay colegios registrados</p></div>';
+        grid.innerHTML = '<div class="loading-card"><p>No hay lugares registrados</p></div>';
         return;
     }
     
@@ -237,7 +237,7 @@ function actualizarSelectVendedores() {
 // MODAL: CREAR/EDITAR COLEGIO
 // ========================================
 function openModalCrearColegio() {
-    document.getElementById('modalColegioTitle').textContent = 'Nuevo Colegio';
+    document.getElementById('modalColegioTitle').textContent = 'Nuevo Lugar';
     document.getElementById('colegioId').value = '';
     document.getElementById('formColegio').reset();
     document.getElementById('modalColegio').classList.add('active');
@@ -248,11 +248,11 @@ function editarColegio(id) {
     const colegio = colegiosData.find(c => c.ID_Colegio == id);
     
     if (!colegio) {
-        alert('Colegio no encontrado');
+        alert('Lugar no encontrado');
         return;
     }
     
-    document.getElementById('modalColegioTitle').textContent = 'Editar Colegio';
+    document.getElementById('modalColegioTitle').textContent = 'Editar Lugar';
     document.getElementById('colegioId').value = colegio.ID_Colegio;
     document.getElementById('nombreColegio').value = colegio.NombreColegio;
     document.getElementById('direccionColegio').value = colegio.Direccion || '';
@@ -269,61 +269,84 @@ function closeModalColegio() {
     document.body.classList.remove('modal-open');
 }
 
-function guardarColegio(event) {
+async function guardarColegio(event) {
     event.preventDefault();
-    
-    const idColegio = document.getElementById('colegioId').value;
-    const nombreColegio = document.getElementById('nombreColegio').value;
-    const direccion = document.getElementById('direccionColegio').value;
-    const telefono = document.getElementById('telefonoColegio').value;
-    const notas = document.getElementById('notasColegio').value;
-    
-    const action = idColegio ? 'editar_colegio' : 'crear_colegio';
-    const datos = {
-        action: action,
-        nombreColegio: nombreColegio,
-        direccion: direccion,
-        telefono: telefono,
-        notas: notas
-    };
-    
-    if (idColegio) {
-        datos.idColegio = idColegio;
-    }
-    
-    showLoadingModal();
-    
-    fetch('../../php/gest-colegios.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoadingModal();
-        
+    const id = document.getElementById('colegioId').value || null;
+    const nombre = document.getElementById('nombreColegio').value.trim();
+    const direccion = document.getElementById('direccionColegio').value.trim();
+    const telefono = document.getElementById('telefonoColegio').value.trim();
+    const notas = document.getElementById('notasColegio').value.trim(); // <= asegurar lectura
+
+    const payload = { id, nombre, direccion, telefono, notas };
+
+    try {
+        showLoading(); // si tienes función de loading
+        const res = await fetch('api/colegios/save.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
         if (data.success) {
-            alert(idColegio ? 'Colegio actualizado correctamente' : 'Colegio creado correctamente');
             closeModalColegio();
-            cargarColegios();
+            cargarColegios(); // recargar lista desde servidor (debe traer notas)
         } else {
-            alert('Error: ' + data.message);
+            alert(data.message || 'Error al guardar');
         }
-    })
-    .catch(error => {
-        hideLoadingModal();
-        console.error('Error:', error);
+    } catch (err) {
+        console.error(err);
         alert('Error de conexión');
-    });
+    } finally {
+        hideLoading();
+    }
+}
+
+// Ejemplo de función para crear la tarjeta de un lugar (usar cuando renderices cada elemento)
+function crearCardColegio(lugar) {
+    const card = document.createElement('div');
+    card.className = 'colegio-card';
+
+    const header = document.createElement('div');
+    header.className = 'colegio-header';
+    const title = document.createElement('h3');
+    title.textContent = lugar.nombre || 'Sin nombre';
+    header.appendChild(title);
+    card.appendChild(header);
+
+    if (lugar.direccion) {
+        const dir = document.createElement('p');
+        dir.className = 'colegio-direccion';
+        dir.textContent = lugar.direccion;
+        card.appendChild(dir);
+    }
+
+    if (lugar.telefono) {
+        const tel = document.createElement('p');
+        tel.className = 'colegio-telefono';
+        tel.textContent = lugar.telefono;
+        card.appendChild(tel);
+    }
+
+    // NOTAS: crear siempre el elemento pero esconder si vacío
+    const notasEl = document.createElement('p');
+    notasEl.className = 'colegio-notas';
+    if (lugar.notas && lugar.notas.trim() !== '') {
+        notasEl.textContent = lugar.notas;
+        notasEl.style.display = ''; // visible
+    } else {
+        notasEl.style.display = 'none'; // ocultar si vacío
+    }
+    card.appendChild(notasEl);
+
+    // ... botones / stats ...
+    return card;
 }
 
 // ========================================
 // CERRAR COLEGIO
 // ========================================
 function cerrarColegio(id, nombre) {
-    if (!confirm('¿Cerrar el colegio "' + nombre + '"?\n\nEsto finalizará todas las asignaciones activas.')) {
+    if (!confirm('¿Cerrar el lugar "' + nombre + '"?\n\nEsto finalizará todas las asignaciones activas.')) {
         return;
     }
     
@@ -344,7 +367,7 @@ function cerrarColegio(id, nombre) {
         hideLoadingModal();
         
         if (data.success) {
-            alert('Colegio cerrado correctamente');
+            alert('Lugar cerrado correctamente');
             cargarColegios();
         } else {
             alert('Error: ' + data.message);
@@ -358,10 +381,10 @@ function cerrarColegio(id, nombre) {
 }
 
 // ========================================
-// ELIMINAR COLEGIO
+// ELIMINAR COLEGIO/LUGAR
 // ========================================
 function eliminarColegio(id, nombre) {
-    if (!confirm('¿Eliminar el colegio "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
+    if (!confirm('¿Eliminar el lugar "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
         return;
     }
     
@@ -382,7 +405,7 @@ function eliminarColegio(id, nombre) {
         hideLoadingModal();
         
         if (data.success) {
-            alert('Colegio eliminado correctamente');
+            alert('Lugar eliminado correctamente');
             cargarColegios();
         } else {
             alert('Error: ' + data.message);

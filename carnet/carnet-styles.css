@@ -1,42 +1,20 @@
-/* ---------- SECCIÓN CARNÉS ---------- */
+/* ---------- SECCIÓN CARNÉS SIN FONDO ---------- */
 .carnes-section {
   position: relative;
   padding: 100px 20px;
-  color: #fff;
+  color: #000;
   text-align: center;
   overflow: hidden;
-  background-color: #000;
+  background: none !important; /* sin color ni imagen */
 }
 
-/* 🔳 COLLAGE DE FONDO */
-.carnes-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: 
-    url("../imagenes/foto1.jpg"),
-    url("../imagenes/foto2.jpg"),
-    url("../imagenes/foto3.jpg"),
-    url("../imagenes/foto4.jpg"),
-    url("../imagenes/foto5.jpg"),
-    url("../imagenes/foto6.jpg");
-  background-size: 33% 50%, 33% 50%, 33% 50%, 33% 50%, 33% 50%, 33% 50%;
-  background-position: 
-    top left, top center, top right, 
-    bottom left, bottom center, bottom right;
-  background-repeat: no-repeat;
-  filter: grayscale(100%) brightness(35%) blur(2px);
-  opacity: 0.7;
-}
-
-/* 🔳 CAPA NEGRA DIFUMINADA PARA CONTRASTE */
+/* 🚫 ELIMINAR COMPLETAMENTE FONDOS Y CAPAS */
+.carnes-section::before,
 .carnes-section::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 1;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  display: none !important;
 }
 
 /* ---------- CONTENIDO ---------- */
@@ -45,9 +23,9 @@
   z-index: 2;
   max-width: 800px;
   margin: 0 auto 50px;
-  background: rgba(0, 0, 0, 0.3);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   padding: 40px 20px;
   border-radius: 20px;
   animation: fadeIn 1.5s ease-in-out;
@@ -57,19 +35,19 @@
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 15px;
-  color: #fff;
+  color: #111;
   letter-spacing: 1px;
 }
 
 .carnes-header p {
   font-size: 1.1rem;
-  color: #ddd;
+  color: #333;
   line-height: 1.6;
 }
 
 /* ---------- TARJETAS ---------- */
 .carnes-wrapper {
-  margin-top: -100px; /* súbelo o bájalo ajustando este valor */
+  margin-top: -100px;
   position: relative;
   z-index: 2;
 }
@@ -83,7 +61,7 @@
 }
 
 .carne-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   padding: 20px;
   width: 360px;
