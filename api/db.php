@@ -1,5 +1,5 @@
 <?php
-// OJO: CAMBIA estos valores por los de tu hosting
+// cambiar valores a futuro
 $DB_HOST = 'localhost';
 $DB_USER = 'TU_USUARIO_BD';
 $DB_PASS = 'TU_PASSWORD_BD';

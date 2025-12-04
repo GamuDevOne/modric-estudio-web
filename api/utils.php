@@ -22,9 +22,6 @@ function allow_cors() {
     }
 }
 
-/**
- * match('/api/pedidos/{id}', $route, $params)
- */
 function match($pattern, $uri, &$params) {
     $regex = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_-]+)', $pattern);
     if (preg_match('#^' . $regex . '$#', $uri, $m)) {
