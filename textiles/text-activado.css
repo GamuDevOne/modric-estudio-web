@@ -33,6 +33,12 @@ body {
     align-items: center;
 }
 
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* espacio entre login y carrito */
+    position: relative; /* importante para que el login-menu se posicione respecto al botón */
+}
 .logo img {
     height: 50px;
     width: auto;
@@ -92,32 +98,23 @@ nav a.active {
 /* ============================
    ICONOS SOCIALES
    ============================ */
-
 .social-icons {
     position: fixed;
-    left: 2rem;
+    left: 30px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    z-index: 999;
+    gap: 20px;
+    z-index: 100;
 }
 
-.social-icons a {
-    width: 40px;
-    height: 40px;
-    background: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1a1a1a;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.social-icons a svg {
+    width: 24px;
+    height: 24px;
+    fill: #333;
 }
+
 
 .social-icons a:hover {
     background: #000;
@@ -165,6 +162,8 @@ nav a.active {
     margin-top: 2rem;
 }
 
+
+
 .producto-card {
     background: #ffffff;
     border-radius: 12px;
@@ -179,6 +178,8 @@ nav a.active {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     border-color: #e0e0e0;
 }
+
+
 
 .producto-imagen-container {
     position: relative;
@@ -199,6 +200,8 @@ nav a.active {
     object-fit: contain;
     background: #f8f9fa;
 }
+
+
 .producto-card:hover .producto-img {
     transform: scale(1.05);
 }
@@ -263,10 +266,13 @@ nav a.active {
 .cantidad-input:focus {
     outline: none;
     border-color: #000;
-    background: #ffffff;
+       background: #ffffff;
 }
 
+
+
 .add-to-cart-btn {
+ 
     width: 100%;
     padding: 1rem;
     background: #000;
@@ -275,6 +281,7 @@ nav a.active {
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 600;
+   
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -285,13 +292,43 @@ nav a.active {
 
 .add-to-cart-btn:hover {
     background: #ffffff;
-    color: #000;
+     color: #000;
 }
 
 /* ============================
    PANEL CARRITO
    ============================ */
 
+.cart-icon {
+    position: relative;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    color: #1a1a1a;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.cart-icon:hover {
+    color: #000;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #000;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
 .cart-panel {
     position: fixed;
     top: 0;
@@ -483,7 +520,7 @@ nav a.active {
 }
 
 .notificacion.success {
-    border-left-color: #4CAF50;
+    border-left-color: #4864ff;
 }
 
 .notificacion.error {
@@ -517,7 +554,7 @@ nav a.active {
     padding: 2rem;
     text-align: center;
     color: #666;
-    border-top: 2px solid #e0e0e0;
+        border-top: 2px solid #e0e0e0;
 }
 
 /* ============================
@@ -570,3 +607,76 @@ nav a.active {
         padding: 1rem;
     }
 }
+
+/* ============================
+   LOGIN HEADER
+   ============================ */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* separación carrito - login */
+}
+/* LOGIN */
+.login-btn {
+    position: relative; /* clave: permite que el menú caiga debajo del botón */
+    display: flex;
+    align-items: center;
+}
+
+
+.login-icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #1a1a1a;
+    transition: color 0.3s ease;
+}
+
+.login-icon-btn:hover {
+    color: #000;
+}
+/* MENÚ DESPLEGABLE LOGIN */
+.login-menu {
+    position: absolute;
+    top: 50px; /* ajusta según tamaño del botón */
+    right: 0; /* alineado al botón */
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    min-width: 160px;
+    display: none;
+    z-index: 2000; /* mayor que carrito */
+}
+
+.login-menu {
+    position: absolute;
+    top: 50px; /* ajusta según tamaño del botón */
+    right: 0; /* alineado al botón */
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    min-width: 160px;
+    display: none;
+    z-index: 2000; /* mayor que carrito */
+}
+
+.login-menu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.login-menu a:hover {
+    background: #f5f5f5;
+}
+
+.login-menu.active {
+    display: block;
+}
+

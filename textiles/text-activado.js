@@ -281,7 +281,7 @@ checkoutBtn.addEventListener('click', () => {
     mensaje += `• Opciones de personalización\n`;
     mensaje += `• Muestras de colores y materiales`;
 
-    const telefono = '34914789012'; // Usando el número de tus iconos sociales
+    const telefono = '50769764758'; // Usando el número de tus iconos sociales
     const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
     
@@ -328,4 +328,26 @@ checkoutBtn.addEventListener('click', () => {
     // ============================
     renderProductos();
     actualizarCarritoUI();
+});
+
+// Función para el menú de login
+function toggleLoginMenu() {
+    const menu = document.getElementById('loginMenu');
+    menu.classList.toggle('active');
+}
+
+// Cerrar menú al hacer clic fuera
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('loginMenu');
+    const button = document.querySelector('.login-icon-btn');
+    
+    if (!menu.contains(e.target) && !button.contains(e.target)) {
+        menu.classList.remove('active');
+    }
+});
+
+// Cerrar menú al hacer scroll
+window.addEventListener('scroll', () => {
+    const menu = document.getElementById('loginMenu');
+    menu.classList.remove('active');
 });
