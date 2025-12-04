@@ -64,9 +64,11 @@ function handleLoginSubmit(event) {
             localStorage.setItem('userSession', JSON.stringify(sessionData));
             
             // Redirigir según el tipo de usuario
-            if (data.user.TipoUsuario === 'CEO' || data.user.TipoUsuario === 'Vendedor') {
+            if (data.user.TipoUsuario === 'CEO') {
                 window.location.replace('../administracion/administracion.html');
-            } else if (data.user.TipoUsuario === 'Cliente') {
+            }else if (data.user.TipoUsuario === 'Vendedor') {
+                window.location.replace('../administracion/vistaVendedor/vendedor.html');
+            }else if (data.user.TipoUsuario === 'Cliente') {
                 window.location.replace('../index.html');
             }
         } else {

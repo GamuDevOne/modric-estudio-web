@@ -560,3 +560,96 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+/* =====================================================
+   ACTUALIZACIÓN: Sistema de Colegios/Bases
+   seagregaron estas tablas a la base de datos existente
+===================================================== */
+
+USE ModricEstudio00;
+
+-- =====================================================
+-- TABLA: Colegios/Bases de trabajo
+-- =====================================================
+CREATE TABLE Colegio (
+    ID_Colegio INT AUTO_INCREMENT PRIMARY KEY,
+    NombreColegio VARCHAR(150) NOT NULL,
+    Direccion VARCHAR(255) NULL,
+    Telefono VARCHAR(20) NULL,
+    FechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Activo',
+    -- Estados: 'Activo', 'Cerrado'
+    Notas TEXT NULL,
+    
+    INDEX IX_Colegio_Estado (Estado),
+    INDEX IX_Colegio_Nombre (NombreColegio)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- TABLA: Asignaciones de Vendedores a Colegios
+-- Una "Base" es una asignación de vendedores a un colegio en una fecha
+-- =====================================================
+CREATE TABLE AsignacionVendedor (
+    ID_Asignacion INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Vendedor INT NOT NULL,
+    ID_Colegio INT NOT NULL,
+    FechaAsignacion DATE NOT NULL,
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Activo',
+    -- Estados: 'Activo', 'Finalizado'
+    FechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT FK_Asignacion_Vendedor FOREIGN KEY (ID_Vendedor)
+        REFERENCES Usuario(ID_Usuario)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    
+    CONSTRAINT FK_Asignacion_Colegio FOREIGN KEY (ID_Colegio)
+        REFERENCES Colegio(ID_Colegio)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    
+    -- Evitar duplicados: mismo vendedor en mismo colegio el mismo día
+    UNIQUE KEY UQ_Vendedor_Colegio_Fecha (ID_Vendedor, ID_Colegio, FechaAsignacion),
+    
+    INDEX IX_Asignacion_Fecha (FechaAsignacion),
+    INDEX IX_Asignacion_Colegio (ID_Colegio)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- MODIFICAR TABLA PEDIDO: Agregar relación con Colegio
+-- =====================================================
+ALTER TABLE Pedido 
+ADD COLUMN ID_Colegio INT NULL AFTER ID_Paquete,
+ADD CONSTRAINT FK_Pedido_Colegio FOREIGN KEY (ID_Colegio)
+    REFERENCES Colegio(ID_Colegio)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+-- =====================================================
+-- DATOS DE PRUEBA
+-- =====================================================
+-- Colegios de ejemplo
+INSERT INTO Colegio (NombreColegio, Direccion, Estado) VALUES
+('Instituto Nacional', 'Calle 50, Ciudad de Panamá', 'Activo'),
+('Colegio Javier', 'Vía España, Ciudad de Panamá', 'Activo'),
+('Pedro Pablo Sánchez', 'La Chorrera, Panamá Oeste', 'Activo');
+
+/* =====================================================
+   NOTAS:
+   
+   1. Colegio: Guarda los colegios/instituciones
+   
+   2. AsignacionVendedor: Relaciona vendedores con colegios
+      - Un vendedor puede estar en diferentes colegios en diferentes días
+      - Pero solo en UN colegio por día (UNIQUE KEY)
+   
+   3. Pedido.ID_Colegio: Cada venta se asocia al colegio
+      donde se realizó
+   
+   FLUJO:
+   1. CEO crea colegio (si no existe)
+   2. CEO asigna vendedores al colegio para fecha X
+   3. Vendedor inicia sesión → ve su asignación del día
+   4. Vendedor registra ventas → se asocian al colegio
+   5. CEO puede ver/exportar ventas por colegio
+===================================================== */

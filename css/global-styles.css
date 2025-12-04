@@ -370,12 +370,18 @@ nav ul li a.active {
    MÓVIL GRANDE (768px y menor) - CON FIXES
 ======================================== */
 @media (max-width: 768px) {
-    /* HEADER MÓVIL */
+    /* HEADER MÓVIL - FIJO */
     header {
         padding: 12px 20px;
         flex-wrap: nowrap;
         justify-content: space-between;
-        position: relative;
+        position: fixed !important; /* ← CAMBIO AQUÍ */
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+        background-color: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     
     /* Mostrar botón hamburguesa */
@@ -504,6 +510,12 @@ nav ul li a.active {
     }
     
     /* HERO */
+
+    .hero { /*con esto se compensa el espacio del header fijo*/
+        margin-top: 0 !important;
+        padding-top: 64px; /* Altura del header móvil */
+    }
+    
     .hero-content h1 {
         font-size: 32px;
         letter-spacing: 6px;
@@ -609,6 +621,13 @@ nav ul li a.active {
     .back-to-top {
         padding: 10px 20px;
         font-size: 13px;
+    }
+
+    /*secciones*/
+    .about-section,
+    .gallery-section,
+    .contact-section {
+        scroll-margin-top: 70px;
     }
 }
 

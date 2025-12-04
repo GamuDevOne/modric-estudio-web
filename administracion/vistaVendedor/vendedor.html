@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Vendedor - Modric Estudio</title>
+    <link rel="stylesheet" href="../../css/global-styles.css">
+    <link rel="stylesheet" href="vendedor.css">
+</head>
+<body>
+    <!-- HEADER SIMPLE -->
+    <header id="header">
+        <div class="logo">
+            <a href="../../index.html">
+                <img src="../../imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../../index.html">INICIO</a></li>
+                <li><a href="vendedor.html" class="active">MI PANEL</a></li>
+            </ul>
+        </nav>
+
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <section class="vendedor-section">
+        <div class="vendedor-container">
+            
+            <!-- HEADER CON INFORMACIÓN DEL DÍA -->
+            <div class="dia-header">
+                <div class="dia-info">
+                    <h1>Vista Vendedor</h1>
+                    <p id="fechaHoy">Cargando...</p>
+                </div>
+                <div class="vendedor-nombre">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span id="nombreVendedor">Vendedor</span>
+                </div>
+            </div>
+
+            <!-- ASIGNACIÓN DEL DÍA -->
+            <div class="asignacion-card" id="asignacionCard">
+                <div class="asignacion-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <div class="asignacion-info">
+                    <h2>Tu Colegio de Hoy</h2>
+                    <p class="colegio-nombre" id="colegioNombre">Sin asignación</p>
+                    <p class="colegio-direccion" id="colegioDireccion"></p>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS DEL DÍA -->
+            <div class="stats-dia">
+                <div class="stat-card-vendedor">
+                    <div class="stat-icon-vendedor" style="background-color: #e8f5e9;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content-vendedor">
+                        <p class="stat-label-vendedor">Ventas de Hoy</p>
+                        <h3 class="stat-value-vendedor" id="ventasHoy">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card-vendedor">
+                    <div class="stat-icon-vendedor" style="background-color: #e3f2fd;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content-vendedor">
+                        <p class="stat-label-vendedor">Total del Día</p>
+                        <h3 class="stat-value-vendedor" id="totalHoy">$0.00</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÓN REGISTRAR VENTA -->
+            <div class="accion-rapida">
+                <button class="btn-registrar-venta" onclick="abrirModalVenta()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Registrar Nueva Venta
+                </button>
+            </div>
+
+            <!-- LISTA DE VENTAS DEL DÍA -->
+            <div class="ventas-card">
+                <div class="ventas-header">
+                    <h3>Ventas de Hoy</h3>
+                    <span class="badge-ventas" id="badgeVentas">0</span>
+                </div>
+                <div class="ventas-lista" id="ventasLista">
+                    <p class="sin-ventas">No has registrado ventas hoy</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL: REGISTRAR VENTA -->
+    <div id="modalVenta" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Nueva Venta</h2>
+                <button class="modal-close" onclick="cerrarModalVenta()">&times;</button>
+            </div>
+            <form id="formVenta" onsubmit="guardarVenta(event)">
+                <div class="modal-body">
+                    <!-- Cliente -->
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre del Cliente *</label>
+                        <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez" required>
+                    </div>
+
+                    <!-- Servicio/Paquete -->
+                    <div class="form-group">
+                        <label for="selectServicio">Servicio/Paquete *</label>
+                        <select id="selectServicio" onchange="actualizarPrecio()" required>
+                            <option value="">Selecciona un servicio</option>
+                        </select>
+                    </div>
+
+                    <!-- Precio (auto-llenado) -->
+                    <div class="form-group">
+                        <label for="precioVenta">Precio</label>
+                        <input type="number" id="precioVenta" step="0.01" readonly style="background-color: #f5f5f5;">
+                    </div>
+
+                    <!-- Método de Pago -->
+                    <div class="form-group">
+                        <label for="metodoPago">Método de Pago *</label>
+                        <select id="metodoPago" required>
+                            <option value="">Selecciona método</option>
+                            <option value="Yappy">Yappy</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                            <option value="Tarjeta">Tarjeta de Crédito/Débito</option>
+                        </select>
+                    </div>
+
+                    <!-- Estado de Pago -->
+                    <div class="form-group">
+                        <label for="estadoPago">Estado del Pago *</label>
+                        <select id="estadoPago" required>
+                            <option value="Completo">Pago Completo</option>
+                            <option value="Abono">Abono (Pendiente Saldo)</option>
+                        </select>
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="form-group">
+                        <label for="notasVenta">Notas Adicionales</label>
+                        <textarea id="notasVenta" rows="3" placeholder="Información adicional sobre la venta..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="cerrarModalVenta()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARGA -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <script src="../../js/global-script.js"></script>
+    <script src="vendedor.js"></script>
+</body>
+</html>

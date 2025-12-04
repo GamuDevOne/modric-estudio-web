@@ -221,3 +221,10 @@
         font-size: 12px;
     }
 }
+
+.botones-container {
+    display: flex;          /* convierte el div en un contenedor flex */
+    justify-content: center; /* centra horizontalmente los botones */
+    gap: 15px;               /* espacio entre los botones */
+    margin-top: 10px;        /* opcional, para separar de otros elementos */
+}

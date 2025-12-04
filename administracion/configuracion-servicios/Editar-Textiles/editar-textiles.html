@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Textiles - Modric Studio</title>
+    <link rel="stylesheet" href="editar-textiles.css">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="editar-textiles-container">
+        <!-- Header -->
+        <header class="textiles-header">
+            <div class="header-content">
+                <h1><i class="fas fa-tshirt"></i> Editor de Textiles</h1>
+                <p>Personaliza suéteres y abrigos para escuelas y empresas</p>
+            </div>
+            <button class="back-btn" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </header>
+
+        <!-- Productos Grid -->
+        <div class="productos-grid">
+            <!-- Suéter -->
+            <div class="producto-card" data-producto="sweater">
+                <div class="producto-header">
+                    <i class="fas fa-tshirt"></i>
+                    <h2>Suéter Personalizado</h2>
+                    <span class="producto-badge">Escolar/Empresarial</span>
+                </div>
+
+                <!-- Galería de Imágenes -->
+                <div class="imagenes-section">
+                    <h3>Galería de Imágenes</h3>
+                    <div class="galeria-container">
+                        <button class="galeria-btn prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="imagenes-preview">
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 1" class="producto-imagen" data-index="0">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="0" hidden>
+                                <button class="upload-btn" data-index="0">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 2" class="producto-imagen" data-index="1">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="1" hidden>
+                                <button class="upload-btn" data-index="1">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 3" class="producto-imagen" data-index="2">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="2" hidden>
+                                <button class="upload-btn" data-index="2">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="galeria-btn next-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Precios y Tallas -->
+                <div class="config-section">
+                    <h3>Precios por Talla</h3>
+                    <div class="precios-grid">
+                        <div class="precio-item">
+                            <label>XS</label>
+                            <input type="number" class="precio-input" data-talla="xs" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>S</label>
+                            <input type="number" class="precio-input" data-talla="s" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>M</label>
+                            <input type="number" class="precio-input" data-talla="m" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>L</label>
+                            <input type="number" class="precio-input" data-talla="l" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>XL</label>
+                            <input type="number" class="precio-input" data-talla="xl" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="estado-section">
+                    <label class="toggle-label">
+                        <span>Producto Activo</span>
+                        <input type="checkbox" class="estado-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Abrigo -->
+            <div class="producto-card" data-producto="abrigo">
+                <div class="producto-header">
+                    <i class="fas fa-temperature-low"></i>
+                    <h2>Abrigo Personalizado</h2>
+                    <span class="producto-badge">Escolar/Empresarial</span>
+                </div>
+
+                <!-- Galería de Imágenes -->
+                <div class="imagenes-section">
+                    <h3>Galería de Imágenes</h3>
+                    <div class="galeria-container">
+                        <button class="galeria-btn prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="imagenes-preview">
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 1" class="producto-imagen" data-index="0">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="0" hidden>
+                                <button class="upload-btn" data-index="0">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 2" class="producto-imagen" data-index="1">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="1" hidden>
+                                <button class="upload-btn" data-index="1">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                            <div class="imagen-item">
+                                <img src="" alt="Imagen 3" class="producto-imagen" data-index="2">
+                                <input type="file" class="imagen-input" accept="image/*" data-index="2" hidden>
+                                <button class="upload-btn" data-index="2">
+                                    <i class="fas fa-upload"></i> Subir
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="galeria-btn next-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Precios y Tallas -->
+                <div class="config-section">
+                    <h3>Precios por Talla</h3>
+                    <div class="precios-grid">
+                        <div class="precio-item">
+                            <label>S</label>
+                            <input type="number" class="precio-input" data-talla="s" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>M</label>
+                            <input type="number" class="precio-input" data-talla="m" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>L</label>
+                            <input type="number" class="precio-input" data-talla="l" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>XL</label>
+                            <input type="number" class="precio-input" data-talla="xl" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                        <div class="precio-item">
+                            <label>XXL</label>
+                            <input type="number" class="precio-input" data-talla="xxl" placeholder="$0.00" min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="estado-section">
+                    <label class="toggle-label">
+                        <span>Producto Activo</span>
+                        <input type="checkbox" class="estado-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Simplificadas -->
+        <div class="acciones-footer">
+            <div class="acciones-buttons">
+                <button class="btn-guardar" id="guardarCambios">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <button class="btn-cotizar" id="verCotizacion">
+                    <i class="fas fa-whatsapp"></i> Ver Cotización WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cotización -->
+    <div class="modal-overlay" id="modalCotizacion">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-whatsapp"></i> Cotización para WhatsApp</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="cotizacion-content">
+                    <p>Esta es la cotización generada para enviar por WhatsApp:</p>
+                    <div class="cotizacion-text" id="textoCotizacion"></div>
+                    <button class="btn-copiar" id="copiarCotizacion">
+                        <i class="fas fa-copy"></i> Copiar al Portapapeles
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="editar-textiles.js"></script>
+</body>
+</html>
