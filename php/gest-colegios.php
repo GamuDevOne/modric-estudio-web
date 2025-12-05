@@ -258,9 +258,10 @@ function obtenerAsignaciones($pdo, $data) {
                 u.NombreCompleto,
                 u.Correo,
                 (SELECT COUNT(*) FROM Pedido p 
-                 WHERE p.ID_Vendedor = av.ID_Vendedor 
-                 AND p.ID_Colegio = av.ID_Colegio
-                 AND DATE(p.Fecha) = av.FechaAsignacion) as VentasDelDia,
+                WHERE p.ID_Vendedor = av.ID_Vendedor 
+                AND p.ID_Colegio = av.ID_Colegio
+                AND DATE(p.Fecha) = av.FechaAsignacion
+                AND p.Estado != 'Cancelado') as VentasDelDia,
                 (SELECT COALESCE(SUM(p.Total), 0) FROM Pedido p 
                  WHERE p.ID_Vendedor = av.ID_Vendedor 
                  AND p.ID_Colegio = av.ID_Colegio

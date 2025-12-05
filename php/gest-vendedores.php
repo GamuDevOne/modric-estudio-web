@@ -67,24 +67,13 @@ try {
 // ========================================
 function getAllVendedores($pdo) {
     try {
-        // Primero verificar si la columna LugarTrabajo existe
-        $stmt = $pdo->query("SHOW COLUMNS FROM Usuario LIKE 'LugarTrabajo'");
-        $columnExists = $stmt->rowCount() > 0;
-        
-        // Si no existe, crearla
-        if (!$columnExists) {
-            $pdo->exec("ALTER TABLE Usuario ADD COLUMN LugarTrabajo VARCHAR(100) NULL AFTER GrupoGrado");
-        }
-        
         // Obtener vendedores
         $stmt = $pdo->query("
             SELECT 
                 u.ID_Usuario,
                 u.NombreCompleto,
                 u.Usuario,
-                u.Correo,
-                u.GrupoGrado,
-                u.LugarTrabajo
+                u.Correo
             FROM Usuario u
             WHERE u.TipoUsuario = 'Vendedor'
             ORDER BY u.NombreCompleto ASC
@@ -154,16 +143,12 @@ function createVendedor($pdo, $data) {
                 Correo, 
                 Contrasena, 
                 TipoUsuario, 
-                GrupoGrado,
-                LugarTrabajo
             ) VALUES (
                 :nombreCompleto,
                 :usuario,
                 :correo,
                 :contrasena,
                 'Vendedor',
-                :grupoGrado,
-                :lugarTrabajo
             )
         ");
         
@@ -171,9 +156,7 @@ function createVendedor($pdo, $data) {
             ':nombreCompleto' => $data['nombreCompleto'],
             ':usuario' => $data['usuario'],
             ':correo' => $data['correo'],
-            ':contrasena' => $data['contrasena'], // TODO: Implementar hash
-            ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-            ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null
+            ':contrasena' => $data['contrasena'], // all: Implementar hash
         ]);
         
         echo json_encode([
@@ -271,8 +254,6 @@ function updateVendedor($pdo, $data) {
                     Usuario = :usuario,
                     Correo = :correo,
                     Contrasena = :contrasena,
-                    GrupoGrado = :grupoGrado,
-                    LugarTrabajo = :lugarTrabajo
                 WHERE ID_Usuario = :id
             ");
             
@@ -280,9 +261,7 @@ function updateVendedor($pdo, $data) {
                 ':nombreCompleto' => $data['nombreCompleto'],
                 ':usuario' => $data['usuario'],
                 ':correo' => $data['correo'],
-                ':contrasena' => $data['contrasena'], // TODO: Implementar hash
-                ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-                ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null,
+                ':contrasena' => $data['contrasena'], // all: Implementar hash
                 ':id' => $data['id']
             ]);
         } else {
@@ -292,8 +271,6 @@ function updateVendedor($pdo, $data) {
                     NombreCompleto = :nombreCompleto,
                     Usuario = :usuario,
                     Correo = :correo,
-                    GrupoGrado = :grupoGrado,
-                    LugarTrabajo = :lugarTrabajo
                 WHERE ID_Usuario = :id
             ");
             
@@ -301,8 +278,6 @@ function updateVendedor($pdo, $data) {
                 ':nombreCompleto' => $data['nombreCompleto'],
                 ':usuario' => $data['usuario'],
                 ':correo' => $data['correo'],
-                ':grupoGrado' => !empty($data['grupoGrado']) ? $data['grupoGrado'] : null,
-                ':lugarTrabajo' => !empty($data['lugarTrabajo']) ? $data['lugarTrabajo'] : null,
                 ':id' => $data['id']
             ]);
         }
@@ -465,7 +440,7 @@ function getVendedorStats($pdo, $data) {
             'success' => true,
             'stats' => [
                 'totalVentas' => $totalVentas,
-                'lugarTrabajo' => $lugarTrabajo,
+                'lugarTrabajo' => $lugarTrabajo, //se eliminará si provoca error
                 'pedidosActivos' => $pedidosActivos,
                 'ultimoPedido' => $ultimoPedidoTexto,
                 'estadoPendientes' => $estadoPendientes,

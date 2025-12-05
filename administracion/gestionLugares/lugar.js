@@ -111,6 +111,18 @@ function crearColegioCard(colegio) {
                     ${colegio.Telefono}
                 </div>
                 ` : ''}
+                ${colegio.Notas ? `
+                <div class="info-item" style="margin-top: 10px; color: #666; font-size: 13px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    ${colegio.Notas}
+                </div>
+                ` : ''}
             </div>
         </div>
         
@@ -269,77 +281,59 @@ function closeModalColegio() {
     document.body.classList.remove('modal-open');
 }
 
-async function guardarColegio(event) {
+function guardarColegio(event) {
     event.preventDefault();
-    const id = document.getElementById('colegioId').value || null;
-    const nombre = document.getElementById('nombreColegio').value.trim();
+    
+    const id = document.getElementById('colegioId').value;
+    const nombreColegio = document.getElementById('nombreColegio').value.trim();
     const direccion = document.getElementById('direccionColegio').value.trim();
     const telefono = document.getElementById('telefonoColegio').value.trim();
-    const notas = document.getElementById('notasColegio').value.trim(); // <= asegurar lectura
-
-    const payload = { id, nombre, direccion, telefono, notas };
-
-    try {
-        showLoading(); // si tienes función de loading
-        const res = await fetch('api/colegios/save.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
+    const notas = document.getElementById('notasColegio').value.trim();
+    
+    if (!nombreColegio) {
+        alert('El nombre del lugar es requerido');
+        return;
+    }
+    
+    showLoadingModal();
+    
+    const action = id ? 'editar_colegio' : 'crear_colegio';
+    const payload = {
+        action: action,
+        nombreColegio: nombreColegio,
+        direccion: direccion,
+        telefono: telefono,
+        notas: notas
+    };
+    
+    if (id) {
+        payload.idColegio = id;
+    }
+    
+    fetch('../../php/gest-colegios.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoadingModal();
+        
         if (data.success) {
+            alert(id ? 'Lugar actualizado correctamente' : 'Lugar creado correctamente');
             closeModalColegio();
-            cargarColegios(); // recargar lista desde servidor (debe traer notas)
+            cargarColegios();
         } else {
-            alert(data.message || 'Error al guardar');
+            alert('Error: ' + data.message);
         }
-    } catch (err) {
-        console.error(err);
+    })
+    .catch(error => {
+        hideLoadingModal();
+        console.error('Error:', error);
         alert('Error de conexión');
-    } finally {
-        hideLoading();
-    }
-}
-
-// Ejemplo de función para crear la tarjeta de un lugar (usar cuando renderices cada elemento)
-function crearCardColegio(lugar) {
-    const card = document.createElement('div');
-    card.className = 'colegio-card';
-
-    const header = document.createElement('div');
-    header.className = 'colegio-header';
-    const title = document.createElement('h3');
-    title.textContent = lugar.nombre || 'Sin nombre';
-    header.appendChild(title);
-    card.appendChild(header);
-
-    if (lugar.direccion) {
-        const dir = document.createElement('p');
-        dir.className = 'colegio-direccion';
-        dir.textContent = lugar.direccion;
-        card.appendChild(dir);
-    }
-
-    if (lugar.telefono) {
-        const tel = document.createElement('p');
-        tel.className = 'colegio-telefono';
-        tel.textContent = lugar.telefono;
-        card.appendChild(tel);
-    }
-
-    // NOTAS: crear siempre el elemento pero esconder si vacío
-    const notasEl = document.createElement('p');
-    notasEl.className = 'colegio-notas';
-    if (lugar.notas && lugar.notas.trim() !== '') {
-        notasEl.textContent = lugar.notas;
-        notasEl.style.display = ''; // visible
-    } else {
-        notasEl.style.display = 'none'; // ocultar si vacío
-    }
-    card.appendChild(notasEl);
-
-    // ... botones / stats ...
-    return card;
+    });
 }
 
 // ========================================

@@ -68,7 +68,7 @@ function mostrarVendedores(vendedores) {
     tabla.innerHTML = '';
     
     if (vendedores.length === 0) {
-        tabla.innerHTML = '<tr><td colspan="5" class="empty">No hay vendedores registrados</td></tr>';
+        tabla.innerHTML = '<tr><td colspan="4" class="empty">No hay vendedores registrados</td></tr>';
         return;
     }
     
@@ -78,7 +78,6 @@ function mostrarVendedores(vendedores) {
             <td>#${vendedor.ID_Usuario}</td>
             <td>${vendedor.NombreCompleto}</td>
             <td>${vendedor.Correo || 'N/A'}</td>
-            <td>${vendedor.GrupoGrado || 'N/A'}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-icon stats" title="Ver estadísticas">
@@ -148,8 +147,6 @@ function editarVendedor(id) {
     document.getElementById('nombreCompleto').value = vendedor.NombreCompleto;
     document.getElementById('usuario').value = vendedor.Usuario || '';
     document.getElementById('correo').value = vendedor.Correo || '';
-    document.getElementById('grupoGrado').value = vendedor.GrupoGrado || '';
-    document.getElementById('lugarTrabajo').value = vendedor.LugarTrabajo || '';
     document.getElementById('contrasena').value = '';
     document.getElementById('contrasena').required = false;
     document.getElementById('requiredStar').style.display = 'none';
@@ -171,8 +168,6 @@ function guardarVendedor(event) {
         nombreCompleto: document.getElementById('nombreCompleto').value,
         usuario: document.getElementById('usuario').value,
         correo: document.getElementById('correo').value,
-        grupoGrado: document.getElementById('grupoGrado').value,
-        lugarTrabajo: document.getElementById('lugarTrabajo').value,
         contrasena: document.getElementById('contrasena').value
     };
     

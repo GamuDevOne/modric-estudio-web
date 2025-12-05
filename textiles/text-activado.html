@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Textiles Personalizados - Modric Estudio</title>
-<link rel="stylesheet" href="text-activado.css">
 <link rel="stylesheet" href="../css/global-styles.css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="text-activado.css">
 </head>
 <body>
 
@@ -18,7 +17,14 @@
         </a>
     </div>
 
-    <nav class="main-nav">
+    <!-- BOTÓN HAMBURGUESA (solo visible en móvil) -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menú">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <nav id="mainNav" class="main-nav">
         <ul>
             <li><a href="../index.html">INICIO</a></li>
             <li><a href="../index.html#sobre-nosotros">SOBRE NOSOTROS</a></li>
@@ -28,8 +34,8 @@
             <li class="dropdown">
                 <a href="javascript:void(0)" class="dropdown-toggle">MÁS</a>
                 <ul class="dropdown-menu">
-                    <li><a href="/modric/index.html#combos">Combos de graduación</a></li>
-                    <li><a href="/modric/index.html#contacto">CONTACTO</a></li>
+                    <li><a href="../index.html#combos">Combos de graduación</a></li>
+                    <li><a href="../index.html#contacto">CONTACTO</a></li>
                 </ul>
             </li>
         </ul>
@@ -39,7 +45,7 @@
     <div class="header-icons">
         <!-- LOGIN -->
         <div class="login-btn">
-            <button id="loginButton" class="login-icon-btn" type="button">
+            <button onclick="toggleLoginMenu()" class="login-icon-btn" aria-label="Abrir menú de usuario" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -53,7 +59,7 @@
         <!-- CARRITO -->
         <div class="cart-icon" id="cart-icon">
             <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count">0</span>
+            <span class="cart-badge" id="cart-count">0</span>
         </div>
     </div>
 </header>
@@ -90,17 +96,19 @@
     </div>
     <div class="cart-body">
         <ul id="cart-items" class="cart-items"></ul>
-        <div class="cart-total" id="cart-total">Total: $0.00</div>
     </div>
-    <button class="cart-btn" id="checkout-btn">
-        <i class="fab fa-whatsapp"></i> Cotizar por WhatsApp
-    </button>
+    <div class="cart-footer">
+        <div class="cart-total" id="cart-total">Total: $0.00</div>
+        <button class="cart-btn" id="checkout-btn">
+            <i class="fab fa-whatsapp"></i> Cotizar por WhatsApp
+        </button>
+    </div>
 </div>
 
 <!-- SECCIÓN PRINCIPAL -->
 <section class="textiles-section">
     <div class="textiles-header">
-        <h2>Suéteres y Abrigos Personalizados</h2>
+        <h1>Suéteres y Abrigos Personalizados</h1>
         <p>Diseñados para instituciones, empresas y eventos.</p>
         <p>Personaliza con logo y color</p>
     </div>
@@ -110,31 +118,11 @@
     </div>
 </section>
 
-<!-- Script interno: manejo del login -->
-<script>
-    // Toggle del menú de login
-    document.getElementById('loginButton').addEventListener('click', () => {
-        const menu = document.getElementById('loginMenu');
-        menu.classList.toggle('active');
-    });
-
-    // Cierra el menú al hacer clic fuera
-    window.addEventListener('click', (e) => {
-        const menu = document.getElementById('loginMenu');
-        const button = document.getElementById('loginButton');
-        if (!menu.contains(e.target) && !button.contains(e.target)) {
-            menu.classList.remove('active');
-        }
-    });
-</script>
-
 <footer class="footer">
     <p>©2025 - Modric Estudio</p>
 </footer>
 
-
-<script src="text-activado.js"></script>
 <script src="../js/global-script.js"></script>
-
+<script src="text-activado.js"></script>
 </body>
 </html>
