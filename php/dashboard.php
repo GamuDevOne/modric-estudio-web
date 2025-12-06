@@ -26,24 +26,34 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
 
-    if ($action === 'get_dashboard_data') {
-        $response = [
-            'success' => true,
-            'estadisticas' => getEstadisticas($pdo),
-            'graficos' => getGraficos($pdo),
-            'pedidos' => getPedidos($pdo)
-        ];
-        
-        echo json_encode($response);
-    } elseif ($action === 'marcar_completado') {
-        marcarCompletado($pdo, $input);
-    } elseif ($action === 'cancelar_pedido') {
-        cancelarPedido($pdo, $input);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Acción no válida'
-        ]);
+    switch ($action) {
+        case 'get_dashboard_data':
+            $response = [
+                'success' => true,
+                'estadisticas' => getEstadisticas($pdo),
+                'graficos' => getGraficos($pdo),
+                'pedidos' => getPedidos($pdo)
+            ];
+            echo json_encode($response);
+            break;
+            
+        case 'marcar_completado':
+            marcarCompletado($pdo, $input);
+            break;
+            
+        case 'cancelar_pedido':
+            cancelarPedido($pdo, $input);
+            break;
+            
+        case 'get_all_pedidos':
+            getAllPedidos($pdo);
+            break;
+            
+        default:
+            echo json_encode([
+                'success' => false,
+                'message' => 'Acción no válida'
+            ]);
     }
     
 } catch (PDOException $e) {
@@ -65,6 +75,7 @@ function getEstadisticas($pdo) {
         FROM Pedido
         WHERE YEAR(Fecha) = YEAR(CURDATE()) 
         AND MONTH(Fecha) = MONTH(CURDATE())
+        AND Estado != 'Cancelado'
     ");
     $stats['ventasMes'] = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMes'];
     
@@ -74,6 +85,7 @@ function getEstadisticas($pdo) {
         FROM Pedido
         WHERE YEAR(Fecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
         AND MONTH(Fecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
+        AND Estado != 'Cancelado'
     ");
     $ventasMesAnterior = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMesAnterior'];
     
@@ -84,31 +96,22 @@ function getEstadisticas($pdo) {
         $stats['cambioVentas'] = 0;
     }
     
-    // Pedidos activos (no cancelados)
+    // Pedidos activos (no cancelados ni completados)
     $stmt = $pdo->query("
         SELECT COUNT(*) as pedidosActivos
         FROM Pedido
-        WHERE Estado != 'Cancelado'
+        WHERE Estado NOT IN ('Cancelado', 'Completado')
     ");
     $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
     
     // Pedidos pendientes de pago
     $stmt = $pdo->query("
-        SELECT 
-            p.ID_Pedido,
-            COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
-            p.Total,
-            DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
-            v.NombreCompleto as Vendedor,
-            vi.EstadoPago
+        SELECT COUNT(*) as pedidosPendientes
         FROM Pedido p
-        INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-        WHERE p.Estado = 'Pendiente' OR (vi.EstadoPago = 'Abono')
-        ORDER BY p.Fecha ASC
+        WHERE p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono'
     ");
-    $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
     
     // Total de clientes
     $stmt = $pdo->query("
@@ -150,7 +153,7 @@ function getGraficos($pdo) {
         SELECT 
             DATE_FORMAT(Fecha, '%Y-%m') as mes,
             DATE_FORMAT(Fecha, '%b %Y') as mesTexto,
-            SUM(Total) as total
+            COALESCE(SUM(Total), 0) as total
         FROM Pedido
         WHERE Fecha >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
         AND Estado != 'Cancelado'
@@ -159,29 +162,47 @@ function getGraficos($pdo) {
     ");
     
     $ventasMensuales = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $graficos['ventasMensuales'] = [
-        'labels' => array_column($ventasMensuales, 'mesTexto'),
-        'data' => array_column($ventasMensuales, 'total')
-    ];
+    
+    // Si no hay datos, devolver arrays vacíos
+    if (empty($ventasMensuales)) {
+        $graficos['ventasMensuales'] = [
+            'labels' => [],
+            'data' => []
+        ];
+    } else {
+        $graficos['ventasMensuales'] = [
+            'labels' => array_column($ventasMensuales, 'mesTexto'),
+            'data' => array_column($ventasMensuales, 'total')
+        ];
+    }
     
     // Top 5 servicios más vendidos
     $stmt = $pdo->query("
         SELECT 
-            s.NombreServicio,
+            COALESCE(s.NombreServicio, pk.NombrePaquete, 'Sin especificar') as Servicio,
             COUNT(p.ID_Pedido) as cantidad
         FROM Pedido p
-        INNER JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+        LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+        LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
         WHERE p.Estado != 'Cancelado'
-        GROUP BY s.ID_Servicio
+        GROUP BY COALESCE(s.ID_Servicio, pk.ID_Paquete, 0)
         ORDER BY cantidad DESC
         LIMIT 5
     ");
     
     $servicios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $graficos['servicios'] = [
-        'labels' => array_column($servicios, 'NombreServicio'),
-        'data' => array_column($servicios, 'cantidad')
-    ];
+    
+    if (empty($servicios)) {
+        $graficos['servicios'] = [
+            'labels' => [],
+            'data' => []
+        ];
+    } else {
+        $graficos['servicios'] = [
+            'labels' => array_column($servicios, 'Servicio'),
+            'data' => array_column($servicios, 'cantidad')
+        ];
+    }
     
     return $graficos;
 }
@@ -196,8 +217,8 @@ function getPedidos($pdo) {
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
-            COALESCE(p.NombreCliente, u.NombreCompleto) as Cliente,
-            s.NombreServicio as Servicio,
+            COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
+            COALESCE(s.NombreServicio, pk.NombrePaquete, 'N/A') as Servicio,
             p.Fecha,
             p.Total,
             p.Estado,
@@ -206,6 +227,8 @@ function getPedidos($pdo) {
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
         LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+        LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
         ORDER BY p.Fecha DESC
         LIMIT 10
     ");
@@ -215,14 +238,16 @@ function getPedidos($pdo) {
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
-            COALESCE(p.NombreCliente, u.NombreCompleto) as Cliente,
+            COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
             p.Total,
             DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
-            v.NombreCompleto as Vendedor
+            v.NombreCompleto as Vendedor,
+            COALESCE(vi.EstadoPago, 'Pendiente') as EstadoPago
         FROM Pedido p
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
         LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
-        WHERE p.Estado = 'Pendiente'
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono'
         ORDER BY p.Fecha ASC
     ");
     $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -244,7 +269,7 @@ function marcarCompletado($pdo, $data) {
         $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = :id");
         $stmt->execute([':id' => $data['idPedido']]);
         
-        // Actualizar estado de pago si existe
+        // Actualizar estado de pago si existe registro en VentaInfo
         $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = :id");
         $stmt->execute([':id' => $data['idPedido']]);
         
@@ -293,28 +318,6 @@ function cancelarPedido($pdo, $data) {
     }
 }
 
-if ($action === 'get_dashboard_data') {
-        $response = [
-            'success' => true,
-            'estadisticas' => getEstadisticas($pdo),
-            'graficos' => getGraficos($pdo),
-            'pedidos' => getPedidos($pdo)
-        ];
-        
-        echo json_encode($response);
-    } elseif ($action === 'marcar_completado') {
-        marcarCompletado($pdo, $input);
-    } elseif ($action === 'cancelar_pedido') {
-        cancelarPedido($pdo, $input);
-    } elseif ($action === 'get_all_pedidos') {
-        getAllPedidos($pdo);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Acción no válida'
-        ]);
-    }
-
 // ========================================
 // FUNCIÓN: OBTENER TODOS LOS PEDIDOS
 // ========================================
@@ -324,7 +327,7 @@ function getAllPedidos($pdo) {
             SELECT 
                 p.ID_Pedido,
                 COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
-                s.NombreServicio as Servicio,
+                COALESCE(s.NombreServicio, pk.NombrePaquete, 'N/A') as Servicio,
                 p.Fecha,
                 p.Total,
                 p.Estado,
@@ -333,6 +336,7 @@ function getAllPedidos($pdo) {
             INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
             LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
             LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
             ORDER BY p.Fecha DESC
             LIMIT 100

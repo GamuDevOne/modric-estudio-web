@@ -408,3 +408,11 @@ function cargarTodosPedidos() {
         tabla.innerHTML = '<tr><td colspan="6" class="empty">Error de conexión</td></tr>';
     });
 }
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('modalTodosPedidos');
+    if (event.target === modal) {
+        cerrarModalTodosPedidos();
+    }
+};
