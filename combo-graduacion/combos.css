@@ -134,23 +134,6 @@ body {
     font-size: 20px;
 }
 
-/* Botón, por si lo usas más adelante */
-.paquete-btn {
-    display: inline-block;
-    padding: 12px 18px;
-    background: #0f6cf2;
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: 0.2s;
-}
-
-.paquete-btn:hover {
-    background: #084cb4;
-}
-
 /* ---------------------------
    RESPONSIVE
 ----------------------------*/
@@ -174,5 +157,28 @@ body {
 
     .paquete-img img {
         width: 100%;
+    }
+}
+@media (max-width: 768px) {
+    .gallery-separator {
+        margin-top: 120px; /* Menos espacio en móvil */
+        padding: 40px 20px;
+        gap: 15px;
+    }
+    
+    .separator-title {
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-separator {
+        margin-top: 100px;
+    }
+    
+    .separator-title {
+        font-size: 18px;
+        letter-spacing: 1px;
     }
 }

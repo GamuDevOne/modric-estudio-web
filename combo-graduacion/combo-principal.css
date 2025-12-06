@@ -70,3 +70,49 @@ body {
     margin-top: 40px;
     font-size: 18px;
 }
+/* ========================================
+   SEPARADOR DE GALERÍA
+======================================== */
+.gallery-separator {
+    padding: 80px 50px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.separator-line {
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.separator-title {
+    font-size: 32px;
+    font-weight: 300;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    white-space: nowrap;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .gallery-separator {
+        padding: 40px 20px;
+        gap: 15px;
+    }
+    
+    .separator-title {
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .separator-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+}
