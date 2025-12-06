@@ -188,14 +188,15 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Cliente</th>
-                                <th>Total</th>
-                                <th>Días Pendiente</th>
-                                <th>Acción</th>
+                                <th>Monto</th>
+                                <th>Antigüedad</th>
+                                <th>Estado</th>
+                                <th style="text-align: center;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tablaPendientes">
                             <tr>
-                                <td colspan="5" class="loading">Cargando datos...</td>
+                                <td colspan="6" class="loading">Cargando datos...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -213,7 +214,7 @@
         </div>
     </div>
 
-      <!-- MODAL: toodos LOS PEDIDOS flag(se mostraran los ultimos 100)-->
+      <!-- MODAL: TODOSs LOS PEDIDOS (se mostraran los ultimos 100)-->
     <div id="modalTodosPedidos" class="modal">
         <div class="modal-content modal-large">
             <div class="modal-header">
@@ -243,6 +244,27 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" onclick="cerrarModalTodosPedidos()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="modalConfirmacion" class="modal">
+        <div class="modal-content modal-confirm">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Confirmar acción</h2>
+                <button class="modal-close" onclick="cerrarModalConfirmacion()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">¿Estás seguro de esta acción?</p>
+                <div id="confirmInputContainer" style="display: none; margin-top: 20px;">
+                    <label for="confirmInput">Motivo (opcional):</label>
+                    <textarea id="confirmInput" placeholder="Ingresa el motivo..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModalConfirmacion()">Cancelar</button>
+                <button type="button" class="btn-primary" id="confirmBtn" onclick="ejecutarAccion()">Confirmar</button>
             </div>
         </div>
     </div>

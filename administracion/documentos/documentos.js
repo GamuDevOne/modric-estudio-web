@@ -935,6 +935,102 @@ function mostrarError(mensaje) {
     alert(mensaje);
 }
 
+// ========================================
+// VARIABLES PARA MODAL DE CONFIRMACIÓN
+// ========================================
+let accionPendiente = null;
+let datosAccion = null;
+
+// ========================================
+// CERRAR ÁLBUM CON CONFIRMACIÓN
+// ========================================
+function cerrarAlbum(idAlbum, tituloAlbum) {
+    accionPendiente = 'cerrar_album';
+    datosAccion = { idAlbum };
+    
+    const modal = document.getElementById('modalConfirmacion');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    title.textContent = 'Cerrar Álbum';
+    message.textContent = `¿Deseas cerrar el álbum "${tituloAlbum}"? Los clientes no podrán descargar las fotos después de esta acción.`;
+    confirmBtn.textContent = 'Cerrar Álbum';
+    confirmBtn.style.background = '#c62828';
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+// ========================================
+// ELIMINAR ÁLBUM CON CONFIRMACIÓN
+// ========================================
+function eliminarAlbum(idAlbum, tituloAlbum) {
+    accionPendiente = 'eliminar_album';
+    datosAccion = { idAlbum };
+    
+    const modal = document.getElementById('modalConfirmacion');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    title.textContent = 'Eliminar Álbum';
+    message.textContent = `¿Deseas eliminar el álbum "${tituloAlbum}"? Esta acción es irreversible y se eliminarán todas las fotos asociadas.`;
+    confirmBtn.textContent = 'Eliminar Álbum';
+    confirmBtn.style.background = '#c62828';
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+// ========================================
+// CERRAR MODAL DE CONFIRMACIÓN
+// ========================================
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    accionPendiente = null;
+    datosAccion = null;
+}
+
+// ========================================
+// EJECUTAR ACCIÓN CONFIRMADA
+// ========================================
+function ejecutarAccion() {
+    if (!accionPendiente || !datosAccion) return;
+    
+    cerrarModalConfirmacion();
+    showLoadingModal('Procesando...');
+    
+    const payload = {
+        action: accionPendiente,
+        idAlbum: datosAccion.idAlbum
+    };
+    
+    fetch('../../php/documentos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            alert(data.message || 'Acción completada exitosamente');
+            cargarAlbums(); // Recargar la lista de álbumes
+        } else {
+            alert('Error: ' + (data.message || 'Respuesta inesperada'));
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error(err);
+        alert('Error de conexión');
+    });
+}
+
 window.onclick = function(event) {
     const modales = document.querySelectorAll('.modal');
     modales.forEach(modal => {

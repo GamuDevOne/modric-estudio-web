@@ -318,36 +318,37 @@ function cancelarPedido($pdo, $data) {
     }
 }
 
-// ========================================
-// FUNCIÓN: OBTENER TODOS LOS PEDIDOS
-// ========================================
+/**
+ * Obtener todos los pedidos (últimos 100)
+ */
 function getAllPedidos($pdo) {
     try {
-        $stmt = $pdo->query("
+        $stmt = $pdo->prepare("
             SELECT 
                 p.ID_Pedido,
-                COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
-                COALESCE(s.NombreServicio, pk.NombrePaquete, 'N/A') as Servicio,
+                u.NombreCompleto as Cliente,
+                s.NombreServicio as Servicio,
                 p.Fecha,
                 p.Total,
-                p.Estado,
-                v.NombreCompleto as Vendedor
+                p.Estado
             FROM Pedido p
-            INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-            LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
+            LEFT JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
             ORDER BY p.Fecha DESC
             LIMIT 100
         ");
-        
+        $stmt->execute();
+        $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         echo json_encode([
             'success' => true,
-            'pedidos' => $stmt->fetchAll(PDO::FETCH_ASSOC)
+            'pedidos' => $pedidos
         ]);
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
     }
 }
 ?>

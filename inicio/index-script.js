@@ -1,14 +1,14 @@
 // ========================================
 // ARRAY DE IMÁGENES PARA EL LIGHTBOX
 // ========================================
-// AQUÍ VAN LAS RUTAS DE LAS IMÁGENES DE LA GALERÍA
+// IMPORTANTE: Las rutas deben coincidir EXACTAMENTE con las del HTML
 const galleryImages = [
-    'imagenes/galeria/foto1.jpg',
-    'imagenes/galeria/foto2.jpg',
-    'imagenes/galeria/foto3.jpg',
-    'imagenes/galeria/foto4.jpg',
-    'imagenes/galeria/foto5.jpg',
-    'imagenes/galeria/foto6.jpg'
+    './imagenes/SBN/IMG_0757.jpg',      // Foto 1
+    './imagenes/SBN/_MG_0430.jpg',      // Foto 2
+    './imagenes/SBN/_MG_0505.jpg',      // Foto 3
+    './imagenes/SBN/_MG_9245.JPG',      // Foto 4
+    './imagenes/SBN/IMG_0758.jpeg',     // Foto 5
+    './imagenes/SBN/IMG_1571.jpeg'      // Foto 6
 ];
 
 let currentImageIndex = 0;
@@ -23,8 +23,22 @@ function openLightbox(index) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightbox-image');
     
+    // Verificar que la imagen existe
+    console.log('Abriendo imagen:', galleryImages[currentImageIndex]);
+    
     lightbox.classList.add('active');
     lightboxImage.src = galleryImages[currentImageIndex];
+    
+    // Agregar evento de error para debugging
+    lightboxImage.onerror = function() {
+        console.error('Error al cargar imagen:', this.src);
+        alert('Error al cargar la imagen. Verifica que el archivo existe en: ' + this.src);
+    };
+    
+    lightboxImage.onload = function() {
+        console.log('Imagen cargada correctamente:', this.src);
+    };
+    
     updateCounter();
     
     // Prevenir scroll del body cuando el lightbox está abierto
@@ -119,36 +133,6 @@ function handleSubmit(event) {
     form.reset();
 }
 
-
-// ========================================
-// ANIMACIONES AL HACER SCROLL (idea opcional de momento)
-// ========================================
-//animaciones al aparecer elementos
-
-/*
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
-const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-// Observar elementos que quieres animar
-document.querySelectorAll('.about-content, .gallery-item, .contact-info').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-});
-*/
-
 // ========================================
 // SCROLL A SECCIÓN CONTACTO
 // ========================================
@@ -162,3 +146,23 @@ function scrollToContacto() {
         behavior: 'smooth'
     });
 }
+
+// ========================================
+// VERIFICACIÓN AL CARGAR LA PÁGINA
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Verificando imágenes de la galería...');
+    console.log('Rutas definidas:', galleryImages);
+    
+    // Verificar que las imágenes existan
+    galleryImages.forEach((img, index) => {
+        const testImg = new Image();
+        testImg.src = img;
+        testImg.onload = function() {
+            console.log(`✓ Imagen ${index + 1} encontrada:`, img);
+        };
+        testImg.onerror = function() {
+            console.error(`✗ Imagen ${index + 1} NO encontrada:`, img);
+        };
+    });
+});

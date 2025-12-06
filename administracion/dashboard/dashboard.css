@@ -375,6 +375,181 @@
 }
 
 /* ========================================
+   MODAL
+======================================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.modal.active {
+    display: flex;
+}
+
+/* Bloquear scroll del body cuando modal está activo */
+body.modal-open {
+    overflow: hidden;
+    padding-right: 15px; /* Compensar barra de scroll */
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    max-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlide 0.3s ease;
+    margin: auto;
+}
+
+.modal-content.modal-large {
+    max-width: 1000px;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.modal-header h2 {
+    font-size: 24px;
+    font-weight: 300;
+    color: #333;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Modal de confirmación personalizado */
+.modal-confirm {
+    max-width: 450px;
+}
+
+.modal-confirm .modal-body p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.modal-confirm textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-confirm textarea:focus {
+    outline: none;
+    border-color: #333;
+    box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+}
+
+.modal-confirm label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Botón primario en modal */
+.modal-footer .btn-primary {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #1b5e20;
+}
+
+/* ========================================
    RESPONSIVE - MODALES (SERAN COMUNES)
    estaran agregadas a cada archivo con modalesss.
 ======================================== */
@@ -929,50 +1104,70 @@
 /* BOTONES DE ACCIÓN EN DASHBOARD */
 .action-buttons-dashboard {
     display: flex;
-    gap: 5px;
-    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    justify-content: center; /* Centrar los botones */
 }
 
 .btn-action {
-    background: none;
-    border: 1px solid #ddd;
-    width: 28px;
-    height: 28px;
-    border-radius: 4px;
-    display: flex;
+    background: #fff;
+    border: 1.5px solid #e6e6e6;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
-.btn-action svg {
-    stroke: #666;
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-completar {
+    color: #2e7d32;
+    border-color: #81c784;
+    background-color: #f1f8f4;
 }
 
 .btn-completar:hover {
-    background-color: #4caf50;
-    border-color: #4caf50;
+    background-color: #e8f5e9;
+    border-color: #66bb6a;
 }
 
-.btn-completar:hover svg {
-    stroke: #fff;
+.btn-cancelar {
+    color: #c62828;
+    border-color: #ef9a9a;
+    background-color: #fef5f5;
 }
 
 .btn-cancelar:hover {
-    background-color: #f44336;
-    border-color: #f44336;
+    background-color: #ffebee;
+    border-color: #e57373;
 }
 
-.btn-cancelar:hover svg {
-    stroke: #fff;
+.btn-detalle {
+    color: #1565c0;
+    border-color: #90caf9;
+    background-color: #f3f7fb;
 }
 
 .btn-detalle:hover {
-    background-color: #2196f3;
-    border-color: #2196f3;
+    background-color: #e3f2fd;
+    border-color: #64b5f6;
 }
 
-.btn-detalle:hover svg {
-    stroke: #fff;
+/* css de estados de pedidoss*/
+.status-badge.proceso {
+    background-color: #e3f2fd;
+    color: #2196f3;
+}
+
+.status-badge.abono {
+    background-color: #fff3e0;
+    color: #ff9800;
 }

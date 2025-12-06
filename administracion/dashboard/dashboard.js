@@ -26,6 +26,12 @@ let ventasChart = null;
 let serviciosChart = null;
 
 // ========================================
+// VARIABLES PARA MODAL DE CONFIRMACIÓN
+// ========================================
+let accionPendiente = null;
+let datosAccion = null;
+
+// ========================================
 // CARGAR TODOS LOS DATOS DEL DASHBOARD
 // ========================================
 function loadDashboardData() {
@@ -223,21 +229,22 @@ function updateTablas(pedidos) {
                 <td>
                     <div class="action-buttons-dashboard">
                         <button class="btn-action btn-completar" onclick="marcarCompletado(${pedido.ID_Pedido})" title="Marcar como completado">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
                             </svg>
                         </button>
                         <button class="btn-action btn-cancelar" onclick="cancelarPedido(${pedido.ID_Pedido})" title="Cancelar pedido">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
                             </svg>
                         </button>
                         <button class="btn-action btn-detalle" onclick="verDetallePedido(${pedido.ID_Pedido})" title="Ver detalle">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
                             </svg>
                         </button>
                     </div>
@@ -271,51 +278,92 @@ function verDetallePedido(idPedido) {
 
 // MARCAR PEDIDO COMO COMPLETADO
 function marcarCompletado(idPedido) {
-    if (!confirm('¿Marcar este pedido como completado?')) {
-        return;
-    }
-
-    showLoadingModal();
-
-    fetch('../../php/dashboard.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'marcar_completado', idPedido })
-    })
-    .then(r => r.json())
-    .then(data => {
-        hideLoadingModal();
-        if (data.success) {
-            alert('Pedido marcado como completado');
-            loadDashboardData();
-        } else {
-            alert('Error: ' + (data.message || 'Respuesta inesperada'));
-        }
-    })
-    .catch(err => {
-        hideLoadingModal();
-        console.error(err);
-        alert('Error de conexión');
-    });
+    accionPendiente = 'marcar_completado';
+    datosAccion = { idPedido };
+    
+    const modal = document.getElementById('modalConfirmacion');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const inputContainer = document.getElementById('confirmInputContainer');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    title.textContent = 'Marcar como Completado';
+    message.textContent = `¿Deseas marcar el pedido #${idPedido} como completado?`;
+    inputContainer.style.display = 'none';
+    confirmBtn.textContent = 'Confirmar';
+    confirmBtn.style.background = '#2e7d32';
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 // CANCELAR PEDIDO
 function cancelarPedido(idPedido) {
-    const motivo = prompt('Motivo de cancelación (opcional):');
-    if (motivo === null) return; // usuario canceló prompt
+    accionPendiente = 'cancelar_pedido';
+    datosAccion = { idPedido };
+    
+    const modal = document.getElementById('modalConfirmacion');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const inputContainer = document.getElementById('confirmInputContainer');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    title.textContent = 'Cancelar Pedido';
+    message.textContent = `¿Deseas cancelar el pedido #${idPedido}?`;
+    inputContainer.style.display = 'block';
+    confirmBtn.textContent = 'Cancelar Pedido';
+    confirmBtn.style.background = '#c62828';
+    
+    // Limpiar textarea
+    document.getElementById('confirmInput').value = '';
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+}
 
-    showLoadingModal();
+// CERRAR MODAL DE CONFIRMACIÓN
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    accionPendiente = null;
+    datosAccion = null;
+}
 
+// EJECUTAR ACCIÓN CONFIRMADA
+function ejecutarAccion() {
+    if (!accionPendiente || !datosAccion) return;
+    
+    // Si es cancelación, agregar motivo
+    if (accionPendiente === 'cancelar_pedido') {
+        const motivo = document.getElementById('confirmInput').value.trim();
+        datosAccion.motivo = motivo;
+    }
+    
+    cerrarModalConfirmacion();
+    showLoadingModal('Procesando...');
+    
+    // Construcción del payload según la acción
+    const payload = {
+        action: accionPendiente,
+        idPedido: datosAccion.idPedido
+    };
+    
+    if (datosAccion.motivo !== undefined) {
+        payload.motivo = datosAccion.motivo;
+    }
+    
     fetch('../../php/dashboard.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'cancelar_pedido', idPedido, motivo })
+        body: JSON.stringify(payload)
     })
     .then(r => r.json())
     .then(data => {
         hideLoadingModal();
+        
         if (data.success) {
-            alert('Pedido cancelado');
+            alert(data.message || 'Acción completada exitosamente');
             loadDashboardData();
         } else {
             alert('Error: ' + (data.message || 'Respuesta inesperada'));
@@ -338,8 +386,15 @@ function refreshDashboard() {
 // ========================================
 // MODALES DE CARGA Y ERROR
 // ========================================
-function showLoadingModal() {
-    document.getElementById('loadingModal').classList.add('active');
+function showLoadingModal(mensaje = 'Cargando...') {
+    const modal = document.getElementById('loadingModal');
+    const texto = modal.querySelector('.loading-text');
+    
+    if (texto) {
+        texto.textContent = mensaje;
+    }
+    
+    modal.classList.add('active');
 }
 
 function hideLoadingModal() {
@@ -354,59 +409,62 @@ function showErrorMessage(message) {
 // MODAL: TODOS LOS PEDIDOS
 // ========================================
 function abrirModalTodosPedidos() {
-    document.getElementById('modalTodosPedidos').classList.add('active');
-    document.body.classList.add('modal-open');
-    cargarTodosPedidos();
-}
-
-function cerrarModalTodosPedidos() {
-    document.getElementById('modalTodosPedidos').classList.remove('active');
-    document.body.classList.remove('modal-open');
-}
-
-function cargarTodosPedidos() {
+    const modal = document.getElementById('modalTodosPedidos');
     const tabla = document.getElementById('tablaTodosPedidos');
-    tabla.innerHTML = '<tr><td colspan="6" class="loading">Cargando...</td></tr>';
     
+    if (!modal) {
+        console.error('Modal no encontrado');
+        return;
+    }
+
+    // Mostrar modal
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+
+    // Cargar todos los pedidos
+    showLoadingModal('Cargando todos los pedidos...');
+
     fetch('../../php/dashboard.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            action: 'get_all_pedidos'
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_all_pedidos' })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-        if (data.success && data.pedidos) {
+        hideLoadingModal();
+        
+        if (data.success && data.pedidos && data.pedidos.length > 0) {
             tabla.innerHTML = '';
-            
-            if (data.pedidos.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="6" class="empty">No hay pedidos registrados</td></tr>';
-                return;
-            }
             
             data.pedidos.forEach(pedido => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>#${pedido.ID_Pedido}</td>
-                    <td>${pedido.Cliente}</td>
+                    <td>${pedido.Cliente || 'N/A'}</td>
                     <td>${pedido.Servicio || 'N/A'}</td>
-                    <td>${formatFecha(pedido.Fecha)}</td>
+                    <td>${new Date(pedido.Fecha).toLocaleDateString('es-ES')}</td>
                     <td>$${parseFloat(pedido.Total).toFixed(2)}</td>
                     <td><span class="status-badge ${pedido.Estado.toLowerCase()}">${pedido.Estado}</span></td>
                 `;
                 tabla.appendChild(row);
             });
         } else {
-            tabla.innerHTML = '<tr><td colspan="6" class="empty">Error al cargar pedidos</td></tr>';
+            tabla.innerHTML = '<tr><td colspan="6" class="empty">No hay pedidos disponibles</td></tr>';
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        tabla.innerHTML = '<tr><td colspan="6" class="empty">Error de conexión</td></tr>';
+    .catch(err => {
+        hideLoadingModal();
+        console.error(err);
+        tabla.innerHTML = '<tr><td colspan="6" class="error">Error al cargar pedidos</td></tr>';
     });
+}
+
+function cerrarModalTodosPedidos() {
+    const modal = document.getElementById('modalTodosPedidos');
+    if (!modal) return;
+    
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
 }
 
 // Cerrar modal al hacer clic fuera
