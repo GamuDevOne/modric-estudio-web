@@ -25,7 +25,7 @@ try {
     // Obtener datos del POST
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
-    
+
     if ($action === 'get_dashboard_data') {
         $response = [
             'success' => true,
@@ -35,6 +35,10 @@ try {
         ];
         
         echo json_encode($response);
+    } elseif ($action === 'marcar_completado') {
+        marcarCompletado($pdo, $input);
+    } elseif ($action === 'cancelar_pedido') {
+        cancelarPedido($pdo, $input);
     } else {
         echo json_encode([
             'success' => false,
@@ -90,11 +94,21 @@ function getEstadisticas($pdo) {
     
     // Pedidos pendientes de pago
     $stmt = $pdo->query("
-        SELECT COUNT(*) as pedidosPendientes
-        FROM Pedido
-        WHERE Estado = 'Pendiente'
+        SELECT 
+            p.ID_Pedido,
+            COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
+            p.Total,
+            DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
+            v.NombreCompleto as Vendedor,
+            vi.EstadoPago
+        FROM Pedido p
+        INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE p.Estado = 'Pendiente' OR (vi.EstadoPago = 'Abono')
+        ORDER BY p.Fecha ASC
     ");
-    $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
+    $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Total de clientes
     $stmt = $pdo->query("
@@ -214,5 +228,122 @@ function getPedidos($pdo) {
     $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     return $pedidos;
+}
+
+// ========================================
+// FUNCIÓN: MARCAR PEDIDO COMO COMPLETADO
+// ========================================
+function marcarCompletado($pdo, $data) {
+    try {
+        if (empty($data['idPedido'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de pedido requerido']);
+            return;
+        }
+        
+        // Actualizar estado del pedido
+        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = :id");
+        $stmt->execute([':id' => $data['idPedido']]);
+        
+        // Actualizar estado de pago si existe
+        $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = :id");
+        $stmt->execute([':id' => $data['idPedido']]);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Pedido marcado como completado'
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+
+// ========================================
+// FUNCIÓN: CANCELAR PEDIDO
+// ========================================
+function cancelarPedido($pdo, $data) {
+    try {
+        if (empty($data['idPedido'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de pedido requerido']);
+            return;
+        }
+        
+        // Actualizar estado del pedido
+        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Cancelado' WHERE ID_Pedido = :id");
+        $stmt->execute([':id' => $data['idPedido']]);
+        
+        // Si hay motivo, actualizar notas en VentaInfo
+        if (!empty($data['motivo'])) {
+            $stmt = $pdo->prepare("
+                UPDATE VentaInfo 
+                SET Notas = CONCAT(COALESCE(Notas, ''), '\n\nMotivo cancelación: ', :motivo)
+                WHERE ID_Pedido = :id
+            ");
+            $stmt->execute([
+                ':id' => $data['idPedido'],
+                ':motivo' => $data['motivo']
+            ]);
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Pedido cancelado correctamente'
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+
+if ($action === 'get_dashboard_data') {
+        $response = [
+            'success' => true,
+            'estadisticas' => getEstadisticas($pdo),
+            'graficos' => getGraficos($pdo),
+            'pedidos' => getPedidos($pdo)
+        ];
+        
+        echo json_encode($response);
+    } elseif ($action === 'marcar_completado') {
+        marcarCompletado($pdo, $input);
+    } elseif ($action === 'cancelar_pedido') {
+        cancelarPedido($pdo, $input);
+    } elseif ($action === 'get_all_pedidos') {
+        getAllPedidos($pdo);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Acción no válida'
+        ]);
+    }
+
+// ========================================
+// FUNCIÓN: OBTENER TODOS LOS PEDIDOS
+// ========================================
+function getAllPedidos($pdo) {
+    try {
+        $stmt = $pdo->query("
+            SELECT 
+                p.ID_Pedido,
+                COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
+                s.NombreServicio as Servicio,
+                p.Fecha,
+                p.Total,
+                p.Estado,
+                v.NombreCompleto as Vendedor
+            FROM Pedido p
+            INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+            LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
+            LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            ORDER BY p.Fecha DESC
+            LIMIT 100
+        ");
+        
+        echo json_encode([
+            'success' => true,
+            'pedidos' => $stmt->fetchAll(PDO::FETCH_ASSOC)
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
 }
 ?>

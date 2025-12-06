@@ -151,9 +151,9 @@
 
             <!-- TABLA DE ÚLTIMOS PEDIDOS -->
             <div class="table-card">
-                <div class="table-header">
+                 <div class="table-header">
                     <h3>Últimos Pedidos</h3>
-                    <button class="view-all-btn" onclick="alert('Función en desarrollo')">Ver todos</button>
+                    <button class="view-all-btn" onclick="abrirModalTodosPedidos()">Ver todos</button>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -210,6 +210,40 @@
         <div class="loading-content">
             <div class="spinner"></div>
             <p>Cargando datos...</p>
+        </div>
+    </div>
+
+      <!-- MODAL: toodos LOS PEDIDOS flag(se mostraran los ultimos 100)-->
+    <div id="modalTodosPedidos" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Todos los Pedidos</h2>
+                <button class="modal-close" onclick="cerrarModalTodosPedidos()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Servicio</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaTodosPedidos">
+                            <tr>
+                                <td colspan="6" class="loading">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModalTodosPedidos()">Cerrar</button>
+            </div>
         </div>
     </div>
 

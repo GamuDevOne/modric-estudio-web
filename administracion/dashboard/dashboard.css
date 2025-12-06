@@ -905,3 +905,74 @@
         font-size: 11px;
     }
 }
+
+/* BOTONES DE ACCIÓN (completado, cancelado, etc...)*/
+.action-btn {
+    background: none;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 6px 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+    background-color: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+/* BOTONES DE ACCIÓN EN DASHBOARD */
+.action-buttons-dashboard {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-action {
+    background: none;
+    border: 1px solid #ddd;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action svg {
+    stroke: #666;
+}
+
+.btn-completar:hover {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+.btn-completar:hover svg {
+    stroke: #fff;
+}
+
+.btn-cancelar:hover {
+    background-color: #f44336;
+    border-color: #f44336;
+}
+
+.btn-cancelar:hover svg {
+    stroke: #fff;
+}
+
+.btn-detalle:hover {
+    background-color: #2196f3;
+    border-color: #2196f3;
+}
+
+.btn-detalle:hover svg {
+    stroke: #fff;
+}
