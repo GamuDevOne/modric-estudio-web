@@ -618,65 +618,16 @@ nav a.active {
     gap: 1rem; /* separación carrito - login */
 }
 /* LOGIN */
-.login-btn {
-    position: relative; /* clave: permite que el menú caiga debajo del botón */
-    display: flex;
-    align-items: center;
-}
 
 
-.login-icon-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    color: #1a1a1a;
-    transition: color 0.3s ease;
+/* RESPONSIVE PARA HEADER ACTIONS */
+@media (max-width: 768px) {
+    .header-actions {
+        gap: 0.5rem;
+        order: 3; /* Después del hamburger */
+    }
+    
+    .cart-icon {
+        margin-right: 0.5rem;
+    }
 }
-
-.login-icon-btn:hover {
-    color: #000;
-}
-/* MENÚ DESPLEGABLE LOGIN */
-.login-menu {
-    position: absolute;
-    top: 50px; /* ajusta según tamaño del botón */
-    right: 0; /* alineado al botón */
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    min-width: 160px;
-    display: none;
-    z-index: 2000; /* mayor que carrito */
-}
-
-.login-menu {
-    position: absolute;
-    top: 50px; /* ajusta según tamaño del botón */
-    right: 0; /* alineado al botón */
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    min-width: 160px;
-    display: none;
-    z-index: 2000; /* mayor que carrito */
-}
-
-.login-menu a {
-    display: block;
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-}
-
-.login-menu a:hover {
-    background: #f5f5f5;
-}
-
-.login-menu.active {
-    display: block;
-}
-

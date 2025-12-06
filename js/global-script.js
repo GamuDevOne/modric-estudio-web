@@ -111,11 +111,22 @@ function addPanelOption() {
     
     if (!existingPanel) {
         const panelItem = document.createElement('li');
+
+        // Detectar la ruta base correcta según la ubicación actual
+        const currentPath = window.location.pathname;
+        let basePath = './';
+
+        // Si estamos en una subcarpeta (textiles, carnet, etc), ajustar ruta
+        if (currentPath.includes('/textiles/') || 
+            currentPath.includes('/carnet/') || 
+            currentPath.includes('/login/')) {
+            basePath = '../';
+        }
         
         if (user.tipo === 'CEO') {
-            panelItem.innerHTML = '<a href="./administracion/administracion.html">Panel de Administración</a>';
+            panelItem.innerHTML = `<a href="${basePath}administracion/administracion.html">Panel de Administración</a>`;
         } else if (user.tipo === 'Vendedor') {
-            panelItem.innerHTML = '<a href="./administracion/vistaVendedor/vendedor.html">Panel de vendedor</a>';
+            panelItem.innerHTML = `<a href="${basePath}administracion/vistaVendedor/vendedor.html">Panel de vendedor</a>`;
         }
         
         dropdownMenu.insertBefore(panelItem, dropdownMenu.firstChild);

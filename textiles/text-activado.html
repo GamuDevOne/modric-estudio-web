@@ -6,6 +6,8 @@
 <title>Textiles Personalizados - Modric Estudio</title>
 <link rel="stylesheet" href="../css/global-styles.css">
 <link rel="stylesheet" href="text-activado.css">
+<!-- Font Awesome para iconos del carrito -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -41,26 +43,27 @@
         </ul>
     </nav>
 
-    <!-- ICONOS DERECHA -->
-    <div class="header-icons">
-        <!-- LOGIN -->
-        <div class="login-btn">
-            <button onclick="toggleLoginMenu()" class="login-icon-btn" aria-label="Abrir menú de usuario" type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            </button>
-            <div id="loginMenu" class="login-menu">
-                <a href="../login/login.html">Iniciar Sesión</a>
-            </div>
-        </div>
-
+    <!-- CONTENEDOR ICONOS DERECHA -->
+    <div class="header-actions">
         <!-- CARRITO -->
         <div class="cart-icon" id="cart-icon">
             <i class="fas fa-shopping-cart"></i>
             <span class="cart-badge" id="cart-count">0</span>
         </div>
+
+        <!-- LOGIN -->
+        <div class="login-btn">
+        <button onclick="toggleLoginMenu()" class="login-icon-btn" aria-label="Abrir menú de usuario" title="Abrir menú de usuario" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </button>
+        
+        <div id="loginMenu" class="login-menu">
+            <a href="../login/login.html">Iniciar Sesión</a>
+        </div>
+    </div>
     </div>
 </header>
 
@@ -124,5 +127,6 @@
 
 <script src="../js/global-script.js"></script>
 <script src="text-activado.js"></script>
+
 </body>
 </html>
