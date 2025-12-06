@@ -279,7 +279,7 @@ function verDetallePedido(idPedido) {
 // MARCAR PEDIDO COMO COMPLETADO
 function marcarCompletado(idPedido) {
     accionPendiente = 'marcar_completado';
-    datosAccion = { idPedido };
+    datosAccion = { idPedido: idPedido }; // ← FIX: Asegurar que idPedido esté correctamente asignado
     
     const modal = document.getElementById('modalConfirmacion');
     const title = document.getElementById('confirmTitle');
@@ -300,7 +300,7 @@ function marcarCompletado(idPedido) {
 // CANCELAR PEDIDO
 function cancelarPedido(idPedido) {
     accionPendiente = 'cancelar_pedido';
-    datosAccion = { idPedido };
+    datosAccion = { idPedido: idPedido }; // ← FIX: Asegurar que idPedido esté correctamente asignado
     
     const modal = document.getElementById('modalConfirmacion');
     const title = document.getElementById('confirmTitle');
@@ -332,26 +332,38 @@ function cerrarModalConfirmacion() {
 
 // EJECUTAR ACCIÓN CONFIRMADA
 function ejecutarAccion() {
-    if (!accionPendiente || !datosAccion) return;
-    
-    // Si es cancelación, agregar motivo
-    if (accionPendiente === 'cancelar_pedido') {
-        const motivo = document.getElementById('confirmInput').value.trim();
-        datosAccion.motivo = motivo;
+    // ← FIX: Validación mejorada
+    if (!accionPendiente || !datosAccion || !datosAccion.idPedido) {
+        console.error('Error: Datos de acción incompletos', { accionPendiente, datosAccion });
+        alert('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
+        cerrarModalConfirmacion();
+        return;
     }
     
-    cerrarModalConfirmacion();
+    // IMPORTANTE: Guardar los datos ANTES de cerrar el modal
+    const accionAEjecutar = accionPendiente;
+    const datosAEnviar = { ...datosAccion }; // Copiar objeto
+    
+    // Si es cancelación, agregar motivo
+    if (accionAEjecutar === 'cancelar_pedido') {
+        const motivo = document.getElementById('confirmInput').value.trim();
+        datosAEnviar.motivo = motivo;
+    }
+    
+    cerrarModalConfirmacion(); // Ahora sí cerramos
     showLoadingModal('Procesando...');
     
     // Construcción del payload según la acción
     const payload = {
-        action: accionPendiente,
-        idPedido: datosAccion.idPedido
+        action: accionAEjecutar,
+        idPedido: datosAEnviar.idPedido
     };
     
-    if (datosAccion.motivo !== undefined) {
-        payload.motivo = datosAccion.motivo;
+    if (datosAEnviar.motivo !== undefined) {
+        payload.motivo = datosAEnviar.motivo;
     }
+    
+    console.log('Enviando payload:', payload); // ← DEBUG
     
     fetch('../../php/dashboard.php', {
         method: 'POST',
@@ -362,6 +374,8 @@ function ejecutarAccion() {
     .then(data => {
         hideLoadingModal();
         
+        console.log('Respuesta del servidor:', data); // ← DEBUG
+        
         if (data.success) {
             alert(data.message || 'Acción completada exitosamente');
             loadDashboardData();
@@ -371,7 +385,7 @@ function ejecutarAccion() {
     })
     .catch(err => {
         hideLoadingModal();
-        console.error(err);
+        console.error('Error en fetch:', err);
         alert('Error de conexión');
     });
 }
@@ -388,7 +402,7 @@ function refreshDashboard() {
 // ========================================
 function showLoadingModal(mensaje = 'Cargando...') {
     const modal = document.getElementById('loadingModal');
-    const texto = modal.querySelector('.loading-text');
+    const texto = modal.querySelector('.loading-content p');
     
     if (texto) {
         texto.textContent = mensaje;

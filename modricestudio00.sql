@@ -653,3 +653,266 @@ INSERT INTO Colegio (NombreColegio, Direccion, Estado) VALUES
    4. Vendedor registra ventas → se asocian al colegio
    5. CEO puede ver/exportar ventas por colegio
 ===================================================== */
+
+-- =====================================================
+-- SISTEMA DE COTIZACIONES Y RESERVACIONES
+-- Para que el cliente cotice sesiones de fotos
+-- =====================================================
+
+USE ModricEstudio00;
+
+-- =====================================================
+-- TABLA: Cotizaciones (Solicitudes de sesión)
+-- =====================================================
+CREATE TABLE Cotizacion (
+    ID_Cotizacion INT AUTO_INCREMENT PRIMARY KEY,
+    
+    -- Información del cliente
+    ID_Cliente INT NULL, -- Puede ser NULL si el cliente aún no existe
+    NombreCliente VARCHAR(100) NOT NULL,
+    CorreoCliente VARCHAR(100) NOT NULL,
+    TelefonoCliente VARCHAR(20) NULL,
+    
+    -- Información de la sesión
+    TipoSesion VARCHAR(50) NOT NULL, -- 'Interior', 'Exterior', 'Estudio', etc.
+    DescripcionSesion TEXT NOT NULL, -- Detalles que escribe el cliente
+    FechaSolicitada DATE NOT NULL, -- Fecha que el cliente quiere
+    HoraSolicitada TIME NULL, -- Hora preferida (opcional)
+    
+    -- Estado de la cotización
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente',
+    -- Estados: 'Pendiente', 'En_Revision', 'Aprobada', 'Rechazada', 'Cancelada'
+    
+    -- Precio y confirmación (lo llena el admin)
+    PrecioEstimado DECIMAL(10,2) NULL,
+    NotasAdmin TEXT NULL, -- Notas del admin sobre la cotización
+    
+    -- Prioridad automática (basada en precio o tipo)
+    Prioridad INT DEFAULT 0,
+    -- 0 = Sin asignar, 1 = Alta, 2 = Baja
+    
+    -- Fechas de control
+    FechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FechaRespuesta DATETIME NULL, -- Cuando el admin responde
+    FechaConfirmacion DATETIME NULL, -- Cuando se confirma
+    
+    -- Relación con pedido (cuando se aprueba)
+    ID_Pedido INT NULL, -- Se llena cuando se convierte en pedido real
+    
+    CONSTRAINT FK_Cotizacion_Cliente FOREIGN KEY (ID_Cliente)
+        REFERENCES Usuario(ID_Usuario)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    
+    CONSTRAINT FK_Cotizacion_Pedido FOREIGN KEY (ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    
+    INDEX IX_Cotizacion_Estado (Estado),
+    INDEX IX_Cotizacion_Fecha (FechaSolicitada),
+    INDEX IX_Cotizacion_Cliente (ID_Cliente)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- MODIFICAR TABLA PEDIDO: Agregar campo Prioridad
+-- =====================================================
+ALTER TABLE Pedido 
+ADD COLUMN Prioridad INT DEFAULT 0 AFTER Estado,
+ADD COLUMN FechaSesion DATE NULL AFTER Prioridad,
+ADD COLUMN HoraSesion TIME NULL AFTER FechaSesion;
+
+-- Comentario sobre prioridades:
+-- 0 = Sin prioridad asignada
+-- 1 = Prioridad Alta (sesiones complejas, precio alto, >$300)
+-- 2 = Prioridad Baja (sesiones sencillas, precio bajo, <$300)
+
+-- =====================================================
+-- TABLA: Bloqueos de Fechas (días no disponibles)
+-- =====================================================
+CREATE TABLE BloqueoFecha (
+    ID_Bloqueo INT AUTO_INCREMENT PRIMARY KEY,
+    FechaInicio DATE NOT NULL,
+    FechaFin DATE NOT NULL,
+    Motivo VARCHAR(200) NULL, -- 'Vacaciones', 'Mantenimiento', etc.
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Activo',
+    FechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX IX_Bloqueo_Fecha (FechaInicio, FechaFin)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- VISTA: Fechas Ocupadas (para el calendario del cliente)
+-- =====================================================
+CREATE VIEW V_FechasOcupadas AS
+SELECT 
+    FechaSesion as Fecha,
+    'Confirmada' as Estado,
+    COUNT(*) as CantidadSesiones
+FROM Pedido
+WHERE FechaSesion IS NOT NULL
+AND Estado IN ('Confirmado', 'En_Proceso')
+GROUP BY FechaSesion
+
+UNION ALL
+
+SELECT 
+    FechaSolicitada as Fecha,
+    CASE 
+        WHEN Estado = 'Aprobada' THEN 'Confirmada'
+        WHEN Estado = 'Pendiente' THEN 'Pendiente'
+        WHEN Estado = 'En_Revision' THEN 'En_Revision'
+        ELSE 'Disponible'
+    END as Estado,
+    COUNT(*) as CantidadSesiones
+FROM Cotizacion
+WHERE FechaSolicitada >= CURDATE()
+GROUP BY FechaSolicitada, Estado;
+
+-- =====================================================
+-- DATOS DE PRUEBA
+-- =====================================================
+
+-- Bloquear algunas fechas (vacaciones, días festivos)
+INSERT INTO BloqueoFecha (FechaInicio, FechaFin, Motivo) VALUES
+('2025-12-24', '2025-12-26', 'Navidad'),
+('2025-12-31', '2026-01-01', 'Año Nuevo');
+
+-- Cotizaciones de ejemplo
+INSERT INTO Cotizacion (
+    NombreCliente, 
+    CorreoCliente, 
+    TelefonoCliente,
+    TipoSesion, 
+    DescripcionSesion, 
+    FechaSolicitada,
+    Estado
+) VALUES 
+(
+    'María González',
+    'maria@example.com',
+    '6000-0001',
+    'Exterior',
+    'Necesito una sesión de fotos familiar en el parque. Somos 5 personas (2 adultos, 3 niños). Preferiblemente en la mañana con luz natural.',
+    '2025-12-15',
+    'Pendiente'
+),
+(
+    'Carlos Ruiz',
+    'carlos@example.com',
+    '6000-0002',
+    'Estudio',
+    'Sesión profesional para LinkedIn y redes sociales. Necesito 10-15 fotos editadas en alta resolución.',
+    '2025-12-18',
+    'En_Revision'
+),
+(
+    'Ana Torres',
+    'ana@example.com',
+    '6000-0003',
+    'Interior',
+    'Fotos de cumpleaños infantil en mi casa. Evento de 3 horas aproximadamente.',
+    '2025-12-20',
+    'Aprobada'
+);
+
+-- =====================================================
+-- PROCEDIMIENTO: Asignar prioridad automáticamente
+-- =====================================================
+DELIMITER $$
+
+CREATE PROCEDURE AsignarPrioridadAutomatica(IN p_idPedido INT)
+BEGIN
+    DECLARE v_precio DECIMAL(10,2);
+    DECLARE v_prioridad INT;
+    
+    -- Obtener el precio del pedido
+    SELECT Total INTO v_precio
+    FROM Pedido
+    WHERE ID_Pedido = p_idPedido;
+    
+    -- Asignar prioridad según el precio
+    IF v_precio >= 300 THEN
+        SET v_prioridad = 1; -- Alta
+    ELSE
+        SET v_prioridad = 2; -- Baja
+    END IF;
+    
+    -- Actualizar el pedido
+    UPDATE Pedido
+    SET Prioridad = v_prioridad
+    WHERE ID_Pedido = p_idPedido;
+    
+    SELECT v_prioridad as PrioridadAsignada;
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- TRIGGER: Asignar prioridad al crear pedido
+-- =====================================================
+DELIMITER $$
+
+CREATE TRIGGER TR_Pedido_AsignarPrioridad
+AFTER INSERT ON Pedido
+FOR EACH ROW
+BEGIN
+    DECLARE v_prioridad INT;
+    
+    -- Asignar prioridad según el precio
+    IF NEW.Total >= 300 THEN
+        SET v_prioridad = 1; -- Alta
+    ELSE
+        SET v_prioridad = 2; -- Baja
+    END IF;
+    
+    -- Actualizar el pedido recién insertado
+    UPDATE Pedido
+    SET Prioridad = v_prioridad
+    WHERE ID_Pedido = NEW.ID_Pedido;
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- NOTAS DE IMPLEMENTACIÓN
+-- =====================================================
+/*
+FLUJO DEL SISTEMA:
+
+1. CLIENTE (Frontend - Ismael):
+   - Ve calendario con fechas disponibles/ocupadas/bloqueadas
+   - Selecciona fecha
+   - Llena formulario (tipo, descripción, contacto)
+   - Envía cotización
+
+2. SISTEMA (Backend - TÚ):
+   - Guarda en tabla Cotizacion con estado 'Pendiente'
+   - Envía notificación al admin
+
+3. ADMIN/CEO (Vista Admin - TÚ):
+   - Ve lista de cotizaciones pendientes
+   - Revisa detalles
+   - Asigna precio estimado
+   - Cambia estado a 'Aprobada' o 'Rechazada'
+   - Si aprueba: crea Pedido automáticamente
+
+4. CLIENTE (Notificación):
+   - Recibe respuesta por correo
+   - Ve precio y confirmación
+   - Puede proceder con el pago
+
+ESTADOS DE COTIZACIÓN:
+- Pendiente: Recién enviada por el cliente
+- En_Revision: El admin la está revisando
+- Aprobada: Admin aprobó y asignó precio
+- Rechazada: No se puede realizar (fecha no disponible, etc.)
+- Cancelada: Cliente canceló la solicitud
+
+ESTADOS DE FECHA (para calendario):
+- Disponible: Fecha libre
+- Pendiente: Hay cotización(es) pendientes
+- En_Revision: Hay cotización(es) en revisión
+- Confirmada: Ya hay pedido confirmado (no disponible)
+- Bloqueada: Fecha bloqueada manualmente
+*/

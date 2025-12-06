@@ -26,6 +26,10 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
 
+    // Log para debug
+    error_log("Dashboard Action: " . $action);
+    error_log("Dashboard Input: " . json_encode($input));
+
     switch ($action) {
         case 'get_dashboard_data':
             $response = [
@@ -52,14 +56,21 @@ try {
         default:
             echo json_encode([
                 'success' => false,
-                'message' => 'Acción no válida'
+                'message' => 'Acción no válida: ' . $action
             ]);
     }
     
 } catch (PDOException $e) {
+    error_log("Dashboard PDO Error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Error de conexión: ' . $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    error_log("Dashboard Error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
     ]);
 }
 
@@ -261,24 +272,31 @@ function getPedidos($pdo) {
 function marcarCompletado($pdo, $data) {
     try {
         if (empty($data['idPedido'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de pedido requerido']);
-            return;
+            throw new Exception('ID de pedido requerido');
         }
         
+        $idPedido = intval($data['idPedido']);
+        
+        error_log("Marcando pedido como completado: " . $idPedido);
+        
         // Actualizar estado del pedido
-        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = :id");
-        $stmt->execute([':id' => $data['idPedido']]);
+        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = ?");
+        $stmt->execute([$idPedido]);
         
         // Actualizar estado de pago si existe registro en VentaInfo
-        $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = :id");
-        $stmt->execute([':id' => $data['idPedido']]);
+        $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = ?");
+        $stmt->execute([$idPedido]);
         
         echo json_encode([
             'success' => true,
-            'message' => 'Pedido marcado como completado'
+            'message' => 'Pedido #' . $idPedido . ' marcado como completado'
         ]);
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    } catch (Exception $e) {
+        error_log("Error en marcarCompletado: " . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
     }
 }
 
@@ -288,39 +306,44 @@ function marcarCompletado($pdo, $data) {
 function cancelarPedido($pdo, $data) {
     try {
         if (empty($data['idPedido'])) {
-            echo json_encode(['success' => false, 'message' => 'ID de pedido requerido']);
-            return;
+            throw new Exception('ID de pedido requerido');
         }
         
+        $idPedido = intval($data['idPedido']);
+        $motivo = $data['motivo'] ?? '';
+        
+        error_log("Cancelando pedido: " . $idPedido . " - Motivo: " . $motivo);
+        
         // Actualizar estado del pedido
-        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Cancelado' WHERE ID_Pedido = :id");
-        $stmt->execute([':id' => $data['idPedido']]);
+        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Cancelado' WHERE ID_Pedido = ?");
+        $stmt->execute([$idPedido]);
         
         // Si hay motivo, actualizar notas en VentaInfo
-        if (!empty($data['motivo'])) {
+        if (!empty($motivo)) {
             $stmt = $pdo->prepare("
                 UPDATE VentaInfo 
-                SET Notas = CONCAT(COALESCE(Notas, ''), '\n\nMotivo cancelación: ', :motivo)
-                WHERE ID_Pedido = :id
+                SET Notas = CONCAT(COALESCE(Notas, ''), '\n\nMotivo cancelación: ', ?)
+                WHERE ID_Pedido = ?
             ");
-            $stmt->execute([
-                ':id' => $data['idPedido'],
-                ':motivo' => $data['motivo']
-            ]);
+            $stmt->execute([$motivo, $idPedido]);
         }
         
         echo json_encode([
             'success' => true,
-            'message' => 'Pedido cancelado correctamente'
+            'message' => 'Pedido #' . $idPedido . ' cancelado correctamente'
         ]);
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    } catch (Exception $e) {
+        error_log("Error en cancelarPedido: " . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
     }
 }
 
-/**
- * Obtener todos los pedidos (últimos 100)
- */
+// ========================================
+// FUNCIÓN: OBTENER TODOS LOS PEDIDOS
+// ========================================
 function getAllPedidos($pdo) {
     try {
         $stmt = $pdo->prepare("
