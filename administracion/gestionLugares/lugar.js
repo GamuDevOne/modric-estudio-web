@@ -1,16 +1,149 @@
 // ========================================
 // VARIABLES GLOBALES
 // ========================================
-let colegiosData = [];
 let vendedoresDisponibles = [];
 let colegioActualId = null;
-let fechaActual = new Date().toISOString().split('T')[0];
+let fechaActual = null; // Cambio: Inicializar en null
 let lugarIdCerrar = null;
 let lugarIdEliminar = null;
 
 // ========================================
-// VERIFICAR SESIÓN Y PERMISOS
+// FUNCIÓN AUXILIAR: Obtener fecha local en formato YYYY-MM-DD
 // ========================================
+function obtenerFechaLocal() {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = String(hoy.getMonth() + 1).padStart(2, '0');
+    const day = String(hoy.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// ========================================
+// FUNCIÓN: Establecer fecha de hoy CORRECTAMENTE
+// ========================================
+function setFechaHoy() {
+    const fechaLocal = obtenerFechaLocal();
+    document.getElementById('fechaAsignacion').value = fechaLocal;
+    fechaActual = fechaLocal;
+    console.log('Fecha establecida:', fechaLocal); // Debug
+    cargarAsignaciones();
+}
+
+// ========================================
+// MODAL: ASIGNAR VENDEDORES
+// ========================================
+function openModalAsignar(id, nombre) {
+    colegioActualId = id;
+    document.getElementById('colegioIdAsignar').value = id;
+    document.getElementById('nombreColegioAsignar').textContent = nombre;
+    
+    // Establecer fecha de hoy por defecto
+    setFechaHoy();
+    
+    // Cargar vendedores disponibles
+    actualizarSelectVendedores();
+    
+    // Cargar asignaciones
+    cargarAsignaciones();
+    
+    document.getElementById('modalAsignar').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+// ========================================
+// CARGAR ASIGNACIONES
+// ========================================
+function cargarAsignaciones() {
+    const idColegio = document.getElementById('colegioIdAsignar').value;
+    const fecha = document.getElementById('fechaAsignacion').value;
+    
+    if (!idColegio || !fecha) {
+        console.log('Faltan datos:', { idColegio, fecha }); // Debug
+        return;
+    }
+    
+    console.log('Cargando asignaciones para:', { idColegio, fecha }); // Debug
+    
+    fetch('../../php/gest-colegios.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'obtener_asignaciones',
+            idColegio: idColegio,
+            fecha: fecha
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta asignaciones:', data); // Debug
+        if (data.success) {
+            mostrarAsignaciones(data.asignaciones);
+        } else {
+            console.error('Error:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// ========================================
+// ASIGNAR VENDEDOR
+// ========================================
+function asignarVendedor() {
+    const idColegio = document.getElementById('colegioIdAsignar').value;
+    const idVendedor = document.getElementById('selectVendedor').value;
+    const fecha = document.getElementById('fechaAsignacion').value;
+    
+    if (!idVendedor) {
+        alert('Debes seleccionar un vendedor');
+        return;
+    }
+    
+    console.log('Asignando vendedor:', { idColegio, idVendedor, fecha }); // Debug
+    
+    showLoadingModal();
+    
+    fetch('../../php/gest-colegios.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'asignar_vendedor',
+            idColegio: idColegio,
+            idVendedor: idVendedor,
+            fecha: fecha
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoadingModal();
+        console.log('Respuesta asignación:', data); // Debug
+        
+        if (data.success) {
+            alert('Vendedor asignado correctamente');
+            document.getElementById('selectVendedor').value = '';
+            cargarAsignaciones();
+            cargarColegios(); // Actualizar contador de vendedores
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        hideLoadingModal();
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========================================
+// RESTO DEL CÓDIGO (sin cambios)
+// ========================================
+let colegiosData = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     const user = checkSession();
     
@@ -25,14 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Cargar datos iniciales
     cargarColegios();
     cargarVendedoresDisponibles();
 });
 
-// ========================================
-// CARGAR COLEGIOS
-// ========================================
 function cargarColegios() {
     showLoadingModal();
     
@@ -64,9 +193,6 @@ function cargarColegios() {
     });
 }
 
-// ========================================
-// MOSTRAR COLEGIOS EN EL GRID
-// ========================================
 function mostrarColegios(colegios) {
     const grid = document.getElementById('colegiosGrid');
     grid.innerHTML = '';
@@ -82,9 +208,6 @@ function mostrarColegios(colegios) {
     });
 }
 
-// ========================================
-// CREAR CARD DE COLEGIO
-// ========================================
 function crearColegioCard(colegio) {
     const card = document.createElement('div');
     card.className = 'colegio-card';
@@ -190,9 +313,6 @@ function crearColegioCard(colegio) {
     return card;
 }
 
-// ========================================
-// FILTRAR COLEGIOS
-// ========================================
 function filtrarColegios() {
     const filtroEstado = document.getElementById('filtroEstado').value;
     
@@ -205,9 +325,6 @@ function filtrarColegios() {
     mostrarColegios(colegiosFiltrados);
 }
 
-// ========================================
-// CARGAR VENDEDORES DISPONIBLES
-// ========================================
 function cargarVendedoresDisponibles() {
     fetch('../../php/gest-colegios.php', {
         method: 'POST',
@@ -230,9 +347,6 @@ function cargarVendedoresDisponibles() {
     });
 }
 
-// ========================================
-// ACTUALIZAR SELECT DE VENDEDORES
-// ========================================
 function actualizarSelectVendedores() {
     const select = document.getElementById('selectVendedor');
     if (!select) return;
@@ -247,9 +361,6 @@ function actualizarSelectVendedores() {
     });
 }
 
-// ========================================
-// MODAL: CREAR/EDITAR COLEGIO
-// ========================================
 function openModalCrearColegio() {
     document.getElementById('modalColegioTitle').textContent = 'Nuevo Lugar';
     document.getElementById('colegioId').value = '';
@@ -338,9 +449,6 @@ function guardarColegio(event) {
     });
 }
 
-// ========================================
-// CERRAR COLEGIO - CON MODAL DE CONFIRMACIÓN
-// ========================================
 function cerrarColegio(id, nombre) {
     lugarIdCerrar = id;
     document.getElementById('nombreLugarCerrar').textContent = nombre;
@@ -388,9 +496,6 @@ function confirmarCerrarLugar() {
     });
 }
 
-// ========================================
-// ELIMINAR COLEGIO/LUGAR - CON MODAL DE CONFIRMACIÓN
-// ========================================
 function eliminarColegio(id, nombre) {
     lugarIdEliminar = id;
     document.getElementById('nombreLugarEliminar').textContent = nombre;
@@ -438,75 +543,12 @@ function confirmarEliminarLugar() {
     });
 }
 
-// ========================================
-// MODAL: ASIGNAR VENDEDORES
-// ========================================
-function openModalAsignar(id, nombre) {
-    colegioActualId = id;
-    document.getElementById('colegioIdAsignar').value = id;
-    document.getElementById('nombreColegioAsignar').textContent = nombre;
-    
-    // Establecer fecha de hoy por defecto
-    setFechaHoy();
-    
-    // Cargar vendedores disponibles
-    actualizarSelectVendedores();
-    
-    // Cargar asignaciones
-    cargarAsignaciones();
-    
-    document.getElementById('modalAsignar').classList.add('active');
-    document.body.classList.add('modal-open');
-}
-
 function closeModalAsignar() {
     document.getElementById('modalAsignar').classList.remove('active');
     colegioActualId = null;
     document.body.classList.remove('modal-open');
 }
 
-function setFechaHoy() {
-    const hoy = new Date().toISOString().split('T')[0];
-    document.getElementById('fechaAsignacion').value = hoy;
-    fechaActual = hoy;
-}
-
-// ========================================
-// CARGAR ASIGNACIONES
-// ========================================
-function cargarAsignaciones() {
-    const idColegio = document.getElementById('colegioIdAsignar').value;
-    const fecha = document.getElementById('fechaAsignacion').value;
-    
-    if (!idColegio || !fecha) return;
-    
-    fetch('../../php/gest-colegios.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            action: 'obtener_asignaciones',
-            idColegio: idColegio,
-            fecha: fecha
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            mostrarAsignaciones(data.asignaciones);
-        } else {
-            console.error('Error:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-// ========================================
-// MOSTRAR ASIGNACIONES
-// ========================================
 function mostrarAsignaciones(asignaciones) {
     const lista = document.getElementById('listaAsignados');
     const badge = document.getElementById('totalAsignados');
@@ -547,55 +589,6 @@ function mostrarAsignaciones(asignaciones) {
     });
 }
 
-// ========================================
-// ASIGNAR VENDEDOR
-// ========================================
-function asignarVendedor() {
-    const idColegio = document.getElementById('colegioIdAsignar').value;
-    const idVendedor = document.getElementById('selectVendedor').value;
-    const fecha = document.getElementById('fechaAsignacion').value;
-    
-    if (!idVendedor) {
-        alert('Debes seleccionar un vendedor');
-        return;
-    }
-    
-    showLoadingModal();
-    
-    fetch('../../php/gest-colegios.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            action: 'asignar_vendedor',
-            idColegio: idColegio,
-            idVendedor: idVendedor,
-            fecha: fecha
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoadingModal();
-        
-        if (data.success) {
-            document.getElementById('selectVendedor').value = '';
-            cargarAsignaciones();
-            cargarColegios(); // Actualizar contador de vendedores
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        hideLoadingModal();
-        console.error('Error:', error);
-        alert('Error de conexión');
-    });
-}
-
-// ========================================
-// QUITAR ASIGNACIÓN
-// ========================================
 function quitarAsignacion(idAsignacion) {
     if (!confirm('¿Quitar esta asignación?')) {
         return;
@@ -619,7 +612,7 @@ function quitarAsignacion(idAsignacion) {
         
         if (data.success) {
             cargarAsignaciones();
-            cargarColegios(); // Actualizar contador
+            cargarColegios();
         } else {
             alert('Error: ' + data.message);
         }
@@ -631,9 +624,6 @@ function quitarAsignacion(idAsignacion) {
     });
 }
 
-// ========================================
-// MODAL: VER ESTADÍSTICAS
-// ========================================
 function verEstadisticas(id, nombre) {
     document.getElementById('nombreColegioStats').textContent = nombre;
     
@@ -673,9 +663,6 @@ function closeModalEstadisticas() {
     document.body.classList.remove('modal-open');
 }
 
-// ========================================
-// MOSTRAR ESTADÍSTICAS
-// ========================================
 function mostrarEstadisticas(stats) {
     document.getElementById('statTotalVentas').textContent = stats.totalVentas;
     document.getElementById('statTotalMonto').textContent = '$' + parseFloat(stats.totalMonto).toFixed(2);
@@ -710,9 +697,6 @@ function mostrarEstadisticas(stats) {
     });
 }
 
-// ========================================
-// FUNCIONES AUXILIARES
-// ========================================
 function showLoadingModal() {
     document.getElementById('loadingModal').classList.add('active');
 }
@@ -725,7 +709,6 @@ function mostrarError(mensaje) {
     alert(mensaje);
 }
 
-// Cerrar modales al hacer clic fuera
 window.onclick = function(event) {
     const modales = document.querySelectorAll('.modal');
     modales.forEach(modal => {
@@ -735,7 +718,6 @@ window.onclick = function(event) {
         }
     });
     
-    // Limpiar variables al cerrar
     if (event.target === document.getElementById('modalCerrarLugar')) {
         lugarIdCerrar = null;
     }

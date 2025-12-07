@@ -1,4 +1,15 @@
 // ========================================
+// FUNCIÓN AUXILIAR: Obtener fecha local
+// ========================================
+function obtenerFechaLocal() {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = String(hoy.getMonth() + 1).padStart(2, '0');
+    const day = String(hoy.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// ========================================
 // VARIABLES GLOBALES
 // ========================================
 let vendedorData = null;
@@ -55,9 +66,13 @@ function mostrarFechaHoy() {
 }
 
 // ========================================
-// CARGAR ASIGNACIÓN DEL DÍA
+// CARGAR ASIGNACIÓN DEL DÍA (CORREGIDO)
 // ========================================
 function cargarAsignacionDelDia() {
+    const fechaLocal = obtenerFechaLocal(); // ← USAR FUNCIÓN LOCAL
+    
+    console.log('Cargando asignación para vendedor:', vendedorData.id, 'fecha:', fechaLocal); // DEBUG
+    
     fetch('../../php/gest-colegios.php', {
         method: 'POST',
         headers: {
@@ -65,16 +80,20 @@ function cargarAsignacionDelDia() {
         },
         body: JSON.stringify({
             action: 'obtener_asignacion_vendedor',
-            idVendedor: vendedorData.id
+            idVendedor: vendedorData.id,
+            fecha: fechaLocal // ← AGREGAR FECHA EXPLÍCITA
         })
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Respuesta asignación:', data); // DEBUG
+        
         if (data.success && data.asignaciones.length > 0) {
             // Tomar la primera asignación (debería ser solo una por día)
             asignacionActual = data.asignaciones[0];
             mostrarAsignacion(asignacionActual);
         } else {
+            console.log('No hay asignaciones para hoy'); // DEBUG
             mostrarSinAsignacion();
         }
     })
@@ -280,6 +299,11 @@ function openModalSinAsignacion() {
 
 function closeModalSinAsignacion() {
     document.getElementById('modalSinAsignacion').classList.remove('active');
+    document.body.classList.remove('modal-open');
+}
+
+function cerrarModalVenta() {
+    document.getElementById('modalVenta').classList.remove('active');
     document.body.classList.remove('modal-open');
 }
 

@@ -1,5 +1,5 @@
 <?php
-// php/colegios.php
+// php/gest-colegios.php
 
 $host = 'localhost';
 $dbname = 'ModricEstudio00';
@@ -22,6 +22,10 @@ try {
     
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
+    
+    // LOG DE DEBUG
+    error_log("gest-colegios.php - Action: " . $action);
+    error_log("gest-colegios.php - Input: " . json_encode($input));
     
     switch ($action) {
         case 'obtener_colegios':
@@ -62,6 +66,7 @@ try {
     }
     
 } catch (PDOException $e) {
+    error_log("gest-colegios.php - Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 
@@ -173,11 +178,9 @@ function cerrarColegio($pdo, $data) {
             return;
         }
         
-        // Cerrar colegio
         $stmt = $pdo->prepare("UPDATE Colegio SET Estado = 'Cerrado' WHERE ID_Colegio = :id");
         $stmt->execute([':id' => $data['idColegio']]);
         
-        // Finalizar asignaciones activas
         $stmt = $pdo->prepare("UPDATE AsignacionVendedor SET Estado = 'Finalizado' WHERE ID_Colegio = :id");
         $stmt->execute([':id' => $data['idColegio']]);
         
@@ -197,7 +200,6 @@ function eliminarColegio($pdo, $data) {
             return;
         }
         
-        // Verificar si tiene ventas asociadas
         $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM Pedido WHERE ID_Colegio = :id");
         $stmt->execute([':id' => $data['idColegio']]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -298,7 +300,7 @@ function asignarVendedor($pdo, $data) {
             return;
         }
         
-        // Verificar si ya existe asignación para ese vendedor en esa fecha y colegio
+        // Verificar si ya existe asignación
         $stmt = $pdo->prepare("
             SELECT ID_Asignacion FROM AsignacionVendedor 
             WHERE ID_Vendedor = :idVendedor 
@@ -353,7 +355,7 @@ function quitarAsignacion($pdo, $data) {
 }
 
 // ========================================
-// OBTENER ASIGNACIÓN DEL VENDEDOR (Para vista vendedor)
+// OBTENER ASIGNACIÓN DEL VENDEDOR (CORREGIDO)
 // ========================================
 function obtenerAsignacionVendedor($pdo, $data) {
     try {
@@ -362,7 +364,11 @@ function obtenerAsignacionVendedor($pdo, $data) {
             return;
         }
         
-        $fecha = date('Y-m-d');
+        // Usar fecha proporcionada o fecha actual
+        $fecha = !empty($data['fecha']) ? $data['fecha'] : date('Y-m-d');
+        
+        // LOG DE DEBUG
+        error_log("Buscando asignación para vendedor: " . $data['idVendedor'] . " en fecha: " . $fecha);
         
         $stmt = $pdo->prepare("
             SELECT 
@@ -386,12 +392,17 @@ function obtenerAsignacionVendedor($pdo, $data) {
         
         $asignaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        // LOG DE DEBUG
+        error_log("Asignaciones encontradas: " . count($asignaciones));
+        error_log("Datos: " . json_encode($asignaciones));
+        
         echo json_encode([
             'success' => true,
             'asignaciones' => $asignaciones,
             'fecha' => $fecha
         ]);
     } catch (PDOException $e) {
+        error_log("Error en obtenerAsignacionVendedor: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
