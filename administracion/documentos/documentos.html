@@ -303,21 +303,25 @@
     </div>
 
     <!-- MODAL DE CONFIRMACIÓN -->
-    <div id="modalConfirmacion" class="modal">
-        <div class="modal-content modal-confirm">
-            <div class="modal-header">
-                <h2 id="confirmTitle">Confirmar acción</h2>
-                <button class="modal-close" onclick="cerrarModalConfirmacion()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="confirmMessage">¿Estás seguro de esta acción?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="cerrarModalConfirmacion()">Cancelar</button>
-                <button type="button" class="btn-primary" id="confirmBtn" onclick="ejecutarAccion()">Confirmar</button>
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-content modal-confirm">
+        <div class="modal-header">
+            <h2 id="confirmTitle">Confirmar acción</h2>
+            <button class="modal-close" onclick="cerrarModalConfirmacion()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmMessage">¿Estás seguro de esta acción?</p>
+            <div id="confirmInputContainer" style="display: none; margin-top: 20px;">
+                <label for="confirmInput">Motivo (opcional):</label>
+                <textarea id="confirmInput" placeholder="Ingresa el motivo..." rows="3"></textarea>
             </div>
         </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="cerrarModalConfirmacion()">Cancelar</button>
+            <button type="button" class="btn-primary" id="confirmBtn" onclick="ejecutarAccion()">Confirmar</button>
+        </div>
     </div>
+</div>
 
     <script src="../../js/global-script.js"></script>
     <script src="documentos.js"></script>

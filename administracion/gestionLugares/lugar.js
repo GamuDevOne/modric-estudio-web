@@ -5,6 +5,8 @@ let colegiosData = [];
 let vendedoresDisponibles = [];
 let colegioActualId = null;
 let fechaActual = new Date().toISOString().split('T')[0];
+let lugarIdCerrar = null;
+let lugarIdEliminar = null;
 
 // ========================================
 // VERIFICAR SESIÓN Y PERMISOS
@@ -337,13 +339,25 @@ function guardarColegio(event) {
 }
 
 // ========================================
-// CERRAR COLEGIO
+// CERRAR COLEGIO - CON MODAL DE CONFIRMACIÓN
 // ========================================
 function cerrarColegio(id, nombre) {
-    if (!confirm('¿Cerrar el lugar "' + nombre + '"?\n\nEsto finalizará todas las asignaciones activas.')) {
-        return;
-    }
+    lugarIdCerrar = id;
+    document.getElementById('nombreLugarCerrar').textContent = nombre;
+    document.getElementById('modalCerrarLugar').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeModalCerrarLugar() {
+    document.getElementById('modalCerrarLugar').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    lugarIdCerrar = null;
+}
+
+function confirmarCerrarLugar() {
+    if (!lugarIdCerrar) return;
     
+    closeModalCerrarLugar();
     showLoadingModal();
     
     fetch('../../php/gest-colegios.php', {
@@ -353,7 +367,7 @@ function cerrarColegio(id, nombre) {
         },
         body: JSON.stringify({
             action: 'cerrar_colegio',
-            idColegio: id
+            idColegio: lugarIdCerrar
         })
     })
     .then(response => response.json())
@@ -375,13 +389,25 @@ function cerrarColegio(id, nombre) {
 }
 
 // ========================================
-// ELIMINAR COLEGIO/LUGAR
+// ELIMINAR COLEGIO/LUGAR - CON MODAL DE CONFIRMACIÓN
 // ========================================
 function eliminarColegio(id, nombre) {
-    if (!confirm('¿Eliminar el lugar "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
-        return;
-    }
+    lugarIdEliminar = id;
+    document.getElementById('nombreLugarEliminar').textContent = nombre;
+    document.getElementById('modalEliminarLugar').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeModalEliminarLugar() {
+    document.getElementById('modalEliminarLugar').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    lugarIdEliminar = null;
+}
+
+function confirmarEliminarLugar() {
+    if (!lugarIdEliminar) return;
     
+    closeModalEliminarLugar();
     showLoadingModal();
     
     fetch('../../php/gest-colegios.php', {
@@ -391,7 +417,7 @@ function eliminarColegio(id, nombre) {
         },
         body: JSON.stringify({
             action: 'eliminar_colegio',
-            idColegio: id
+            idColegio: lugarIdEliminar
         })
     })
     .then(response => response.json())
@@ -708,4 +734,12 @@ window.onclick = function(event) {
             document.body.classList.remove('modal-open');
         }
     });
+    
+    // Limpiar variables al cerrar
+    if (event.target === document.getElementById('modalCerrarLugar')) {
+        lugarIdCerrar = null;
+    }
+    if (event.target === document.getElementById('modalEliminarLugar')) {
+        lugarIdEliminar = null;
+    }
 };

@@ -747,6 +747,18 @@ body.modal-open {
 }
 
 /* ========================================
+   WARNING TEXT
+======================================== */
+.warning-text {
+    color: #f44336;
+    font-size: 13px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ========================================
    RESPONSIVE
 ======================================== */
 @media (max-width: 1024px) {

@@ -193,6 +193,46 @@
         </div>
     </div>
 
+    <!-- MODAL: CONFIRMAR CERRAR LUGAR -->
+    <div id="modalCerrarLugar" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Cerrar Lugar</h2>
+                <button class="modal-close" onclick="closeModalCerrarLugar()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Deseas cerrar el lugar "<strong id="nombreLugarCerrar"></strong>"?</p>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                    Esto finalizará todas las asignaciones activas.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalCerrarLugar()">Cancelar</button>
+                <button type="button" class="btn-danger" onclick="confirmarCerrarLugar()">Cerrar Lugar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMAR ELIMINAR LUGAR -->
+    <div id="modalEliminarLugar" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Eliminar Lugar</h2>
+                <button class="modal-close" onclick="closeModalEliminarLugar()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Deseas eliminar el lugar "<strong id="nombreLugarEliminar"></strong>"?</p>
+                <p class="warning-text" style="margin-top: 15px; font-size: 14px;">
+                    ⚠️ Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalEliminarLugar()">Cancelar</button>
+                <button type="button" class="btn-danger" onclick="confirmarEliminarLugar()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CARGA -->
     <div id="loadingModal" class="loading-modal">
         <div class="loading-content">

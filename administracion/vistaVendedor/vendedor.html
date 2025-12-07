@@ -123,6 +123,34 @@
         </div>
     </section>
 
+    <!-- MODAL: SIN ASIGNACIÓN -->
+    <div id="modalSinAsignacion" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Sin Asignación</h2>
+                <button class="modal-close" onclick="closeModalSinAsignacion()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2" style="margin-bottom: 15px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <p style="text-align: center; font-size: 15px; color: #555; line-height: 1.6;">
+                    No tienes un lugar asignado para hoy.
+                </p>
+                <p style="text-align: center; font-size: 14px; color: #999; margin-top: 10px;">
+                    Por favor, contacta con tu supervisor para recibir tu asignación.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalSinAsignacion()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: REGISTRAR VENTA -->
     <div id="modalVenta" class="modal">
         <div class="modal-content">

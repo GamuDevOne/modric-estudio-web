@@ -264,7 +264,7 @@ function actualizarEstadisticas(stats) {
 function abrirModalVenta() {
     // Verificar que tenga asignación
     if (!asignacionActual) {
-        alert('No tienes un colegio asignado para hoy. Contacta con tu supervisor.');
+        openModalSinAsignacion();
         return;
     }
     
@@ -273,9 +273,13 @@ function abrirModalVenta() {
     document.body.classList.add('modal-open');
 }
 
-function cerrarModalVenta() {
-    document.getElementById('modalVenta').classList.remove('active');
-    document.getElementById('formVenta').reset();
+function openModalSinAsignacion() {
+    document.getElementById('modalSinAsignacion').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeModalSinAsignacion() {
+    document.getElementById('modalSinAsignacion').classList.remove('active');
     document.body.classList.remove('modal-open');
 }
 
