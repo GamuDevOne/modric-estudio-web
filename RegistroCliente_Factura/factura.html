@@ -65,24 +65,30 @@
     </div>
 
 <script>
-document.getElementById("btnDescargarPDF").addEventListener("click", () => {
-    // Obtenemos todos los datos que ya están en pantalla
-    const facturaData = {
+    function generarPDF(){
+        const facturaData = JSON.parse( localStorage.getItem('facturaData'));
+        let totalFactura = 0;
+
+        facturaData.productos.forEach(p => {
+            totalFactura += parseFloat(p.total);
+        });
+           let factura = {   
+            // Obtenemos todos los datos que ya están en pantalla
         numero: document.getElementById("numeroFactura").textContent,
         fecha: document.getElementById("fechaFactura").textContent,
         clienteNombre: document.getElementById("clienteNombre").textContent,
         clienteCorreo: document.getElementById("clienteCorreo").textContent,
-        metodoPago: document.getElementById("metodoPago").textContent,
-        paquete: document.getElementById("paqueteSeleccionado").textContent,
-        total: document.getElementById("totalFactura").textContent,
-        comentario: document.getElementById("comentarioFactura").textContent
-    };
+        metodoPago: facturaData.metodoPago,
+        paquete: facturaData.paquete,
+        total: totalFactura,
+        comentario: facturaData.comentario
 
+    };  
     // Enviamos los datos al PHP por POST
-    fetch("../php/factura_pdf.php", {
+    fetch("../php/facturas_pdf.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(facturaData)
+        body: JSON.stringify(factura)
     })
     .then(response => response.json())
     .then(data => {
@@ -94,10 +100,12 @@ document.getElementById("btnDescargarPDF").addEventListener("click", () => {
         }
     })
     .catch(error => console.error("Error:", error));
-});
+    }
+
 </script>
 <div class="acciones-factura">
-    <button id="btnGenerarPDF" class="btn-pdf">📄 Generar PDF</button>
+    <button id="btnGenerarPDF" class="btn-pdf" onclick="generarPDF()">📄 Generar PDF</button>
+
     <button id="btnWhatsApp" class="btn-whatsapp" disabled>📱 Enviar por WhatsApp</button>
 </div>
 
