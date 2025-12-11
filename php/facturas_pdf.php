@@ -1,8 +1,22 @@
 <?php
+// Headers para permitir peticiones POST
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Verificar que sea POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode([
+        "exito" => false, 
+        "mensaje" => "Solo se permiten peticiones POST"
+    ]);
+    exit;
+}
 require_once 'dompdf/autoload.inc.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
-
+var_dump(1);
 // Recibir datos del formulario (JSON)
 $datos = json_decode(file_get_contents("php://input"), true);
 
