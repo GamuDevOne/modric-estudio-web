@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cotizaciones - Modric Estudio</title>
+    <link rel="stylesheet" href="../../css/global-styles.css">
+    <link rel="stylesheet" href="gestion-cotizaciones.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header id="header">
+        <div class="logo">
+            <a href="../../index.html">
+                <img src="../../imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../index.html">INICIO</a></li>
+                <li><a href="../administracion.html">PANEL</a></li>
+                <li><a href="../dashboard/dashboard.html">DASHBOARD</a></li>
+                <li><a href="gestion-cotizaciones.html" class="active">COTIZACIONES</a></li>
+            </ul>
+        </nav>
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <section class="cotizaciones-section">
+        <div class="cotizaciones-container">
+            
+            <!-- HEADER DE LA PÁGINA -->
+            <div class="page-header">
+                <div class="header-content">
+                    <h1>Gestión de Cotizaciones</h1>
+                    <p>Administra las solicitudes de sesiones de fotos</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="openModalBloquearFecha()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Bloquear Fechas
+                    </button>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS RÁPIDAS -->
+            <div class="stats-cotizaciones">
+                <div class="stat-card-cot pendientes">
+                    <div class="stat-icon-cot">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content-cot">
+                        <p class="stat-label-cot">Pendientes</p>
+                        <h3 class="stat-value-cot" id="statPendientes">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card-cot revision">
+                    <div class="stat-icon-cot">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="stat-content-cot">
+                        <p class="stat-label-cot">En Revisión</p>
+                        <h3 class="stat-value-cot" id="statRevision">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card-cot aprobadas">
+                    <div class="stat-icon-cot">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content-cot">
+                        <p class="stat-label-cot">Aprobadas</p>
+                        <h3 class="stat-value-cot" id="statAprobadas">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filtros-card">
+                <div class="filtro-grupo">
+                    <label for="filtroEstado">Estado:</label>
+                    <select id="filtroEstado" onchange="filtrarCotizaciones()">
+                        <option value="todos">Todas</option>
+                        <option value="Pendiente" selected>Pendientes</option>
+                        <option value="En_Revision">En Revisión</option>
+                        <option value="Aprobada">Aprobadas</option>
+                        <option value="Rechazada">Rechazadas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABLA DE COTIZACIONES -->
+            <div class="table-card">
+                <div class="table-container">
+                    <table class="cotizaciones-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Tipo Sesión</th>
+                                <th>Fecha Solicitada</th>
+                                <th>Días Restantes</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCotizaciones">
+                            <tr>
+                                <td colspan="7" class="loading">Cargando cotizaciones...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL: VER DETALLE -->
+    <div id="modalDetalle" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Detalle de Cotización #<span id="detalleId"></span></h2>
+                <button class="modal-close" onclick="closeModalDetalle()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detalle-grid">
+                    <div class="detalle-seccion">
+                        <h4>Información del Cliente</h4>
+                        <p><strong>Nombre:</strong> <span id="detalleNombre"></span></p>
+                        <p><strong>Correo:</strong> <span id="detalleCorreo"></span></p>
+                        <p><strong>Teléfono:</strong> <span id="detalleTelefono"></span></p>
+                    </div>
+                    <div class="detalle-seccion">
+                        <h4>Información de la Sesión</h4>
+                        <p><strong>Tipo:</strong> <span id="detalleTipo"></span></p>
+                        <p><strong>Fecha:</strong> <span id="detalleFecha"></span></p>
+                        <p><strong>Hora:</strong> <span id="detalleHora"></span></p>
+                        <p><strong>Estado:</strong> <span id="detalleEstado" class="status-badge"></span></p>
+                    </div>
+                </div>
+                <div class="detalle-descripcion">
+                    <h4>Descripción de la Sesión</h4>
+                    <p id="detalleDescripcion"></p>
+                </div>
+                <div class="detalle-admin" id="detalleAdminSection" style="display: none;">
+                    <h4>Información Administrativa</h4>
+                    <p><strong>Precio Estimado:</strong> $<span id="detallePrecio"></span></p>
+                    <p><strong>Notas:</strong> <span id="detalleNotas"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalDetalle()">Cerrar</button>
+                <button type="button" class="btn-warning" id="btnRevisar" onclick="marcarEnRevision()">Marcar en Revisión</button>
+                <button type="button" class="btn-success" id="btnAprobar" onclick="openModalAprobar()">Aprobar</button>
+                <button type="button" class="btn-danger" id="btnRechazar" onclick="openModalRechazar()">Rechazar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: APROBAR COTIZACIÓN -->
+    <div id="modalAprobar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Aprobar Cotización</h2>
+                <button class="modal-close" onclick="closeModalAprobar()">&times;</button>
+            </div>
+            <form id="formAprobar" onsubmit="aprobarCotizacion(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="aprobarIdCotizacion">
+                    
+                    <div class="form-group">
+                        <label for="precioEstimado">Precio Estimado *</label>
+                        <input type="number" id="precioEstimado" step="0.01" placeholder="Ej: 250.00" required>
+                        <small>El sistema asignará prioridad automáticamente según el precio</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notasAdmin">Notas para el Cliente (opcional)</label>
+                        <textarea id="notasAdmin" rows="4" placeholder="Información adicional o requisitos..."></textarea>
+                    </div>
+
+                    <div class="info-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <div>
+                            <p><strong>Al aprobar:</strong></p>
+                            <ul>
+                                <li>Se creará un pedido automáticamente</li>
+                                <li>Precio ≥ $300 → Prioridad Alta</li>
+                                <li>Precio < $300 → Prioridad Baja</li>
+                                <li>Se notificará al cliente por correo</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModalAprobar()">Cancelar</button>
+                    <button type="submit" class="btn-success">Aprobar y Crear Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RECHAZAR COTIZACIÓN -->
+    <div id="modalRechazar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Rechazar Cotización</h2>
+                <button class="modal-close" onclick="closeModalRechazar()">&times;</button>
+            </div>
+            <form id="formRechazar" onsubmit="rechazarCotizacion(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="rechazarIdCotizacion">
+                    
+                    <div class="form-group">
+                        <label for="motivoRechazo">Motivo del Rechazo *</label>
+                        <textarea id="motivoRechazo" rows="4" placeholder="Explica por qué se rechaza la cotización..." required></textarea>
+                        <small>Este mensaje será enviado al cliente</small>
+                    </div>
+
+                    <div class="warning-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <p>Esta acción cambiará el estado a "Rechazada" y el cliente recibirá una notificación.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModalRechazar()">Cancelar</button>
+                    <button type="submit" class="btn-danger">Rechazar Cotización</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: BLOQUEAR FECHAS -->
+    <div id="modalBloquearFecha" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bloquear Fechas</h2>
+                <button class="modal-close" onclick="closeModalBloquearFecha()">&times;</button>
+            </div>
+            <form id="formBloquear" onsubmit="bloquearFechas(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fechaInicio">Fecha Inicio *</label>
+                        <input type="date" id="fechaInicio" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaFin">Fecha Fin *</label>
+                        <input type="date" id="fechaFin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motivoBloqueo">Motivo</label>
+                        <input type="text" id="motivoBloqueo" placeholder="Ej: Vacaciones, Mantenimiento, etc.">
+                    </div>
+
+                    <div class="info-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <p>Las fechas bloqueadas no estarán disponibles para cotizaciones en el calendario del cliente.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModalBloquearFecha()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Bloquear Fechas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARGA -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <script src="../../js/global-script.js"></script>
+    <script src="gestion-cotizaciones.js"></script>
+</body>
+</html>

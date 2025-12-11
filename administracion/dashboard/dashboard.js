@@ -481,7 +481,7 @@ function cerrarModalTodosPedidos() {
     document.body.classList.remove('modal-open');
 }
 
-// Cerrar modal al hacer clic fuera
+// Cerrar modal al hacer clic fuerad
 window.onclick = function(event) {
     const modal = document.getElementById('modalTodosPedidos');
     if (event.target === modal) {
