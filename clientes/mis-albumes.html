@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Álbumes - Modric Estudio</title>
+    <link rel="stylesheet" href="../css/global-styles.css">
+    <link rel="stylesheet" href="mis-albumes.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header id="header">
+        <!-- LOGO - IZQUIERDA -->
+        <div class="logo">
+            <a href="../index.html">
+                <img src="../imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+
+        <!-- NAVEGACIÓN - CENTRO -->
+        <nav>
+            <ul>
+                <li><a href="../index.html">INICIO</a></li>
+                <li><a href="mis-albumes.html" class="active">MIS ÁLBUMES</a></li>
+            </ul>
+        </nav>
+
+        <!-- BOTÓN LOGOUT - DERECHA -->
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <section class="albums-section">
+        <div class="albums-container">
+            
+            <!-- HEADER -->
+            <div class="page-header">
+                <div class="header-content">
+                    <h1>Mis Álbumes de Fotos</h1>
+                    <p id="welcomeMessage">Bienvenido/a</p>
+                </div>
+            </div>
+
+            <!-- ALERTA DE INFORMACIÓN -->
+            <div class="info-alert" id="infoAlert" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong>Importante:</strong>
+                    <span id="infoMessage">Recuerda descargar tus fotos antes de que caduque el álbum.</span>
+                </div>
+            </div>
+
+            <!-- GRID DE ÁLBUMES -->
+            <div id="albumsGrid" class="albums-grid">
+                <div class="loading-card">
+                    <div class="spinner"></div>
+                    <p>Cargando tus álbumes...</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL: VER FOTOS Y DESCARGAR -->
+    <div id="modalVerFotos" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2>Álbum: <span id="tituloAlbumFotos"></span></h2>
+                    <p class="album-info-bar">
+                        <span id="diasRestantesInfo"></span>
+                    </p>
+                </div>
+                <button class="modal-close" onclick="closeModalVerFotos()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Barra de acciones -->
+                <div class="fotos-actions-bar">
+                    <div class="fotos-count">
+                        Total de fotos: <strong id="totalFotosAlbum">0</strong>
+                    </div>
+                    <div class="download-actions">
+                        <button class="btn-download-selected" id="btnDownloadSelected" onclick="descargarSeleccionadas()" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Descargar seleccionadas (<span id="countSelected">0</span>)
+                        </button>
+                        <button class="btn-download-all" onclick="descargarTodasLasFotos()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Descargar todas (ZIP)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Galería de fotos -->
+                <div id="galeriaPreviews" class="galeria-previews">
+                    <div class="loading-card">
+                        <div class="spinner"></div>
+                        <p>Cargando fotos...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModalVerFotos()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARGA -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DE RETROALIMENTACIÓN -->
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-icon" id="feedbackIcon">
+                <!-- El ícono se insertará dinámicamente -->
+            </div>
+            <p id="feedbackMessage">Mensaje</p>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN ZIP -->
+    <div id="confirmZipModal" class="modal">
+        <div class="modal-content modal-confirm">
+            <div class="modal-header">
+                <div class="confirm-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </div>
+                <h2>localhost</h2>
+            </div>
+            <div class="modal-body">
+                <p id="confirmZipMessage">¿Descargar 5 fotos como archivo ZIP?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModalConfirmZip()">Cancelar</button>
+                <button type="button" class="btn-primary" onclick="confirmarDescargaZip()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX PARA VER IMAGEN COMPLETA -->
+    <div id="lightbox" class="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-prev" onclick="cambiarImagen(-1)">&#10094;</button>
+        <button class="lightbox-next" onclick="cambiarImagen(1)">&#10095;</button>
+        
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="Imagen ampliada">
+        </div>
+
+        <div class="lightbox-counter">
+            <span id="image-counter"></span>
+        </div>
+    </div>
+
+    <script src="../js/global-script.js"></script>
+    <script src="mis-albumes.js"></script>
+</body>
+</html>

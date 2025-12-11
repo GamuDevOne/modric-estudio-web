@@ -87,7 +87,7 @@ function logout() {
 }
 
 // ========================================
-// AGREGAR OPCIÓN "PANEL..." AL MENÚ SI HAY SESIÓN
+// AGREGAR OPCIÓN "VISTA DE..." AL MENÚ SI HAY SESIÓN
 // ========================================
 function addPanelOption() {
     const user = checkSession();
@@ -127,6 +127,8 @@ function addPanelOption() {
             panelItem.innerHTML = `<a href="${basePath}administracion/administracion.html">Panel de Administración</a>`;
         } else if (user.tipo === 'Vendedor') {
             panelItem.innerHTML = `<a href="${basePath}administracion/vistaVendedor/vendedor.html">Panel de vendedor</a>`;
+        } else if (user.tipo === 'Cliente') {
+            panelItem.innerHTML = `<a href="${basePath}clientes/mis-albumes.html">Mis Álbumes</a>`;
         }
         
         dropdownMenu.insertBefore(panelItem, dropdownMenu.firstChild);

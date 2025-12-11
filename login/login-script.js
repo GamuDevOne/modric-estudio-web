@@ -69,7 +69,7 @@ function handleLoginSubmit(event) {
             }else if (data.user.TipoUsuario === 'Vendedor') {
                 window.location.replace('../administracion/vistaVendedor/vendedor.html');
             }else if (data.user.TipoUsuario === 'Cliente') {
-                window.location.replace('../index.html');
+                window.location.replace('../clientes/mis-albumes.html');
             }
         } else {
             errorMessage.textContent = data.message || 'Credenciales incorrectas';
