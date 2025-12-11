@@ -1,6 +1,0 @@
-RewriteEngine On
-
-# Redirigir todas las peticiones a index.php si no existe archivo/carpeta
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]

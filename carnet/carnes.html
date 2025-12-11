@@ -6,37 +6,55 @@
   <title>Carnés | Modric Estudio</title>
 
   <!-- Enlaces a tus hojas de estilo -->
-  <link rel="stylesheet" href="../inicio/index-styles.css">
-  <link rel="stylesheet" href="../css/global-styles.css">
+   <link rel="stylesheet" href="../css/global-styles.css">
   <link rel="stylesheet" href="carnet-styles.css">
-
-  <!-- Scroll suave -->
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-  </style>
 </head>
 
 <body>
   <!-- HEADER -->
   <header id="header">
+    <!-- 1. LOGO -->
     <div class="logo">
-      <img src="../imagenes/logo.png" alt="Modric Estudio" class="logo-img">
+        <a href="../index.html">
+            <img src="../imagenes/logo.png" alt="Modric Estudio">
+        </a>
     </div>
-    <nav>
-      <ul>
-        <li><a href="../index.html">INICIO</a></li>
-        <li><a href="#sobre-nosotros">SOBRE NOSOTROS</a></li>
-         <li><a href="../index.html#fotografias">FOTOGRAFÍAS</a></li>
-        <li><a href="carnet.html" class="active">CARNÉS</a></li>
-       <li><a href="../textiles/text-activado.html">TEXTIL</a></li>
 
-      <li><a href="../combo-graduacion/combo-principal.html">COMBOS</a></li>
-       <li><a href="../index.html#contacto">CONTACTO</a></li>
-      </ul>
+    <!-- 2. BOTÓN HAMBURGUESA (móvil) -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menú de navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- 3. NAVEGACIÓN -->
+    <nav id="mainNav" class="main-nav">
+        <ul>
+            <li><a href="../index.html">INICIO</a></li>
+            <li><a href="../index.html#sobre-nosotros">SOBRE NOSOTROS</a></li>
+            <li><a href="../index.html#fotografias">FOTOGRAFÍAS</a></li>
+            <li><a href="../carnet/carnes.html">CARNÉS</a></li>
+            <li><a href="../textiles/text-activado.html">TEXTIL</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropdown-toggle">MÁS</a>
+                <ul class="dropdown-menu">
+                    <li><a href="../index.html#combos">Combos de graduación</a></li>
+                    <li><a href="../index.html#contacto">CONTACTO</a></li>
+                </ul>
+            </li>
+        </ul>
     </nav>
-  </header>
+
+    <!-- 4. BOTÓN LOGIN -->
+    <div class="login-btn">
+        <button onclick="toggleLoginMenu()" class="login-icon-btn" title="Abrir menú de inicio de sesión">
+            <!-- SVG icon -->
+        </button>
+        <div id="loginMenu" class="login-menu">
+            <a href="../login/login.html">Iniciar Sesión</a>
+        </div>
+    </div>
+</header>
 
   <!-- SECCIÓN PRINCIPAL -->
   <section id="carnes" class="carnes-section">
@@ -57,39 +75,43 @@
         <div class="carne-card">
           <h3>Carné Estudiantil</h3>
           <div class="carne-img-wrap">
-            <img src="../imagenes/instituto-nacional.jpg" alt="Ejemplo Carné Estudiantil">
+            <img src="../imgcarnet/Carnet estudiantil.png" alt="Ejemplo Carné Estudiantil">
           </div>
           <p class="carne-desc">
             Carné para instituciones educativas — impresión a color, plastificado y diseño personalizado.
           </p>
-          <aa class="btn-cotizar"
-             href="https://wa.me/50766110691?text=Hola%2C%20quiero%20cotizar%20un%20carn%C3%A9%20estudiantil."
+          <a class="btn-cotizar"
+             href="https://wa.me/50769764758?text=Hola%2C%20quiero%20cotizar%20un%20carn%C3%A9%20estudiantil."
              target="_blank"
-             rel="noopener">Cotizar</a>
+             rel="noopener noreferrer">Cotizar</a>
         </div>
 
         <!-- Carné Empresarial -->
         <div class="carne-card">
           <h3>Carné Empresarial</h3>
           <div class="carne-img-wrap">
-            <img src="../imagenes/carne-empresarial.jpg" alt="Ejemplo Carné Empresarial">
+            <img src="../imgcarnet/Carnet empresarial.png" alt="Ejemplo Carné Empresarial">
           </div>
           <p class="carne-desc">
             Carné corporativo para empresas — impresión profesional, plastificado y diseño personalizado.
+          </p>
           <a class="btn-cotizar"
-             href="https://wa.me/50766110691?text=Hola%2C%20quiero%20cotizar%20un%20carn%C3%A9%20empresarial."
+             href="https://wa.me/50769764758?text=Hola%2C%20quiero%20cotizar%20un%20carn%C3%A9%20empresarial."
              target="_blank"
-             rel="noopener">Cotizar</a>
-             target="_blank">Cotizar</a>
+             rel="noopener noreferrer">Cotizar</a>
         </div>
 
       </div>
     </div>
   </section>
 
+  
   <!-- FOOTER -->
   <footer class="footer">
-    <p class="copyright"> -Modric Estudio-</p>
+    <p class="copyright">©2025 - Modric Estudio</p>
   </footer>
+
+  <script src="../js/global-script.js"></script>
+  
 </body>
 </html>

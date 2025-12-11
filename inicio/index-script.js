@@ -107,30 +107,42 @@ document.getElementById('lightbox').addEventListener('click', function(e) {
 // ========================================
 function handleSubmit(event) {
     event.preventDefault();
-    
+
     const form = event.target;
     const formData = new FormData(form);
-    
-    // Aquí se implementará el envío del formulario
-    // Por ejemplo, usando fetch para enviar a un servidor:
-    /*
-    fetch('tu-endpoint-de-servidor.php', {
+    const payload = {
+        nombre: formData.get('nombre') || '',
+        email: formData.get('email') || '',
+        telefono: formData.get('telefono') || '',
+        mensaje: formData.get('mensaje') || ''
+    };
+
+    // Validación básica
+    if (!payload.nombre || !payload.email || !payload.mensaje) {
+        alert('Por favor completa los campos obligatorios (Nombre, Email y Mensaje).');
+        return;
+    }
+
+    fetch('/api/contacto', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(data => {
-        alert('¡Mensaje enviado correctamente!');
-        form.reset();
+        if (data && data.ok) {
+            alert(data.message || '¡Mensaje enviado correctamente!');
+            form.reset();
+        } else {
+            alert((data && data.error) ? data.error : 'Error al enviar el mensaje.');
+        }
     })
     .catch(error => {
+        console.error('Error al enviar contacto:', error);
         alert('Error al enviar el mensaje. Por favor, intenta de nuevo.');
     });
-    */
-    
-    // Por ahora, solo mostramos un mensaje de confirmación
-    alert('¡Gracias por tu mensaje!\n\nTe contactaremos pronto.');
-    form.reset();
 }
 
 // ========================================

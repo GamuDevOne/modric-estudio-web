@@ -216,21 +216,22 @@
             <div class="contact-divider"></div>
 
             <div class="contact-details">
-                <p><strong>Modric Estudio</strong></p>
-                <p>Panamá, +507</p>
-                <p>Tel: 914-789-012</p>
+                <p><strong>📍 Ubicación: </strong></p>
+                <a href="https://maps.app.goo.gl/NHDQzRHkEcpLVfvx8"
+                target="_blank"
+                rel="noopener noreferrer">
+                Panamá, La Chorrera</a>
+                <p>Tel: +507 6976-4758</p>
                 <p>
-                    <a href="mailto:info@modricestudio.com">
-                        info@modricestudio.com
-                    </a>
+                <a>Modricestudio@gmail.com</a>
                 </p>
             </div>
 
-            <form class="contact-form" onsubmit="handleSubmit(event)">
-                <input type="text" placeholder="Nombre" required>
-                <input type="email" placeholder="Email" required>
-                <input type="tel" placeholder="Teléfono">
-                <textarea placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
+            <form id="contactForm" class="contact-form" onsubmit="handleSubmit(event)">
+                <input type="text" name="nombre" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="telefono" placeholder="Teléfono">
+                <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
                 <button type="submit">ENVIAR MENSAJE</button>
             </form>
         </div>

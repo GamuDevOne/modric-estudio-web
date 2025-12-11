@@ -8,7 +8,7 @@
   background: none !important; /* sin color ni imagen */
 }
 
-/* 🚫 ELIMINAR COMPLETAMENTE FONDOS Y CAPAS */
+/* ELIMINAR COMPLETAMENTE FONDOS Y CAPAS */
 .carnes-section::before,
 .carnes-section::after {
   content: none !important;
