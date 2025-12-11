@@ -438,24 +438,53 @@ function registrarDescarga(idFoto) {
 // ========================================
 // DESCARGAR TODAS LAS FOTOS (ZIP)
 // ========================================
-function descargarTodasLasFotos() {
+function descargarTodasLasFotos(event) {
+    // Evitar que el click burbujee y algún handler global cierre el modal inmediatamente
+    if (event && event.stopPropagation) event.stopPropagation();
+
     if (!albumActualId) {
         mostrarModal('No se pudo identificar el álbum', 'error');
         return;
     }
-    
+
     const totalFotos = parseInt(document.getElementById('totalFotosAlbum').textContent);
-    
+
     if (totalFotos === 0) {
         mostrarModal('No hay fotos para descargar', 'warning');
         return;
     }
-    
+
     // Mostrar modal de confirmación personalizado
     abrirModalConfirmZip(totalFotos);
 }
 
 function abrirModalConfirmZip(totalFotos) {
+    const dashboardModal = document.getElementById('modalConfirmacion');
+    if (dashboardModal) {
+        const title = document.getElementById('confirmTitle');
+        const message = document.getElementById('confirmMessage');
+        const inputContainer = document.getElementById('confirmInputContainer');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+        title.textContent = 'Descargar álbum';
+        message.textContent = `¿Descargar ${totalFotos} ${totalFotos === 1 ? 'foto' : 'fotos'} como archivo ZIP?`;
+        if (inputContainer) inputContainer.style.display = 'none';
+
+        if (confirmBtn) {
+            confirmBtn.textContent = 'ACEPTAR';
+            confirmBtn.style.background = ''; // use default primary style
+            // Remove previous handlers and set to confirmarDescargaZip
+            confirmBtn.onclick = function(e) {
+                e.stopPropagation();
+                confirmarDescargaZip();
+            };
+        }
+
+        dashboardModal.classList.add('active');
+        document.body.classList.add('modal-open');
+        return;
+    }
+
     const modal = document.getElementById('confirmZipModal');
     const message = document.getElementById('confirmZipMessage');
     
@@ -463,6 +492,17 @@ function abrirModalConfirmZip(totalFotos) {
     
     modal.classList.add('active');
     document.body.classList.add('modal-open');
+}
+
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+
+    // limpiar handler del botón para evitar referencias accidentales
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) confirmBtn.onclick = null;
 }
 
 function cerrarModalConfirmZip() {
