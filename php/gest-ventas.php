@@ -97,7 +97,7 @@ function registrarVenta($pdo, $data) {
             return;
         }
         
-        // ✅ NUEVO: Validar abono si es necesario
+        //NUEVO: Validar abono si es necesario (11/12/25)
         if ($data['estadoPago'] === 'Abono') {
             if (empty($data['montoAbonado']) || $data['montoAbonado'] <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Monto abonado inválido']);
@@ -113,7 +113,9 @@ function registrarVenta($pdo, $data) {
         // Obtener ID del cliente
         $idUsuario = $data['idVendedor']; // TEMPORAL
         
-        // Insertar pedido
+                //Calcular prioridad ANTES de insertar (11/12/25)
+        $prioridad = ($data['total'] >= 300) ? 1 : 2; // 1=Alta, 2=Baja
+
         $stmt = $pdo->prepare("
             INSERT INTO Pedido (
                 ID_Usuario,
@@ -123,6 +125,7 @@ function registrarVenta($pdo, $data) {
                 ID_Servicio,
                 ID_Paquete,
                 Total,
+                Prioridad,
                 Estado,
                 Fecha
             ) VALUES (
@@ -133,11 +136,12 @@ function registrarVenta($pdo, $data) {
                 :idServicio,
                 :idPaquete,
                 :total,
+                :prioridad,
                 'Pendiente',
                 NOW()
             )
         ");
-        
+
         $stmt->execute([
             ':idUsuario' => $idUsuario,
             ':idVendedor' => $data['idVendedor'],
@@ -145,12 +149,13 @@ function registrarVenta($pdo, $data) {
             ':nombreCliente' => $data['nombreCliente'],
             ':idServicio' => $data['idServicio'] ?? null,
             ':idPaquete' => $data['idPaquete'] ?? null,
-            ':total' => $data['total']
+            ':total' => $data['total'],
+            ':prioridad' => $prioridad
         ]);
         
         $idPedido = $pdo->lastInsertId();
         
-        // ✅ ACTUALIZADO: Registrar información de venta CON monto abonado
+        // ACTUALIZADO: Registrar información de venta CON monto abonado (11/12/25)
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO VentaInfo (
