@@ -267,12 +267,13 @@ function getPedidos($pdo) {
     ");
     $pedidos['ultimos'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Pedidos pendientes de pago
+    //FIX: Pedidos pendientes (EXCLUIR CANCELADOS) 12/12/25
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
             COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
             p.Total,
+            p.Estado,
             DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
             v.NombreCompleto as Vendedor,
             COALESCE(vi.EstadoPago, 'Pendiente') as EstadoPago
@@ -280,7 +281,10 @@ function getPedidos($pdo) {
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
         LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-        WHERE p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono'
+        WHERE (
+            (p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono')
+            AND p.Estado != 'Cancelado'
+        )
         ORDER BY p.Fecha ASC
     ");
     $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -371,14 +375,16 @@ function getAllPedidos($pdo) {
         $stmt = $pdo->prepare("
             SELECT 
                 p.ID_Pedido,
-                u.NombreCompleto as Cliente,
-                s.NombreServicio as Servicio,
+                COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente,
+                COALESCE(s.NombreServicio, pk.NombrePaquete, 'N/A') as Servicio,
                 p.Fecha,
                 p.Total,
                 p.Estado
             FROM Pedido p
             LEFT JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
+            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
             ORDER BY p.Fecha DESC
             LIMIT 100
         ");

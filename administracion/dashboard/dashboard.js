@@ -186,12 +186,15 @@ function updateGraficos(graficos) {
 // ACTUALIZAR TABLAS
 // ========================================
 function updateTablas(pedidos) {
-    // Tabla de últimos pedidos
+    //FIX 1: Tabla de ÚLTIMOS PEDIDOS (limitada a 5) (12/12/25)
     const tablaPedidos = document.getElementById('tablaPedidos');
     tablaPedidos.innerHTML = '';
     
     if (pedidos.ultimos && pedidos.ultimos.length > 0) {
-        pedidos.ultimos.forEach(pedido => {
+        // Limitar a solo 5 pedidos (sin importar cuántos haya)
+        const pedidosLimitados = pedidos.ultimos.slice(0, 5);
+        
+        pedidosLimitados.forEach(pedido => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>#${pedido.ID_Pedido}</td>
@@ -207,51 +210,61 @@ function updateTablas(pedidos) {
         tablaPedidos.innerHTML = '<tr><td colspan="6" class="empty">No hay pedidos recientes</td></tr>';
     }
     
-    // Tabla de pedidos pendientes
+    //FIX 2: Tabla de PEDIDOS PENDIENTES (excluir cancelados)(12/12/25)
     const tablaPendientes = document.getElementById('tablaPendientes');
     const badgePendientes = document.getElementById('badgePendientes');
     tablaPendientes.innerHTML = '';
     
     if (pedidos.pendientes && pedidos.pendientes.length > 0) {
-        badgePendientes.textContent = pedidos.pendientes.length;
+        // ← FIX: Filtrar pedidos cancelados en el frontend
+        const pedidosActivos = pedidos.pendientes.filter(p => 
+            p.Estado !== 'Cancelado' && 
+            p.EstadoPago !== 'Cancelado'
+        );
         
-        pedidos.pendientes.forEach(pedido => {
-            const row = document.createElement('tr');
-            const estadoTexto = pedido.EstadoPago === 'Abono' ? 'Abono' : 'Pendiente';
-            const estadoClass = pedido.EstadoPago === 'Abono' ? 'abono' : 'pendiente';
-            
-            row.innerHTML = `
-                <td>#${pedido.ID_Pedido}</td>
-                <td>${pedido.Cliente}</td>
-                <td>$${parseFloat(pedido.Total).toFixed(2)}</td>
-                <td>${pedido.DiasPendiente} días</td>
-                <td><span class="status-badge ${estadoClass}">${estadoTexto}</span></td>
-                <td>
-                    <div class="action-buttons-dashboard">
-                        <button class="btn-action btn-completar" onclick="marcarCompletado(${pedido.ID_Pedido})" title="Marcar como completado">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                        </button>
-                        <button class="btn-action btn-cancelar" onclick="cancelarPedido(${pedido.ID_Pedido})" title="Cancelar pedido">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                            </svg>
-                        </button>
-                        <button class="btn-action btn-detalle" onclick="verDetallePedido(${pedido.ID_Pedido})" title="Ver detalle">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tablaPendientes.appendChild(row);
-        });
+        badgePendientes.textContent = pedidosActivos.length;
+        
+        if (pedidosActivos.length > 0) {
+            pedidosActivos.forEach(pedido => {
+                const row = document.createElement('tr');
+                const estadoTexto = pedido.EstadoPago === 'Abono' ? 'Abono' : 'Pendiente';
+                const estadoClass = pedido.EstadoPago === 'Abono' ? 'abono' : 'pendiente';
+                
+                row.innerHTML = `
+                    <td>#${pedido.ID_Pedido}</td>
+                    <td>${pedido.Cliente}</td>
+                    <td>$${parseFloat(pedido.Total).toFixed(2)}</td>
+                    <td>${pedido.DiasPendiente} días</td>
+                    <td><span class="status-badge ${estadoClass}">${estadoTexto}</span></td>
+                    <td>
+                        <div class="action-buttons-dashboard">
+                            <button class="btn-action btn-completar" onclick="marcarCompletado(${pedido.ID_Pedido})" title="Marcar como completado">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </button>
+                            <button class="btn-action btn-cancelar" onclick="cancelarPedido(${pedido.ID_Pedido})" title="Cancelar pedido">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </button>
+                            <button class="btn-action btn-detalle" onclick="verDetallePedido(${pedido.ID_Pedido})" title="Ver detalle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tablaPendientes.appendChild(row);
+            });
+        } else {
+            tablaPendientes.innerHTML = '<tr><td colspan="6" class="empty">No hay pedidos pendientes</td></tr>';
+        }
     } else {
         badgePendientes.textContent = '0';
         tablaPendientes.innerHTML = '<tr><td colspan="6" class="empty">No hay pedidos pendientes</td></tr>';
@@ -279,7 +292,7 @@ function verDetallePedido(idPedido) {
 // MARCAR PEDIDO COMO COMPLETADO
 function marcarCompletado(idPedido) {
     accionPendiente = 'marcar_completado';
-    datosAccion = { idPedido: idPedido }; // ← FIX: Asegurar que idPedido esté correctamente asignado
+    datosAccion = { idPedido: idPedido };
     
     const modal = document.getElementById('modalConfirmacion');
     const title = document.getElementById('confirmTitle');
@@ -300,7 +313,7 @@ function marcarCompletado(idPedido) {
 // CANCELAR PEDIDO
 function cancelarPedido(idPedido) {
     accionPendiente = 'cancelar_pedido';
-    datosAccion = { idPedido: idPedido }; // ← FIX: Asegurar que idPedido esté correctamente asignado
+    datosAccion = { idPedido: idPedido };
     
     const modal = document.getElementById('modalConfirmacion');
     const title = document.getElementById('confirmTitle');
@@ -332,7 +345,6 @@ function cerrarModalConfirmacion() {
 
 // EJECUTAR ACCIÓN CONFIRMADA
 function ejecutarAccion() {
-    // ← FIX: Validación mejorada
     if (!accionPendiente || !datosAccion || !datosAccion.idPedido) {
         console.error('Error: Datos de acción incompletos', { accionPendiente, datosAccion });
         alert('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
@@ -340,9 +352,9 @@ function ejecutarAccion() {
         return;
     }
     
-    // IMPORTANTE: Guardar los datos ANTES de cerrar el modal
+    // Guardar los datos ANTES de cerrar el modal
     const accionAEjecutar = accionPendiente;
-    const datosAEnviar = { ...datosAccion }; // Copiar objeto
+    const datosAEnviar = { ...datosAccion };
     
     // Si es cancelación, agregar motivo
     if (accionAEjecutar === 'cancelar_pedido') {
@@ -350,7 +362,7 @@ function ejecutarAccion() {
         datosAEnviar.motivo = motivo;
     }
     
-    cerrarModalConfirmacion(); // Ahora sí cerramos
+    cerrarModalConfirmacion();
     showLoadingModal('Procesando...');
     
     // Construcción del payload según la acción
@@ -363,7 +375,7 @@ function ejecutarAccion() {
         payload.motivo = datosAEnviar.motivo;
     }
     
-    console.log('Enviando payload:', payload); // ← DEBUG
+    console.log('Enviando payload:', payload);
     
     fetch('../../php/dashboard.php', {
         method: 'POST',
@@ -374,11 +386,11 @@ function ejecutarAccion() {
     .then(data => {
         hideLoadingModal();
         
-        console.log('Respuesta del servidor:', data); // ← DEBUG
+        console.log('Respuesta del servidor:', data);
         
         if (data.success) {
             alert(data.message || 'Acción completada exitosamente');
-            loadDashboardData();
+            loadDashboardData(); // ← Recargar dashboard completo
         } else {
             alert('Error: ' + (data.message || 'Respuesta inesperada'));
         }
@@ -431,11 +443,9 @@ function abrirModalTodosPedidos() {
         return;
     }
 
-    // Mostrar modal
     modal.classList.add('active');
     document.body.classList.add('modal-open');
 
-    // Cargar todos los pedidos
     showLoadingModal('Cargando todos los pedidos...');
 
     fetch('../../php/dashboard.php', {
@@ -481,7 +491,7 @@ function cerrarModalTodosPedidos() {
     document.body.classList.remove('modal-open');
 }
 
-// Cerrar modal al hacer clic fuerad
+// Cerrar modal al hacer clic fuera
 window.onclick = function(event) {
     const modal = document.getElementById('modalTodosPedidos');
     if (event.target === modal) {

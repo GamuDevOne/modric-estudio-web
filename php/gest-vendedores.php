@@ -358,16 +358,34 @@ function getVendedorStats($pdo, $data) {
             return;
         }
         
-        // Obtener lugar de trabajo
-        $stmt = $pdo->prepare("SELECT LugarTrabajo FROM Usuario WHERE ID_Usuario = :id");
-        $stmt->execute([':id' => $data['id']]);
-        $lugarTrabajo = $stmt->fetch(PDO::FETCH_ASSOC)['LugarTrabajo'] ?? null;
-        
-        // Total de ventas
+        //FIX: Obtener asignación ACTUAL (del día de HOY) (12/12/25)
         $stmt = $pdo->prepare("
-            SELECT COALESCE(SUM(Total), 0) as totalVentas
-            FROM Pedido
-            WHERE ID_Vendedor = :id AND Estado != 'Cancelado'
+            SELECT c.NombreColegio 
+            FROM AsignacionVendedor av
+            INNER JOIN Colegio c ON av.ID_Colegio = c.ID_Colegio
+            WHERE av.ID_Vendedor = :id 
+            AND av.FechaAsignacion = CURDATE()
+            AND av.Estado = 'Activo'
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $data['id']]);
+        $asignacionHoy = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Si tiene asignación hoy, usar ese nombre; si no, indicar que no tiene
+        $lugarTrabajo = $asignacionHoy ? $asignacionHoy['NombreColegio'] : 'Sin asignación hoy';
+        
+        // Total de ventas (considerando abonos)
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(
+                CASE 
+                    WHEN vi.EstadoPago = 'Abono' THEN vi.MontoAbonado
+                    ELSE p.Total
+                END
+            ), 0) as totalVentas
+            FROM Pedido p
+            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            WHERE p.ID_Vendedor = :id 
+            AND p.Estado != 'Cancelado'
         ");
         $stmt->execute([':id' => $data['id']]);
         $totalVentas = $stmt->fetch(PDO::FETCH_ASSOC)['totalVentas'];
@@ -376,7 +394,8 @@ function getVendedorStats($pdo, $data) {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as pedidosActivos
             FROM Pedido
-            WHERE ID_Vendedor = :id AND Estado NOT IN ('Completado', 'Cancelado')
+            WHERE ID_Vendedor = :id 
+            AND Estado NOT IN ('Completado', 'Cancelado')
         ");
         $stmt->execute([':id' => $data['id']]);
         $pedidosActivos = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
@@ -386,9 +405,10 @@ function getVendedorStats($pdo, $data) {
             SELECT 
                 p.ID_Pedido,
                 p.Fecha,
-                u.NombreCompleto as Cliente
+                COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente
             FROM Pedido p
             INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
             WHERE p.ID_Vendedor = :id
             ORDER BY p.Fecha DESC
             LIMIT 1
@@ -425,6 +445,7 @@ function getVendedorStats($pdo, $data) {
                     $estadoPendientes = $estado['cantidad'];
                     break;
                 case 'En Proceso':
+                case 'En_Proceso':
                     $estadoProceso = $estado['cantidad'];
                     break;
                 case 'Completado':
@@ -440,7 +461,7 @@ function getVendedorStats($pdo, $data) {
             'success' => true,
             'stats' => [
                 'totalVentas' => $totalVentas,
-                'lugarTrabajo' => $lugarTrabajo, //se eliminará si provoca error
+                'lugarTrabajo' => $lugarTrabajo, //Ahora muestra asignación del día (12/12/25)
                 'pedidosActivos' => $pedidosActivos,
                 'ultimoPedido' => $ultimoPedidoTexto,
                 'estadoPendientes' => $estadoPendientes,
