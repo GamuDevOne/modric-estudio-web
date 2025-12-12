@@ -173,19 +173,39 @@ function editarColegio($pdo, $data) {
 // ========================================
 function cerrarColegio($pdo, $data) {
     try {
-        if (empty($data['idColegio'])) {
+        //FIX: Validación mejorada que acepta 0 y valores numéricos (11-12-25)
+        if (!isset($data['idColegio']) || $data['idColegio'] === '' || $data['idColegio'] === null) {
+            error_log("cerrarColegio - Error: ID no proporcionado. Data recibida: " . json_encode($data));
             echo json_encode(['success' => false, 'message' => 'ID requerido']);
             return;
         }
         
+        $idColegio = intval($data['idColegio']);
+        
+        if ($idColegio <= 0) {
+            error_log("cerrarColegio - Error: ID inválido ($idColegio). Data: " . json_encode($data));
+            echo json_encode(['success' => false, 'message' => 'ID inválido']);
+            return;
+        }
+        
+        error_log("cerrarColegio - Procesando ID: $idColegio");
+        
         $stmt = $pdo->prepare("UPDATE Colegio SET Estado = 'Cerrado' WHERE ID_Colegio = :id");
-        $stmt->execute([':id' => $data['idColegio']]);
+        $stmt->execute([':id' => $idColegio]);
+        
+        if ($stmt->rowCount() === 0) {
+            error_log("cerrarColegio - Advertencia: No se encontró colegio con ID $idColegio");
+            echo json_encode(['success' => false, 'message' => 'Colegio no encontrado']);
+            return;
+        }
         
         $stmt = $pdo->prepare("UPDATE AsignacionVendedor SET Estado = 'Finalizado' WHERE ID_Colegio = :id");
-        $stmt->execute([':id' => $data['idColegio']]);
+        $stmt->execute([':id' => $idColegio]);
         
+        error_log("cerrarColegio - Éxito: Colegio $idColegio cerrado");
         echo json_encode(['success' => true, 'message' => 'Colegio cerrado correctamente']);
     } catch (PDOException $e) {
+        error_log("cerrarColegio - Error PDO: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
@@ -195,25 +215,48 @@ function cerrarColegio($pdo, $data) {
 // ========================================
 function eliminarColegio($pdo, $data) {
     try {
-        if (empty($data['idColegio'])) {
+        //FIX: Validación mejorada (11-12-25)
+        if (!isset($data['idColegio']) || $data['idColegio'] === '' || $data['idColegio'] === null) {
+            error_log("eliminarColegio - Error: ID no proporcionado. Data: " . json_encode($data));
             echo json_encode(['success' => false, 'message' => 'ID requerido']);
             return;
         }
         
+        $idColegio = intval($data['idColegio']);
+        
+        if ($idColegio <= 0) {
+            error_log("eliminarColegio - Error: ID inválido ($idColegio). Data: " . json_encode($data));
+            echo json_encode(['success' => false, 'message' => 'ID inválido']);
+            return;
+        }
+        
+        error_log("eliminarColegio - Verificando ventas para ID: $idColegio");
+        
         $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM Pedido WHERE ID_Colegio = :id");
-        $stmt->execute([':id' => $data['idColegio']]);
+        $stmt->execute([':id' => $idColegio]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($result['total'] > 0) {
+            error_log("eliminarColegio - Advertencia: Colegio $idColegio tiene {$result['total']} ventas");
             echo json_encode(['success' => false, 'message' => 'No se puede eliminar: tiene ventas asociadas']);
             return;
         }
         
-        $stmt = $pdo->prepare("DELETE FROM Colegio WHERE ID_Colegio = :id");
-        $stmt->execute([':id' => $data['idColegio']]);
+        error_log("eliminarColegio - Eliminando colegio ID: $idColegio");
         
+        $stmt = $pdo->prepare("DELETE FROM Colegio WHERE ID_Colegio = :id");
+        $stmt->execute([':id' => $idColegio]);
+        
+        if ($stmt->rowCount() === 0) {
+            error_log("eliminarColegio - Advertencia: No se encontró colegio con ID $idColegio");
+            echo json_encode(['success' => false, 'message' => 'Colegio no encontrado']);
+            return;
+        }
+        
+        error_log("eliminarColegio - Éxito: Colegio $idColegio eliminado");
         echo json_encode(['success' => true, 'message' => 'Colegio eliminado']);
     } catch (PDOException $e) {
+        error_log("eliminarColegio - Error PDO: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }

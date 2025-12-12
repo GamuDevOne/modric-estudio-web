@@ -450,7 +450,17 @@ function guardarColegio(event) {
 }
 
 function cerrarColegio(id, nombre) {
-    lugarIdCerrar = id;
+    // ✅ CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO
+    lugarIdCerrar = parseInt(id);
+    
+    console.log('Cerrar colegio - ID recibido:', id, 'Tipo:', typeof id);
+    console.log('Cerrar colegio - ID guardado:', lugarIdCerrar, 'Tipo:', typeof lugarIdCerrar);
+    
+    if (!lugarIdCerrar || isNaN(lugarIdCerrar)) {
+        alert('Error: ID de lugar inválido');
+        return;
+    }
+    
     document.getElementById('nombreLugarCerrar').textContent = nombre;
     document.getElementById('modalCerrarLugar').classList.add('active');
     document.body.classList.add('modal-open');
@@ -463,11 +473,24 @@ function closeModalCerrarLugar() {
 }
 
 function confirmarCerrarLugar() {
-    if (!lugarIdCerrar) return;
+    // FIX CRÍTICO: GUARDAR ID ANTES DE CERRAR MODAL (11/12/25)
+    const idAUsar = lugarIdCerrar;
     
+    // VALIDACIÓN CON LA VARIABLE LOCAL
+    if (!idAUsar || isNaN(idAUsar)) {
+        console.error('Error: ID inválido', idAUsar);
+        alert('Error: No se pudo identificar el lugar a cerrar');
+        closeModalCerrarLugar();
+        return;
+    }
+    
+    console.log('Confirmando cerrar colegio - ID a usar:', idAUsar);
+    
+    // AHORA SÍ CERRAMOS EL MODAL(11/12/25)
     closeModalCerrarLugar();
     showLoadingModal();
     
+    // USAR LA VARIABLE LOCAL EN EL FETCH(11/12/25)
     fetch('../../php/gest-colegios.php', {
         method: 'POST',
         headers: {
@@ -475,12 +498,14 @@ function confirmarCerrarLugar() {
         },
         body: JSON.stringify({
             action: 'cerrar_colegio',
-            idColegio: lugarIdCerrar
+            idColegio: idAUsar
         })
     })
     .then(response => response.json())
     .then(data => {
         hideLoadingModal();
+        
+        console.log('Respuesta cerrar colegio:', data);
         
         if (data.success) {
             alert('Lugar cerrado correctamente');
@@ -497,7 +522,17 @@ function confirmarCerrarLugar() {
 }
 
 function eliminarColegio(id, nombre) {
-    lugarIdEliminar = id;
+    // FIZ CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO(11/12/25)
+    lugarIdEliminar = parseInt(id);
+    
+    console.log('Eliminar colegio - ID recibido:', id, 'Tipo:', typeof id);
+    console.log('Eliminar colegio - ID guardado:', lugarIdEliminar, 'Tipo:', typeof lugarIdEliminar);
+    
+    if (!lugarIdEliminar || isNaN(lugarIdEliminar)) {
+        alert('Error: ID de lugar inválido');
+        return;
+    }
+    
     document.getElementById('nombreLugarEliminar').textContent = nombre;
     document.getElementById('modalEliminarLugar').classList.add('active');
     document.body.classList.add('modal-open');
@@ -510,11 +545,24 @@ function closeModalEliminarLugar() {
 }
 
 function confirmarEliminarLugar() {
-    if (!lugarIdEliminar) return;
+    // FIX CRÍTICO: GUARDAR ID ANTES DE CERRAR MODAL(11/12/25)
+    const idAUsar = lugarIdEliminar;
     
+    // VALIDACIÓN CON LA VARIABLE LOCAL
+    if (!idAUsar || isNaN(idAUsar)) {
+        console.error('Error: ID inválido', idAUsar);
+        alert('Error: No se pudo identificar el lugar a eliminar');
+        closeModalEliminarLugar();
+        return;
+    }
+    
+    console.log('Confirmando eliminar colegio - ID a usar:', idAUsar);
+    
+    // AHORA SÍ CERRAMOS EL MODAL
     closeModalEliminarLugar();
     showLoadingModal();
     
+    // USAR LA VARIABLE LOCAL EN EL FETCH
     fetch('../../php/gest-colegios.php', {
         method: 'POST',
         headers: {
@@ -522,12 +570,14 @@ function confirmarEliminarLugar() {
         },
         body: JSON.stringify({
             action: 'eliminar_colegio',
-            idColegio: lugarIdEliminar
+            idColegio: idAUsar
         })
     })
     .then(response => response.json())
     .then(data => {
         hideLoadingModal();
+        
+        console.log('Respuesta eliminar colegio:', data);
         
         if (data.success) {
             alert('Lugar eliminado correctamente');

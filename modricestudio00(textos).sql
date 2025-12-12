@@ -916,3 +916,428 @@ ESTADOS DE FECHA (para calendario):
 - Confirmada: Ya hay pedido confirmado (no disponible)
 - Bloqueada: Fecha bloqueada manualmente
 */
+
+-- =====================================================
+--CAMPO AGREGADO MontoAbonado A VentaInfo
+-- =====================================================
+
+-- Agregar columna si no existe
+ALTER TABLE VentaInfo 
+ADD COLUMN IF NOT EXISTS MontoAbonado DECIMAL(10,2) NULL 
+AFTER EstadoPago;
+
+-- Verificar estructura
+DESCRIBE VentaInfo;
+
+-- Datos de ejemplo para testing
+/*
+UPDATE VentaInfo 
+SET MontoAbonado = 150.00 
+WHERE EstadoPago = 'Abono' AND MontoAbonado IS NULL;
+*/
+
+-- =====================================================
+-- SISTEMA DE HISTORIAL DE ABONOS Y NOTIFICACIONES   (?testeo)
+-- =====================================================
+
+USE ModricEstudio00;
+
+-- =====================================================
+-- 1. TABLA: HistorialAbonos
+-- Registra cada pago parcial realizado sobre un pedido
+-- =====================================================
+CREATE TABLE IF NOT EXISTS HistorialAbonos (
+    ID_Abono INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Pedido INT NOT NULL,
+    MontoAbonado DECIMAL(10,2) NOT NULL,
+    MetodoPago VARCHAR(50) NULL,
+    FechaAbono DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ID_Vendedor INT NULL, -- Quien registró el abono
+    Notas TEXT NULL,
+    Comprobante VARCHAR(255) NULL, -- Ruta del comprobante si se sube
+    
+    CONSTRAINT FK_Abono_Pedido FOREIGN KEY (ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    
+    CONSTRAINT FK_Abono_Vendedor FOREIGN KEY (ID_Vendedor)
+        REFERENCES Usuario(ID_Usuario)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    
+    INDEX IX_Abono_Pedido (ID_Pedido),
+    INDEX IX_Abono_Fecha (FechaAbono)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- 2. TABLA: Notificaciones
+-- Sistema de notificaciones para abonos y recordatorios
+-- =====================================================
+CREATE TABLE IF NOT EXISTS Notificaciones (
+    ID_Notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Usuario INT NOT NULL, -- A quién va dirigida
+    TipoNotificacion VARCHAR(50) NOT NULL,
+    -- Tipos: 'abono_pendiente', 'abono_vencido', 'pago_completo', 
+    --        'recordatorio_7dias', 'recordatorio_3dias', 'recordatorio_1dia'
+    
+    Titulo VARCHAR(200) NOT NULL,
+    Mensaje TEXT NOT NULL,
+    
+    ID_Pedido INT NULL, -- Referencia al pedido relacionado
+    
+    Leida BOOLEAN NOT NULL DEFAULT FALSE,
+    FechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FechaLeida DATETIME NULL,
+    
+    Prioridad VARCHAR(20) NOT NULL DEFAULT 'Normal',
+    -- Prioridades: 'Alta', 'Normal', 'Baja'
+    
+    CONSTRAINT FK_Notif_Usuario FOREIGN KEY (ID_Usuario)
+        REFERENCES Usuario(ID_Usuario)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    
+    CONSTRAINT FK_Notif_Pedido FOREIGN KEY (ID_Pedido)
+        REFERENCES Pedido(ID_Pedido)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    
+    INDEX IX_Notif_Usuario (ID_Usuario),
+    INDEX IX_Notif_Leida (Leida),
+    INDEX IX_Notif_Fecha (FechaCreacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- 3. MODIFICAR VentaInfo: Agregar campos de control
+-- =====================================================
+ALTER TABLE VentaInfo 
+ADD COLUMN IF NOT EXISTS TotalAbonado DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER MontoAbonado,
+ADD COLUMN IF NOT EXISTS SaldoPendiente DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER TotalAbonado,
+ADD COLUMN IF NOT EXISTS FechaLimiteAbono DATE NULL AFTER SaldoPendiente;
+
+-- =====================================================
+-- 4. VISTA: Pedidos con Abonos Pendientes
+-- =====================================================
+CREATE OR REPLACE VIEW V_PedidosAbonosPendientes AS
+SELECT 
+    p.ID_Pedido,
+    p.ID_Usuario,
+    u.NombreCompleto as Cliente,
+    u.Correo as CorreoCliente,
+    p.Total,
+    vi.TotalAbonado,
+    vi.SaldoPendiente,
+    vi.FechaLimiteAbono,
+    DATEDIFF(vi.FechaLimiteAbono, CURDATE()) as DiasRestantes,
+    CASE 
+        WHEN DATEDIFF(vi.FechaLimiteAbono, CURDATE()) <= 0 THEN 'Vencido'
+        WHEN DATEDIFF(vi.FechaLimiteAbono, CURDATE()) <= 3 THEN 'Urgente'
+        WHEN DATEDIFF(vi.FechaLimiteAbono, CURDATE()) <= 7 THEN 'Próximo'
+        ELSE 'Normal'
+    END as EstadoUrgencia,
+    p.Fecha as FechaPedido,
+    v.NombreCompleto as Vendedor
+FROM Pedido p
+INNER JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
+LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
+WHERE vi.EstadoPago = 'Abono'
+AND vi.SaldoPendiente > 0
+AND p.Estado != 'Cancelado'
+ORDER BY vi.FechaLimiteAbono ASC;
+
+-- =====================================================
+-- 5. TRIGGER: Actualizar TotalAbonado automáticamente
+-- =====================================================
+DELIMITER $$
+
+CREATE TRIGGER TR_ActualizarTotalAbonado
+AFTER INSERT ON HistorialAbonos
+FOR EACH ROW
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+    DECLARE v_totalAbonado DECIMAL(10,2);
+    
+    -- Obtener total del pedido
+    SELECT Total INTO v_total
+    FROM Pedido
+    WHERE ID_Pedido = NEW.ID_Pedido;
+    
+    -- Calcular total abonado (suma de todos los abonos)
+    SELECT COALESCE(SUM(MontoAbonado), 0) INTO v_totalAbonado
+    FROM HistorialAbonos
+    WHERE ID_Pedido = NEW.ID_Pedido;
+    
+    -- Actualizar VentaInfo
+    UPDATE VentaInfo
+    SET TotalAbonado = v_totalAbonado,
+        SaldoPendiente = v_total - v_totalAbonado,
+        EstadoPago = IF(v_totalAbonado >= v_total, 'Completo', 'Abono')
+    WHERE ID_Pedido = NEW.ID_Pedido;
+    
+    -- Si se completó el pago, crear notificación
+    IF v_totalAbonado >= v_total THEN
+        INSERT INTO Notificaciones (
+            ID_Usuario,
+            TipoNotificacion,
+            Titulo,
+            Mensaje,
+            ID_Pedido,
+            Prioridad
+        )
+        SELECT 
+            p.ID_Usuario,
+            'pago_completo',
+            'Pago Completado',
+            CONCAT('¡Tu pedido #', p.ID_Pedido, ' ha sido pagado completamente!'),
+            p.ID_Pedido,
+            'Normal'
+        FROM Pedido p
+        WHERE p.ID_Pedido = NEW.ID_Pedido;
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- 6. PROCEDIMIENTO: Registrar Abono
+-- =====================================================
+DELIMITER $$
+
+CREATE PROCEDURE RegistrarAbono(
+    IN p_idPedido INT,
+    IN p_monto DECIMAL(10,2),
+    IN p_metodoPago VARCHAR(50),
+    IN p_idVendedor INT,
+    IN p_notas TEXT
+)
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+    DECLARE v_totalAbonado DECIMAL(10,2);
+    DECLARE v_saldoPendiente DECIMAL(10,2);
+    
+    -- Obtener total del pedido
+    SELECT Total INTO v_total
+    FROM Pedido
+    WHERE ID_Pedido = p_idPedido;
+    
+    -- Obtener total abonado actual
+    SELECT COALESCE(TotalAbonado, 0) INTO v_totalAbonado
+    FROM VentaInfo
+    WHERE ID_Pedido = p_idPedido;
+    
+    -- Calcular saldo pendiente
+    SET v_saldoPendiente = v_total - v_totalAbonado - p_monto;
+    
+    -- Validar que el abono no exceda el saldo
+    IF v_saldoPendiente < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El monto abonado excede el saldo pendiente';
+    END IF;
+    
+    -- Insertar abono (el trigger actualizará automáticamente)
+    INSERT INTO HistorialAbonos (
+        ID_Pedido,
+        MontoAbonado,
+        MetodoPago,
+        ID_Vendedor,
+        Notas
+    ) VALUES (
+        p_idPedido,
+        p_monto,
+        p_metodoPago,
+        p_idVendedor,
+        p_notas
+    );
+    
+    -- Retornar información actualizada
+    SELECT 
+        p_idPedido as ID_Pedido,
+        v_total as Total,
+        v_totalAbonado + p_monto as TotalAbonado,
+        v_saldoPendiente as SaldoPendiente,
+        IF(v_saldoPendiente <= 0, 'Completo', 'Abono') as EstadoPago;
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- 7. PROCEDIMIENTO: Generar Notificaciones Automáticas
+-- (Ejecutar diariamente vía CRON o evento programado)
+-- =====================================================
+DELIMITER $$
+
+CREATE PROCEDURE GenerarNotificacionesAbonos()
+BEGIN
+    -- Notificaciones 7 días antes
+    INSERT INTO Notificaciones (
+        ID_Usuario,
+        TipoNotificacion,
+        Titulo,
+        Mensaje,
+        ID_Pedido,
+        Prioridad
+    )
+    SELECT 
+        p.ID_Usuario,
+        'recordatorio_7dias',
+        'Recordatorio: Abono Pendiente',
+        CONCAT('Tienes un saldo pendiente de $', 
+               FORMAT(vi.SaldoPendiente, 2),
+               ' para el pedido #', p.ID_Pedido,
+               '. Faltan 7 días para el vencimiento.'),
+        p.ID_Pedido,
+        'Normal'
+    FROM Pedido p
+    INNER JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+    WHERE vi.EstadoPago = 'Abono'
+    AND vi.SaldoPendiente > 0
+    AND DATEDIFF(vi.FechaLimiteAbono, CURDATE()) = 7
+    AND p.Estado != 'Cancelado'
+    AND NOT EXISTS (
+        SELECT 1 FROM Notificaciones n
+        WHERE n.ID_Pedido = p.ID_Pedido
+        AND n.TipoNotificacion = 'recordatorio_7dias'
+        AND DATE(n.FechaCreacion) = CURDATE()
+    );
+    
+    -- Notificaciones 3 días antes
+    INSERT INTO Notificaciones (
+        ID_Usuario,
+        TipoNotificacion,
+        Titulo,
+        Mensaje,
+        ID_Pedido,
+        Prioridad
+    )
+    SELECT 
+        p.ID_Usuario,
+        'recordatorio_3dias',
+        '⚠️ Abono Próximo a Vencer',
+        CONCAT('¡IMPORTANTE! Tienes un saldo pendiente de $', 
+               FORMAT(vi.SaldoPendiente, 2),
+               ' para el pedido #', p.ID_Pedido,
+               '. Faltan solo 3 días para el vencimiento.'),
+        p.ID_Pedido,
+        'Alta'
+    FROM Pedido p
+    INNER JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+    WHERE vi.EstadoPago = 'Abono'
+    AND vi.SaldoPendiente > 0
+    AND DATEDIFF(vi.FechaLimiteAbono, CURDATE()) = 3
+    AND p.Estado != 'Cancelado'
+    AND NOT EXISTS (
+        SELECT 1 FROM Notificaciones n
+        WHERE n.ID_Pedido = p.ID_Pedido
+        AND n.TipoNotificacion = 'recordatorio_3dias'
+        AND DATE(n.FechaCreacion) = CURDATE()
+    );
+    
+    -- Notificaciones 1 día antes
+    INSERT INTO Notificaciones (
+        ID_Usuario,
+        TipoNotificacion,
+        Titulo,
+        Mensaje,
+        ID_Pedido,
+        Prioridad
+    )
+    SELECT 
+        p.ID_Usuario,
+        'recordatorio_1dia',
+        '🚨 URGENTE: Abono Vence Mañana',
+        CONCAT('¡ÚLTIMA OPORTUNIDAD! Tienes un saldo pendiente de $', 
+               FORMAT(vi.SaldoPendiente, 2),
+               ' para el pedido #', p.ID_Pedido,
+               '. El plazo vence mañana.'),
+        p.ID_Pedido,
+        'Alta'
+    FROM Pedido p
+    INNER JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+    WHERE vi.EstadoPago = 'Abono'
+    AND vi.SaldoPendiente > 0
+    AND DATEDIFF(vi.FechaLimiteAbono, CURDATE()) = 1
+    AND p.Estado != 'Cancelado'
+    AND NOT EXISTS (
+        SELECT 1 FROM Notificaciones n
+        WHERE n.ID_Pedido = p.ID_Pedido
+        AND n.TipoNotificacion = 'recordatorio_1dia'
+        AND DATE(n.FechaCreacion) = CURDATE()
+    );
+    
+    -- Notificaciones de vencidos
+    INSERT INTO Notificaciones (
+        ID_Usuario,
+        TipoNotificacion,
+        Titulo,
+        Mensaje,
+        ID_Pedido,
+        Prioridad
+    )
+    SELECT 
+        p.ID_Usuario,
+        'abono_vencido',
+        '❌ Plazo de Abono Vencido',
+        CONCAT('El plazo para completar el pago del pedido #', 
+               p.ID_Pedido,
+               ' ha vencido. Saldo pendiente: $',
+               FORMAT(vi.SaldoPendiente, 2),
+               '. Contacta con nosotros.'),
+        p.ID_Pedido,
+        'Alta'
+    FROM Pedido p
+    INNER JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+    WHERE vi.EstadoPago = 'Abono'
+    AND vi.SaldoPendiente > 0
+    AND DATEDIFF(vi.FechaLimiteAbono, CURDATE()) < 0
+    AND p.Estado != 'Cancelado'
+    AND NOT EXISTS (
+        SELECT 1 FROM Notificaciones n
+        WHERE n.ID_Pedido = p.ID_Pedido
+        AND n.TipoNotificacion = 'abono_vencido'
+        AND DATE(n.FechaCreacion) = CURDATE()
+    );
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- 8. EVENTO PROGRAMADO: Ejecutar notificaciones diarias
+-- =====================================================
+CREATE EVENT IF NOT EXISTS EventoNotificacionesAbonos
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+    CALL GenerarNotificacionesAbonos();
+
+-- Verificar que los eventos estén activos
+SET GLOBAL event_scheduler = ON;
+
+-- =====================================================
+-- 9. DATOS DE PRUEBA (Opcional - para testing)
+-- =====================================================
+/*
+-- Simular un pedido con abono
+UPDATE VentaInfo 
+SET EstadoPago = 'Abono',
+    TotalAbonado = 150.00,
+    SaldoPendiente = 50.00,
+    FechaLimiteAbono = DATE_ADD(CURDATE(), INTERVAL 3 DAYS)
+WHERE ID_Pedido = 1;
+
+-- Insertar abono de prueba
+CALL RegistrarAbono(1, 100.00, 'Yappy', 2, 'Segundo abono');
+
+-- Ver historial de abonos
+SELECT * FROM HistorialAbonos WHERE ID_Pedido = 1;
+
+-- Ver pedidos con abonos pendientes
+SELECT * FROM V_PedidosAbonosPendientes;
+
+-- Generar notificaciones manualmente (para testing)
+CALL GenerarNotificacionesAbonos();
+
+-- Ver notificaciones
+SELECT * FROM Notificaciones ORDER BY FechaCreacion DESC;
+*/

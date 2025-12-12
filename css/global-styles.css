@@ -4,14 +4,6 @@
     box-sizing: border-box;
 }
 
-/*
-okay, me gustaria aclarar algo sobre los clientes de la plataforma 
-(segun nuestro cliente, es que es el ceo, pidio que los usuarios de las personas que coticen algun combo o sesion de lo que ofrecen ellos, se les asigne un usuario "temporal",
- con el cual podran iniciar sesion (solo seria un usuario y una contraseña, podria ser "nombre cliente, y la contraseña aleatoria"), y ver en un catalogo digital sus fotos, 
- con la opcion de que la puedan descargar con la mejor resolucion claro.  
- ya el vendedor les diria el tiempo que tendran para poder descargar las fotos y luego de que pase ese tiempo se borraria/bloquearian esas fotos y ya el usuario no le funionaria por que es temporal)
-*/
-
 body {
     font-family: 'Georgia', 'Times New Roman', serif;
     color: #333;
@@ -1479,3 +1471,4 @@ nav ul li a.active {
         z-index: 1003 !important;
     }
 }
+ 

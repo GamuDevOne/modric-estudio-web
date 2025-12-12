@@ -251,6 +251,21 @@ function mostrarVentas(ventas) {
         const estadoClass = venta.EstadoPago === 'Completo' ? 'completo' : 'abono';
         const estadoTexto = venta.EstadoPago === 'Completo' ? 'Pagado' : 'Abono';
         
+        //NUEVO: Calcular saldo pendiente (11/12/25)
+        let detalleAbono = '';
+        if (venta.EstadoPago === 'Abono' && venta.MontoAbonado) {
+            const montoAbonado = parseFloat(venta.MontoAbonado);
+            const total = parseFloat(venta.Total);
+            const saldoPendiente = total - montoAbonado;
+            
+            detalleAbono = `
+                <div style="margin-top: 8px; padding: 8px; background-color: #fff3e0; border-radius: 5px; font-size: 12px;">
+                    <strong>Abonado:</strong> $${montoAbonado.toFixed(2)} / $${total.toFixed(2)}<br>
+                    <strong style="color: #f57c00;">Saldo pendiente:</strong> $${saldoPendiente.toFixed(2)}
+                </div>
+            `;
+        }
+        
         item.innerHTML = `
             <div class="venta-header-item">
                 <span class="venta-cliente">${venta.NombreCliente}</span>
@@ -262,6 +277,7 @@ function mostrarVentas(ventas) {
                 <span class="venta-metodo">${venta.MetodoPago}</span>
                 <span class="venta-estado ${estadoClass}">${estadoTexto}</span>
             </div>
+            ${detalleAbono}
             ${venta.Notas ? `<div style="margin-top: 8px; font-size: 13px; color: #999;">${venta.Notas}</div>` : ''}
         `;
         
@@ -323,10 +339,27 @@ function guardarVenta(event) {
     const selectedOption = selectServicio.options[selectServicio.selectedIndex];
     const idServicio = selectServicio.value;
     const esPaquete = selectedOption.dataset.esPaquete === 'true';
-    const precio = document.getElementById('precioVenta').value;
+    const precio = parseFloat(document.getElementById('precioVenta').value);
     const metodoPago = document.getElementById('metodoPago').value;
     const estadoPago = document.getElementById('estadoPago').value;
     const notas = document.getElementById('notasVenta').value;
+    
+    // NUEVO: Obtener monto abonado(11/12/25)
+    let montoAbonado = null;
+    if (estadoPago === 'Abono') {
+        montoAbonado = parseFloat(document.getElementById('montoAbonado').value);
+        
+        // Validaciones
+        if (!montoAbonado || montoAbonado <= 0) {
+            alert('Debes ingresar el monto abonado');
+            return;
+        }
+        
+        if (montoAbonado > precio) {
+            alert('El abono no puede ser mayor al precio total');
+            return;
+        }
+    }
     
     showLoadingModal();
     
@@ -345,6 +378,7 @@ function guardarVenta(event) {
             total: precio,
             metodoPago: metodoPago,
             estadoPago: estadoPago,
+            montoAbonado: montoAbonado, // nuevo. monto abonado (11/12/25)
             notas: notas
         })
     })

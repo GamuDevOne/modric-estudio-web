@@ -195,10 +195,24 @@
                     <!-- Estado de Pago -->
                     <div class="form-group">
                         <label for="estadoPago">Estado del Pago *</label>
-                        <select id="estadoPago" required>
+                        <select id="estadoPago" onchange="toggleMontoAbono()" required>
                             <option value="Completo">Pago Completo</option>
                             <option value="Abono">Abono (Pendiente Saldo)</option>
                         </select>
+                    </div>
+
+                    <!-- Campo de Monto Abonado (oculto por defecto) -->
+                    <div class="form-group" id="grupoMontoAbono" style="display: none;">
+                        <label for="montoAbonado">Monto Abonado *</label>
+                        <input 
+                            type="number" 
+                            id="montoAbonado" 
+                            step="0.01" 
+                            placeholder="Ej: 150.00"
+                            min="0.01"
+                        >
+                        <small>El saldo pendiente se calculará automáticamente</small>
+                        <div id="saldoPendiente" style="margin-top: 8px; font-weight: 600; color: #ff9800;"></div>
                     </div>
 
                     <!-- Notas -->
@@ -223,6 +237,44 @@
             <p>Procesando...</p>
         </div>
     </div>
+
+    <script>
+    // Función para mostrar/ocultar campo de abono
+    function toggleMontoAbono() {
+        const estadoPago = document.getElementById('estadoPago').value;
+        const grupo = document.getElementById('grupoMontoAbono');
+        const inputMonto = document.getElementById('montoAbonado');
+        
+        if (estadoPago === 'Abono') {
+            grupo.style.display = 'block';
+            inputMonto.required = true;
+        } else {
+            grupo.style.display = 'none';
+            inputMonto.required = false;
+            inputMonto.value = '';
+            document.getElementById('saldoPendiente').textContent = '';
+        }
+    }
+
+    // Calcular saldo pendiente en tiempo real
+    document.getElementById('montoAbonado').addEventListener('input', function() {
+        const total = parseFloat(document.getElementById('precioVenta').value) || 0;
+        const abonado = parseFloat(this.value) || 0;
+        const saldo = total - abonado;
+        
+        const saldoDiv = document.getElementById('saldoPendiente');
+        
+        if (abonado > total) {
+            saldoDiv.textContent = '⚠️ El abono no puede ser mayor al total';
+            saldoDiv.style.color = '#f44336';
+        } else if (abonado > 0) {
+            saldoDiv.textContent = `Saldo pendiente: $${saldo.toFixed(2)}`;
+            saldoDiv.style.color = '#ff9800';
+        } else {
+            saldoDiv.textContent = '';
+        }
+    });
+    </script>
 
     <script src="../../js/global-script.js"></script>
     <script src="vendedor.js"></script>

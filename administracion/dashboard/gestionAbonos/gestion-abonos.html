@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Abonos - Modric Estudio</title>
+    <link rel="stylesheet" href="../../css/global-styles.css">
+    <link rel="stylesheet" href="gestion-abonos.css">
+
+</head>
+<body>
+    <header id="header">
+        <div class="logo">
+            <a href="../../index.html">
+                <img src="../../imagenes/logo.png" alt="Modric Estudio">
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../index.html">INICIO</a></li>
+                <li><a href="../administracion.html">PANEL</a></li>
+                <li><a href="../dashboard/dashboard.html">DASHBOARD</a></li>
+                <li><a href="gestion-abonos.html" class="active">ABONOS</a></li>
+            </ul>
+        </nav>
+        <div class="login-btn">
+            <button onclick="logout()" class="login-icon-btn" title="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <section class="abonos-section">
+        <div class="dashboard-container">
+            
+            <div class="page-header">
+                <div class="header-content">
+                    <h1>Gestión de Abonos</h1>
+                    <p>Control de pagos parciales y saldos pendientes</p>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-abonos">
+                <div class="stat-card-abono">
+                    <div class="stat-label">Total Pendientes</div>
+                    <div class="stat-value" id="statTotalPendientes">0</div>
+                </div>
+                <div class="stat-card-abono">
+                    <div class="stat-label">Suma Saldos</div>
+                    <div class="stat-value" id="statSumaSaldos">$0.00</div>
+                </div>
+                <div class="stat-card-abono urgente">
+                    <div class="stat-label">Urgentes (≤7 días)</div>
+                    <div class="stat-value" id="statUrgentes">0</div>
+                </div>
+                <div class="stat-card-abono vencido">
+                    <div class="stat-label">Vencidos</div>
+                    <div class="stat-value" id="statVencidos">0</div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filtros-abonos">
+                <label for="filtroAbonos">Filtrar:</label>
+                <select id="filtroAbonos" onchange="cargarPedidosAbonos()">
+                    <option value="todos">Todos</option>
+                    <option value="urgente">Urgentes</option>
+                    <option value="vencido">Vencidos</option>
+                </select>
+                <button class="btn-primary" onclick="cargarEstadisticas()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Actualizar
+                </button>
+            </div>
+
+            <!-- Tabla de Pedidos -->
+            <div class="tabla-abonos">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#Pedido</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Abonado</th>
+                            <th>Saldo</th>
+                            <th>Fecha Límite</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPedidosAbonos">
+                        <tr>
+                            <td colspan="8" class="loading-cell">
+                                Cargando...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL: Ver Historial -->
+    <div id="modalHistorial" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Historial de Abonos - Pedido #<span id="historialPedidoId"></span></h2>
+                <button class="modal-close" onclick="cerrarModalHistorial()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="totales-abono">
+                    <div class="totales-grid">
+                        <div class="total-item">
+                            <div class="total-label">Total</div>
+                            <div class="total-value" id="totalPedido">$0.00</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-label">Total Abonado</div>
+                            <div class="total-value" style="color: #4caf50;" id="totalAbonado">$0.00</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-label">Saldo Pendiente</div>
+                            <div class="total-value" style="color: #f57c00;" id="saldoPendiente">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>Registro de Abonos:</h4>
+                <div id="listaHistorial">
+                    <p style="text-align: center; color: #999;">Cargando historial...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="cerrarModalHistorial()">Cerrar</button>
+                <button class="btn-primary" onclick="abrirModalNuevoAbono()">Registrar Nuevo Abono</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Nuevo Abono -->
+    <div id="modalNuevoAbono" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Abono</h2>
+                <button class="modal-close" onclick="cerrarModalNuevoAbono()">&times;</button>
+            </div>
+            <form id="formNuevoAbono" onsubmit="guardarAbono(event)">
+                <input type="hidden" id="abonoIdPedido">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="abonoMonto">Monto a Abonar *</label>
+                        <input type="number" id="abonoMonto" step="0.01" placeholder="Ingrese el monto" required>
+                        <small>Saldo pendiente: $<span id="abonoSaldoDisponible">0.00</span></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="abonoMetodoPago">Método de Pago *</label>
+                        <select id="abonoMetodoPago" required>
+                            <option value="Yappy">Yappy</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="abonoNotas">Notas (opcional)</label>
+                        <textarea id="abonoNotas" rows="3" placeholder="Agregue notas adicionales sobre el pago"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="cerrarModalNuevoAbono()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Registrar Abono</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <script src="../../js/global-script.js"></script>
+    <script src="gestion-abonos.js"></script>
+</body>
+</html>

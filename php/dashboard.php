@@ -80,23 +80,37 @@ try {
 function getEstadisticas($pdo) {
     $stats = [];
     
-    // Ventas del mes actual
+    //ACTUALIZADO: Ventas del mes CON abonos considerados (11/12/25)
     $stmt = $pdo->query("
-        SELECT COALESCE(SUM(Total), 0) as ventasMes
-        FROM Pedido
-        WHERE YEAR(Fecha) = YEAR(CURDATE()) 
-        AND MONTH(Fecha) = MONTH(CURDATE())
-        AND Estado != 'Cancelado'
+        SELECT 
+            COALESCE(SUM(
+                CASE 
+                    WHEN vi.EstadoPago = 'Abono' THEN vi.MontoAbonado
+                    ELSE p.Total
+                END
+            ), 0) as ventasMes
+        FROM Pedido p
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE YEAR(p.Fecha) = YEAR(CURDATE()) 
+        AND MONTH(p.Fecha) = MONTH(CURDATE())
+        AND p.Estado != 'Cancelado'
     ");
     $stats['ventasMes'] = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMes'];
     
-    // Ventas del mes anterior
+    //ACTUALIZADO: Ventas del mes anterior (11/12/25)
     $stmt = $pdo->query("
-        SELECT COALESCE(SUM(Total), 0) as ventasMesAnterior
-        FROM Pedido
-        WHERE YEAR(Fecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-        AND MONTH(Fecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-        AND Estado != 'Cancelado'
+        SELECT 
+            COALESCE(SUM(
+                CASE 
+                    WHEN vi.EstadoPago = 'Abono' THEN vi.MontoAbonado
+                    ELSE p.Total
+                END
+            ), 0) as ventasMesAnterior
+        FROM Pedido p
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE YEAR(p.Fecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
+        AND MONTH(p.Fecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
+        AND p.Estado != 'Cancelado'
     ");
     $ventasMesAnterior = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMesAnterior'];
     
@@ -107,7 +121,7 @@ function getEstadisticas($pdo) {
         $stats['cambioVentas'] = 0;
     }
     
-    // Pedidos activos (no cancelados ni completados)
+    // Pedidos activos (igual que antes)
     $stmt = $pdo->query("
         SELECT COUNT(*) as pedidosActivos
         FROM Pedido
@@ -115,16 +129,17 @@ function getEstadisticas($pdo) {
     ");
     $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
     
-    // Pedidos pendientes de pago
+    //ACTUALIZADO: Pedidos pendientes (incluyendo abonos parciales) (11/12/25)
     $stmt = $pdo->query("
         SELECT COUNT(*) as pedidosPendientes
         FROM Pedido p
         LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-        WHERE p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono'
+        WHERE p.Estado = 'Pendiente' 
+        OR (vi.EstadoPago = 'Abono' AND vi.MontoAbonado < p.Total)
     ");
     $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
     
-    // Total de clientes
+    // Total de clientes (igual)
     $stmt = $pdo->query("
         SELECT COUNT(*) as totalClientes
         FROM Usuario
@@ -132,7 +147,7 @@ function getEstadisticas($pdo) {
     ");
     $stats['totalClientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['totalClientes'];
     
-    // Clientes nuevos este mes
+    // Clientes nuevos este mes (igual)
     $stmt = $pdo->query("
         SELECT COUNT(*) as clientesNuevos
         FROM Usuario
@@ -142,11 +157,18 @@ function getEstadisticas($pdo) {
     ");
     $stats['clientesNuevos'] = $stmt->fetch(PDO::FETCH_ASSOC)['clientesNuevos'];
     
-    // Ingresos totales
+    //ACTUALIZADO: Ingresos totales reales(11/12/25)
     $stmt = $pdo->query("
-        SELECT COALESCE(SUM(Total), 0) as ingresosTotales
-        FROM Pedido
-        WHERE Estado != 'Cancelado'
+        SELECT 
+            COALESCE(SUM(
+                CASE 
+                    WHEN vi.EstadoPago = 'Abono' THEN vi.MontoAbonado
+                    ELSE p.Total
+                END
+            ), 0) as ingresosTotales
+        FROM Pedido p
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE p.Estado != 'Cancelado'
     ");
     $stats['ingresosTotales'] = $stmt->fetch(PDO::FETCH_ASSOC)['ingresosTotales'];
     
