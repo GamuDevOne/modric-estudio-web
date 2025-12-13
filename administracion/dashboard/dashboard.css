@@ -1171,3 +1171,349 @@ body.modal-open {
     background-color: #fff3e0;
     color: #ff9800;
 }
+
+/* ========================================
+   MODAL DETALLE PEDIDO - SECCIONES
+======================================== */
+.detalle-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+}
+
+.detalle-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.detalle-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detalle-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detalle-value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.detalle-notas {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #2196f3;
+    margin: 0;
+}
+
+/* ========================================
+   SECCIÓN DE PAGO
+======================================== */
+.payment-section {
+    background-color: #f8f9fa !important;
+    border: 2px solid #e3f2fd !important;
+}
+
+.payment-summary {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 6px;
+    border-left: 4px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.payment-item span {
+    font-size: 14px;
+    color: #666;
+}
+
+.payment-item strong {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.payment-item.success {
+    border-left-color: #4caf50;
+    background-color: #f1f8f4;
+}
+
+.payment-item.success strong {
+    color: #2e7d32;
+}
+
+.payment-item.warning {
+    border-left-color: #ff9800;
+    background-color: #fff3e0;
+}
+
+.payment-item.warning strong {
+    color: #f57c00;
+}
+
+/* ========================================
+   HISTORIAL DE ABONOS
+======================================== */
+.historial-abonos {
+    margin: 25px 0;
+}
+
+.historial-abonos h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.historial-abonos h4::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background-color: #4caf50;
+    border-radius: 2px;
+}
+
+.lista-abonos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.sin-abonos {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-size: 14px;
+    background-color: #fff;
+    border-radius: 6px;
+    border: 2px dashed #e0e0e0;
+}
+
+.abono-item {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid #4caf50;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+}
+
+.abono-item:hover {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    transform: translateX(3px);
+}
+
+.abono-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.abono-monto {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+.abono-fecha {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+}
+
+.abono-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-size: 13px;
+    color: #555;
+}
+
+.abono-detalles span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.abono-detalles strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.abono-notas {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Scrollbar personalizado para lista de abonos */
+.lista-abonos::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lista-abonos::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+}
+
+.lista-abonos::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.lista-abonos::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* ========================================
+   BOTÓN NUEVO ABONO
+======================================== */
+#btnNuevoAbono {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+#btnNuevoAbono:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+/* ========================================
+   MODAL NUEVO ABONO
+======================================== */
+.modal-small {
+    max-width: 500px !important;
+}
+
+.info-box {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-left: 4px solid #2196f3;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    stroke: #2196f3;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.info-box strong {
+    color: #1976d2;
+}
+
+/* ========================================
+   RESPONSIVE - GESTIÓN DE ABONOS
+======================================== */
+@media (max-width: 768px) {
+    .detalle-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .payment-item {
+        padding: 12px 15px;
+    }
+    
+    .payment-item strong {
+        font-size: 18px;
+    }
+    
+    .abono-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .abono-monto {
+        font-size: 16px;
+    }
+    
+    .abono-detalles {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .lista-abonos {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detalle-section {
+        padding: 15px;
+    }
+    
+    .detalle-section h3 {
+        font-size: 16px;
+    }
+    
+    .payment-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .payment-item strong {
+        font-size: 20px;
+    }
+}
