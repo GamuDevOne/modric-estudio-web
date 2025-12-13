@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ========================================
+// VARIABLES GLOBALES PARA GESTIÓN DE ABONOS
+// ========================================
+let pedidoActualDetalle = null;
+let saldoPendienteActual = 0;
+
+// ========================================
 // VARIABLES GLOBALES PARA GRÁFICOS
 // ========================================
 let ventasChart = null;
@@ -286,7 +292,76 @@ function formatFecha(fecha) {
 // VER DETALLE / MARCAR COMPLETADO / CANCELAR
 // ========================================
 function verDetallePedido(idPedido) {
-    mostrarModal(`Ver detalle del pedido #${idPedido}\n\nFunción en desarrollo`);
+    showLoadingModal('Cargando detalles...');
+    
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'obtener_detalle_pedido',
+            idPedido: idPedido
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success && data.pedido) {
+            mostrarModalDetallePedido(data.pedido);
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo cargar el pedido'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al cargar el pedido', 'error');
+    });
+}
+
+// ========================================
+// MOSTRAR MODAL CON DETALLE DEL PEDIDO
+// ========================================
+function mostrarModalDetallePedido(pedido) {
+    pedidoActualDetalle = pedido;
+    saldoPendienteActual = parseFloat(pedido.SaldoPendiente);
+    
+    // Llenar información básica
+    document.getElementById('detallePedidoId').textContent = pedido.ID_Pedido;
+    document.getElementById('detCliente').textContent = pedido.Cliente || 'N/A';
+    document.getElementById('detServicio').textContent = pedido.Servicio || 'N/A';
+    document.getElementById('detVendedor').textContent = pedido.Vendedor || 'N/A';
+    document.getElementById('detFecha').textContent = formatFecha(pedido.Fecha);
+    document.getElementById('detColegio').textContent = pedido.Colegio || 'N/A';
+    
+    // Estado del pedido
+    const estadoBadge = document.getElementById('detEstado');
+    estadoBadge.textContent = pedido.Estado;
+    estadoBadge.className = 'status-badge ' + pedido.Estado.toLowerCase();
+    
+    // Información de pago
+    document.getElementById('detTotal').textContent = '$' + parseFloat(pedido.Total).toFixed(2);
+    document.getElementById('detAbonado').textContent = '$' + parseFloat(pedido.TotalAbonado || 0).toFixed(2);
+    document.getElementById('detPendiente').textContent = '$' + saldoPendienteActual.toFixed(2);
+    
+    // Notas
+    const notasEl = document.getElementById('detNotas');
+    notasEl.textContent = pedido.Notas || 'Sin notas adicionales';
+    
+    // Mostrar botón de nuevo abono solo si hay saldo pendiente
+    const btnNuevoAbono = document.getElementById('btnNuevoAbono');
+    if (saldoPendienteActual > 0) {
+        btnNuevoAbono.style.display = 'block';
+    } else {
+        btnNuevoAbono.style.display = 'none';
+    }
+    
+    // Cargar historial de abonos
+    cargarHistorialAbonos(pedido.ID_Pedido);
+    
+    // Mostrar modal
+    document.getElementById('modalDetallePedido').classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 // MARCAR PEDIDO COMO COMPLETADO
@@ -498,4 +573,224 @@ window.onclick = function(event) {
         cerrarModalTodosPedidos();
     }
 };
+
+// ========================================
+// FUNCIONES DE HISTORIAL DE ABONOS (ENLZADAS AL DETALLE)
+// ========================================
+
+// ========================================
+// CARGAR HISTORIAL DE ABONOS
+// ========================================
+function cargarHistorialAbonos(idPedido) {
+    const listaAbonos = document.getElementById('listaAbonos');
+    listaAbonos.innerHTML = '<p class="sin-abonos">Cargando historial...</p>';
+    
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'obtener_historial_abonos',
+            idPedido: idPedido
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            mostrarHistorialAbonos(data.abonos);
+        } else {
+            listaAbonos.innerHTML = '<p class="sin-abonos">Error al cargar historial</p>';
+        }
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        listaAbonos.innerHTML = '<p class="sin-abonos">Error de conexión</p>';
+    });
+}
+
+// ========================================
+// MOSTRAR HISTORIAL DE ABONOS EN EL DOM
+// ========================================
+function mostrarHistorialAbonos(abonos) {
+    const listaAbonos = document.getElementById('listaAbonos');
+    
+    if (!abonos || abonos.length === 0) {
+        listaAbonos.innerHTML = '<p class="sin-abonos">No hay abonos registrados aún</p>';
+        return;
+    }
+    
+    listaAbonos.innerHTML = '';
+    
+    abonos.forEach((abono, index) => {
+        const abonoDiv = document.createElement('div');
+        abonoDiv.className = 'abono-item';
+        
+        const fecha = new Date(abono.FechaRegistro);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        abonoDiv.innerHTML = `
+            <div class="abono-header">
+                <span class="abono-monto">$${parseFloat(abono.Monto).toFixed(2)}</span>
+                <span class="abono-fecha">${fechaFormateada}</span>
+            </div>
+            <div class="abono-detalles">
+                <span>
+                    <strong>Método:</strong> ${abono.MetodoPago || 'No especificado'}
+                </span>
+                <span>
+                    <strong>Registrado por:</strong> ${abono.RegistradoPor || 'Sistema'}
+                </span>
+                <span>
+                    <strong>Abono #${index + 1}</strong>
+                </span>
+            </div>
+            ${abono.Notas ? `<div class="abono-notas">${abono.Notas}</div>` : ''}
+        `;
+        
+        listaAbonos.appendChild(abonoDiv);
+    });
+}
+
+// ========================================
+// CERRAR MODAL DETALLE PEDIDO
+// ========================================
+function cerrarModalDetallePedido() {
+    document.getElementById('modalDetallePedido').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    pedidoActualDetalle = null;
+    saldoPendienteActual = 0;
+}
+
+// ========================================
+// ABRIR MODAL NUEVO ABONO
+// ========================================
+function abrirModalNuevoAbono() {
+    if (!pedidoActualDetalle) {
+        mostrarModal('Error: No se ha cargado el pedido', 'error');
+        return;
+    }
+    
+    // Llenar datos del modal
+    document.getElementById('abonoIdPedido').value = pedidoActualDetalle.ID_Pedido;
+    document.getElementById('abonoSaldoPendiente').textContent = saldoPendienteActual.toFixed(2);
+    
+    // Limpiar formulario
+    document.getElementById('formNuevoAbono').reset();
+    document.getElementById('abonoIdPedido').value = pedidoActualDetalle.ID_Pedido; // Restaurar después del reset
+    
+    // Mostrar modal
+    document.getElementById('modalNuevoAbono').classList.add('active');
+}
+
+// ========================================
+// CERRAR MODAL NUEVO ABONO
+// ========================================
+function cerrarModalNuevoAbono() {
+    document.getElementById('modalNuevoAbono').classList.remove('active');
+}
+
+// ========================================
+// REGISTRAR NUEVO ABONO
+// ========================================
+function registrarNuevoAbono(event) {
+    event.preventDefault();
+    
+    const user = checkSession();
+    if (!user) {
+        mostrarModal('Sesión expirada. Por favor, inicia sesión nuevamente.', 'error');
+        return;
+    }
+    
+    const idPedido = document.getElementById('abonoIdPedido').value;
+    const monto = parseFloat(document.getElementById('montoNuevoAbono').value);
+    const metodo = document.getElementById('metodoAbono').value;
+    const notas = document.getElementById('notasAbono').value.trim();
+    
+    // Validaciones frontend
+    if (!monto || monto <= 0) {
+        mostrarModal('El monto debe ser mayor a 0', 'warning');
+        return;
+    }
+    
+    if (monto > saldoPendienteActual) {
+        mostrarModal(`El monto ($${monto.toFixed(2)}) excede el saldo pendiente ($${saldoPendienteActual.toFixed(2)})`, 'warning');
+        return;
+    }
+    
+    if (!metodo) {
+        mostrarModal('Selecciona un método de pago', 'warning');
+        return;
+    }
+    
+    showLoadingModal('Registrando abono...');
+    
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'registrar_nuevo_abono',
+            idPedido: idPedido,
+            monto: monto,
+            metodo: metodo,
+            notas: notas,
+            idUsuario: user.id
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            // Mensaje de éxito
+            if (data.completado) {
+                mostrarModal('¡Pago completado! El cliente ha pagado la totalidad del pedido.', 'success');
+            } else {
+                mostrarModal(`Abono registrado. Nuevo saldo pendiente: $${data.saldoRestante.toFixed(2)}`, 'success');
+            }
+            
+            // Cerrar modal de nuevo abono
+            cerrarModalNuevoAbono();
+            
+            // Recargar detalles del pedido
+            setTimeout(() => {
+                verDetallePedido(idPedido);
+            }, 500);
+            
+            // Recargar dashboard completo después de 1 segundo
+            setTimeout(() => {
+                loadDashboardData();
+            }, 1000);
+            
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo registrar el abono'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al registrar el abono', 'error');
+    });
+}
+
+// ========================================
+// CERRAR MODALES AL HACER CLIC FUERA
+// ========================================
+window.addEventListener('click', function(event) {
+    // Modal detalle pedido
+    const modalDetalle = document.getElementById('modalDetallePedido');
+    if (event.target === modalDetalle) {
+        cerrarModalDetallePedido();
+    }
+    
+    // Modal nuevo abono
+    const modalAbono = document.getElementById('modalNuevoAbono');
+    if (event.target === modalAbono) {
+        cerrarModalNuevoAbono();
+    }
+});
 

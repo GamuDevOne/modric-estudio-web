@@ -133,15 +133,15 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data && data.ok) {
-            alert(data.message || '¡Mensaje enviado correctamente!');
+            mostrarModal(data.message || '¡Mensaje enviado correctamente!');
             form.reset();
         } else {
-            alert((data && data.error) ? data.error : 'Error al enviar el mensaje.');
+            mostrarModal((data && data.error) ? data.error : 'Error al enviar el mensaje.');
         }
     })
     .catch(error => {
         console.error('Error al enviar contacto:', error);
-        alert('Error al enviar el mensaje. Por favor, intenta de nuevo.');
+        mostrarModal('Error al enviar el mensaje. Por favor, intenta de nuevo.');
     });
 }
 

@@ -330,7 +330,7 @@ function guardarVenta(event) {
     event.preventDefault();
     
     if (!asignacionActual) {
-        alert('No tienes un colegio asignado para hoy');
+        mostrarModal('No tienes un colegio asignado para hoy');
         return;
     }
     
@@ -351,12 +351,12 @@ function guardarVenta(event) {
         
         // Validaciones
         if (!montoAbonado || montoAbonado <= 0) {
-            alert('Debes ingresar el monto abonado');
-            return;
+            mostrarModal('Debes ingresar el monto abonado');
+            return;  //revisar el mensaje (12/13/25)
         }
         
         if (montoAbonado > precio) {
-            alert('El abono no puede ser mayor al precio total');
+            mostrarModal('El abono no puede ser mayor al precio total');
             return;
         }
     }
@@ -387,17 +387,17 @@ function guardarVenta(event) {
         hideLoadingModal();
         
         if (data.success) {
-            alert('¡Venta registrada correctamente!');
+            mostrarModal('¡Venta registrada correctamente!');
             cerrarModalVenta();
             cargarVentasDelDia();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 

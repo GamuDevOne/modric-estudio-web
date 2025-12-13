@@ -137,7 +137,7 @@ function editarVendedor(id) {
     const vendedor = vendedoresData.find(v => v.ID_Usuario === id);
     
     if (!vendedor) {
-        mostrarModal('Vendedor no encontrado');
+        mostrarModal('Vendedor no encontrado', 'error');
         return;
     }
     
@@ -157,7 +157,7 @@ function editarVendedor(id) {
 }
 
 // ========================================
-// GUARDAR VENDEDOR (CREAR O ACTUALIZAR)
+// GUARDAR VENDEDOR (✅ CORREGIDO - SIN DELAY)
 // ========================================
 function guardarVendedor(event) {
     event.preventDefault();
@@ -173,11 +173,17 @@ function guardarVendedor(event) {
     
     // Validación de contraseña
     if (!modoEdicion && formData.contrasena.length < 6) {
-        mostrarModal('La contraseña debe tener al menos 6 caracteres');
+        mostrarModal('La contraseña debe tener al menos 6 caracteres', 'error');
         return;
     }
     
-    showLoadingModal();
+    // ✅ FIX 1: CERRAR MODAL PRIMERO (antes del fetch)
+    closeModal();
+    
+    // ✅ FIX 2: Pequeño delay para suavizar transición
+    setTimeout(() => {
+        showLoadingModal();
+    }, 100);
     
     fetch('../../php/gest-vendedores.php', {
         method: 'POST',
@@ -190,18 +196,26 @@ function guardarVendedor(event) {
     .then(data => {
         hideLoadingModal();
         
-        if (data.success) {
-            mostrarModal(modoEdicion ? 'Vendedor actualizado correctamente' : 'Vendedor agregado correctamente');
-            closeModal();
-            cargarVendedores();
-        } else {
-            mostrarModal('Error: ' + data.message);
-        }
+        // ✅ FIX 3: Mostrar mensaje DESPUÉS de cerrar loading
+        setTimeout(() => {
+            if (data.success) {
+                mostrarModal(
+                    modoEdicion ? 'Vendedor actualizado correctamente' : 'Vendedor agregado correctamente',
+                    'success'
+                );
+                cargarVendedores();
+            } else {
+                mostrarModal('Error: ' + data.message, 'error');
+            }
+        }, 200); // Delay para suavizar
+        
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        mostrarModal('Error de conexión. Intenta nuevamente.');
+        setTimeout(() => {
+            mostrarModal('Error de conexión. Intenta nuevamente.', 'error');
+        }, 200);
     });
 }
 
@@ -217,7 +231,12 @@ function eliminarVendedor(id, nombre) {
 function confirmarEliminar() {
     if (!vendedorIdEliminar) return;
     
-    showLoadingModal();
+    // ✅ CERRAR MODAL PRIMERO
+    closeModalEliminar();
+    
+    setTimeout(() => {
+        showLoadingModal();
+    }, 100);
     
     fetch('../../php/gest-vendedores.php', {
         method: 'POST',
@@ -233,18 +252,21 @@ function confirmarEliminar() {
     .then(data => {
         hideLoadingModal();
         
-        if (data.success) {
-            mostrarModal('Vendedor eliminado correctamente');
-            closeModalEliminar();
-            cargarVendedores();
-        } else {
-            mostrarModal('Error: ' + data.message);
-        }
+        setTimeout(() => {
+            if (data.success) {
+                mostrarModal('Vendedor eliminado correctamente', 'success');
+                cargarVendedores();
+            } else {
+                mostrarModal('Error: ' + data.message, 'error');
+            }
+        }, 200);
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        mostrarModal('Error de conexión. Intenta nuevamente.');
+        setTimeout(() => {
+            mostrarModal('Error de conexión. Intenta nuevamente.', 'error');
+        }, 200);
     });
 }
 
@@ -255,7 +277,7 @@ function verEstadisticas(id) {
     const vendedor = vendedoresData.find(v => v.ID_Usuario === id);
     
     if (!vendedor) {
-        mostrarModal('Vendedor no encontrado');
+        mostrarModal('Vendedor no encontrado', 'error');
         return;
     }
     
@@ -295,13 +317,13 @@ function verEstadisticas(id) {
             
             document.getElementById('modalEstadisticas').classList.add('active');
         } else {
-            mostrarModal('Error al cargar estadísticas');
+            mostrarModal('Error al cargar estadísticas', 'error');
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        mostrarModal('Error de conexión.');
+        mostrarModal('Error de conexión.', 'error');
     });
 }
 
@@ -335,7 +357,7 @@ function hideLoadingModal() {
 }
 
 function mostrarError(mensaje) {
-    mostrarModal(mensaje);
+    mostrarModal(mensaje, 'error');
 }
 
 // Cerrar modales al hacer clic fuera

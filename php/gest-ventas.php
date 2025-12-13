@@ -97,7 +97,7 @@ function registrarVenta($pdo, $data) {
             return;
         }
         
-        //NUEVO: Validar abono si es necesario (11/12/25)
+        // Validar abono si es necesario
         if ($data['estadoPago'] === 'Abono') {
             if (empty($data['montoAbonado']) || $data['montoAbonado'] <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Monto abonado inválido']);
@@ -110,53 +110,64 @@ function registrarVenta($pdo, $data) {
             }
         }
         
-        // Obtener ID del cliente
-        $idUsuario = $data['idVendedor']; // TEMPORAL
-        
-                //Calcular prioridad ANTES de insertar (11/12/25)
+        // Calcular prioridad ANTES de insertar
         $prioridad = ($data['total'] >= 300) ? 1 : 2; // 1=Alta, 2=Baja
 
-        $stmt = $pdo->prepare("
-            INSERT INTO Pedido (
-                ID_Usuario,
-                ID_Vendedor,
-                ID_Colegio,
-                NombreCliente,
-                ID_Servicio,
-                ID_Paquete,
-                Total,
-                Prioridad,
-                Estado,
-                Fecha
-            ) VALUES (
-                :idUsuario,
-                :idVendedor,
-                :idColegio,
-                :nombreCliente,
-                :idServicio,
-                :idPaquete,
-                :total,
-                :prioridad,
-                'Pendiente',
-                NOW()
-            )
-        ");
-
-        $stmt->execute([
-            ':idUsuario' => $idUsuario,
-            ':idVendedor' => $data['idVendedor'],
-            ':idColegio' => $data['idColegio'],
-            ':nombreCliente' => $data['nombreCliente'],
-            ':idServicio' => $data['idServicio'] ?? null,
-            ':idPaquete' => $data['idPaquete'] ?? null,
-            ':total' => $data['total'],
-            ':prioridad' => $prioridad
-        ]);
+        // ========================================
+        // INICIAR TRANSACCIÓN
+        // ========================================
+        $pdo->beginTransaction();
         
-        $idPedido = $pdo->lastInsertId();
-        
-        // ACTUALIZADO: Registrar información de venta CON monto abonado (11/12/25)
         try {
+            // Obtener ID del cliente
+            $idUsuario = $data['idVendedor']; // TEMPORAL
+            
+            // Insertar pedido
+            $stmt = $pdo->prepare("
+                INSERT INTO Pedido (
+                    ID_Usuario,
+                    ID_Vendedor,
+                    ID_Colegio,
+                    NombreCliente,
+                    ID_Servicio,
+                    ID_Paquete,
+                    Total,
+                    Prioridad,
+                    Estado,
+                    Fecha
+                ) VALUES (
+                    :idUsuario,
+                    :idVendedor,
+                    :idColegio,
+                    :nombreCliente,
+                    :idServicio,
+                    :idPaquete,
+                    :total,
+                    :prioridad,
+                    'Pendiente',
+                    NOW()
+                )
+            ");
+
+            $stmt->execute([
+                ':idUsuario' => $idUsuario,
+                ':idVendedor' => $data['idVendedor'],
+                ':idColegio' => $data['idColegio'],
+                ':nombreCliente' => $data['nombreCliente'],
+                ':idServicio' => $data['idServicio'] ?? null,
+                ':idPaquete' => $data['idPaquete'] ?? null,
+                ':total' => $data['total'],
+                ':prioridad' => $prioridad
+            ]);
+            
+            $idPedido = $pdo->lastInsertId();
+            
+            // Registrar información de venta CON monto abonado
+            $montoAbonado = null;
+            if ($data['estadoPago'] === 'Abono') {
+                $montoAbonado = $data['montoAbonado'];
+            }
+            
             $stmt = $pdo->prepare("
                 INSERT INTO VentaInfo (
                     ID_Pedido,
@@ -175,43 +186,57 @@ function registrarVenta($pdo, $data) {
                 )
             ");
             
-            $montoAbonado = null;
-            if ($data['estadoPago'] === 'Abono') {
-                $montoAbonado = $data['montoAbonado'];
-            }
-            
             $stmt->execute([
                 ':idPedido' => $idPedido,
                 ':nombreCliente' => $data['nombreCliente'],
                 ':metodoPago' => $data['metodoPago'] ?? null,
                 ':estadoPago' => $data['estadoPago'] ?? 'Completo',
-                ':montoAbonado' => $montoAbonado, // ✅ NUEVO
+                ':montoAbonado' => $montoAbonado,
                 ':notas' => $data['notas'] ?? null
             ]);
-        } catch (PDOException $e) {
-            // Si la columna no existe, agregarla
-            if (strpos($e->getMessage(), 'Unknown column') !== false) {
-                $pdo->exec("ALTER TABLE VentaInfo ADD COLUMN MontoAbonado DECIMAL(10,2) NULL AFTER EstadoPago");
+            
+            // ========================================
+            // NUEVO: REGISTRAR ABONO INICIAL EN HISTORIAL
+            // ========================================
+            if ($data['estadoPago'] === 'Abono' && $montoAbonado > 0) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO HistorialAbonos (
+                        ID_Pedido,
+                        Monto,
+                        MetodoPago,
+                        Notas,
+                        ID_RegistradoPor
+                    ) VALUES (
+                        :idPedido,
+                        :monto,
+                        :metodoPago,
+                        :notas,
+                        :idRegistradoPor
+                    )
+                ");
                 
-                // Reintentar inserción
                 $stmt->execute([
                     ':idPedido' => $idPedido,
-                    ':nombreCliente' => $data['nombreCliente'],
+                    ':monto' => $montoAbonado,
                     ':metodoPago' => $data['metodoPago'] ?? null,
-                    ':estadoPago' => $data['estadoPago'] ?? 'Completo',
-                    ':montoAbonado' => $montoAbonado,
-                    ':notas' => $data['notas'] ?? null
+                    ':notas' => 'Abono inicial registrado por el vendedor',
+                    ':idRegistradoPor' => $data['idVendedor']
                 ]);
-            } else {
-                throw $e;
             }
+            
+            // Confirmar transacción
+            $pdo->commit();
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Venta registrada correctamente',
+                'idPedido' => $idPedido
+            ]);
+            
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
         }
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Venta registrada correctamente',
-            'idPedido' => $idPedido
-        ]);
         
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
@@ -228,7 +253,7 @@ function obtenerVentasVendedorHoy($pdo, $data) {
             return;
         }
         
-        // ✅ ACTUALIZADO: Incluir MontoAbonado en SELECT
+        //Incluir MontoAbonado en SELECT
         $stmt = $pdo->prepare("
             SELECT 
                 p.ID_Pedido,
@@ -252,7 +277,7 @@ function obtenerVentasVendedorHoy($pdo, $data) {
         $stmt->execute([':idVendedor' => $data['idVendedor']]);
         $ventas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // ✅ ACTUALIZADO: Calcular estadísticas considerando abonos
+        //Calcular estadísticas considerando abonos
         $totalVentas = count($ventas);
         $totalMonto = 0;
         
