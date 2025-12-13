@@ -121,23 +121,27 @@ function getEstadisticas($pdo) {
         $stats['cambioVentas'] = 0;
     }
     
-    // Pedidos activos (igual que antes)
-    $stmt = $pdo->query("
-        SELECT COUNT(*) as pedidosActivos
-        FROM Pedido
-        WHERE Estado NOT IN ('Cancelado', 'Completado')
-    ");
-    $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
-    
-    //ACTUALIZADO: Pedidos pendientes (incluyendo abonos parciales) (11/12/25)
-    $stmt = $pdo->query("
-        SELECT COUNT(*) as pedidosPendientes
-        FROM Pedido p
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-        WHERE p.Estado = 'Pendiente' 
+   // Pedidos activos (NO cancelados ni completados)
+$stmt = $pdo->query("
+    SELECT COUNT(*) as pedidosActivos
+    FROM Pedido
+    WHERE Estado NOT IN ('Cancelado', 'Completado')
+");
+$stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
+
+// Pedidos pendientes de pago (SOLO de los activos)
+$stmt = $pdo->query("
+    SELECT COUNT(DISTINCT p.ID_Pedido) as pedidosPendientes
+    FROM Pedido p
+    LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+    WHERE p.Estado NOT IN ('Cancelado', 'Completado')
+    AND (
+        vi.EstadoPago IS NULL 
+        OR vi.EstadoPago = 'Pendiente'
         OR (vi.EstadoPago = 'Abono' AND vi.MontoAbonado < p.Total)
-    ");
-    $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
+    )
+");
+$stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
     
     // Total de clientes (igual)
     $stmt = $pdo->query("

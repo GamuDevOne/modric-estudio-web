@@ -1438,106 +1438,97 @@ body.modal-open {
    MODAL NUEVO ABONO
 ======================================== */
 .modal-small {
-    max-width: 700px !important;
+    max-width: 500px !important;
 }
 
 .modal-small .modal-body {
     padding: 25px 30px !important;
 }
 
-/* Layout en dos columnas para el formulario de abono */
+/* Caja de información del saldo - Estilo azul COMPACTO */
 .modal-small .info-box {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3f7fb 100%);
-    border-left: 3px solid #1976d2;
-    padding: 18px;
-    border-radius: 8px;
-    margin-bottom: 22px;
-    display: flex;
-    gap: 12px;
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
-    grid-column: 1 / -1;
-}
-
-.modal-small .info-box svg {
-    flex-shrink: 0;
-    stroke: #1976d2;
-    width: 22px;
-    height: 22px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+    border-left: 4px solid #2196f3;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    text-align: left;
 }
 
 .modal-small .info-box p {
-    margin: 0;
-    font-size: 13px;
-    color: #555;
-    line-height: 1.4;
+    margin: 0 0 4px 0;
+    font-size: 11px;
+    color: #1565c0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
 .modal-small .info-box strong {
-    color: #1565c0;
+    color: #1976d2;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 22px;
     display: block;
-    margin-top: 4px;
+    margin: 0 0 4px 0;
 }
 
-/* Grid de dos columnas para los inputs */
-.modal-small .modal-body > form,
-.modal-small .modal-body > div {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+.modal-small .info-box small {
+    display: block;
+    font-size: 11px;
+    color: #64b5f6;
+    margin: 0;
+    line-height: 1.3;
 }
 
-.modal-small .form-group {
+/* Layout simple de una columna */
+.modal-small .modal-body > form { /*espacio entre labels*/
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 60px;  /* ← Este controla si los labels suben o bajan */
+}
+
+.modal-small .form-group { /*labels cerca de los inputs(titulos de texto)*/
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .modal-small .form-group label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: #333;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px; /* Espaciado entre letras */
 }
 
 .modal-small .form-group input,
 .modal-small .form-group select,
 .modal-small .form-group textarea {
-    padding: 11px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 13px;
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
     font-family: inherit;
     color: #333;
     transition: all 0.3s ease;
 }
 
 .modal-small .form-group input:focus,
-.modal-small .form-group select:focus {
+.modal-small .form-group select:focus,
+.modal-small .form-group textarea:focus {
     outline: none;
-    border-color: #70b8f2;
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-    background-color: #fafbfc;
+    border-color: #333;
+    box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
 }
 
 .modal-small .form-group textarea {
-    grid-column: 1 / -1;
     min-height: 70px;
     resize: vertical;
 }
 
-.modal-small .form-group textarea:focus {
-    outline: none;
-    border-color: #2196f3;
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-}
-
 .modal-small .form-group textarea::placeholder {
     color: #999;
-    font-style: italic;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 /* ========================================
@@ -1677,4 +1668,12 @@ body.modal-open {
     .payment-item strong {
         font-size: 20px;
     }
+}
+
+#metodoAbono {
+    margin-bottom: 10px;  /* Agregá espacio solo debajo de este select */
+}
+
+#montoNuevoAbono{
+    margin-bottom: 10px;  /* Agregá espacio solo debajo de este input */
 }
