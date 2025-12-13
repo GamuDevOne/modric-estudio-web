@@ -478,18 +478,22 @@ body.modal-open {
 .btn-secondary {
     background-color: #f5f5f5;
     color: #333;
-    border: none;
-    padding: 12px 24px;
-    font-size: 14px;
+    border: 2px solid #e0e0e0;
+    padding: 11px 26px;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     cursor: pointer;
     transition: all 0.3s ease;
     border-radius: 5px;
+    font-weight: 600;
 }
 
 .btn-secondary:hover {
     background-color: #e0e0e0;
+    border-color: #999;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Modal de confirmación personalizado */
@@ -533,20 +537,24 @@ body.modal-open {
 
 /* Botón primario en modal */
 .modal-footer .btn-primary {
-    background-color: #2e7d32;
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
-    font-size: 14px;
+    padding: 11px 26px;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
 }
 
 .modal-footer .btn-primary:hover {
-    background-color: #1b5e20;
+    background: linear-gradient(135deg, #1b5e20 0%, #0d3d1a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
 }
 
 /* ========================================
@@ -1223,9 +1231,8 @@ body.modal-open {
     color: #555;
     line-height: 1.6;
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: #eeeeee; /*eeeeeeeeeeeee*/
     border-radius: 6px;
-    border-left: 3px solid #2196f3;
     margin: 0;
 }
 
@@ -1250,7 +1257,7 @@ body.modal-open {
     padding: 15px 20px;
     background-color: #fff;
     border-radius: 6px;
-    border-left: 4px solid #ccc;
+    border: 0px solid #e6e6e6; /*borde completo sutill*/
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
@@ -1331,7 +1338,6 @@ body.modal-open {
     background-color: #fff;
     padding: 15px;
     border-radius: 6px;
-    border-left: 3px solid #4caf50;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     transition: all 0.2s ease;
 }
@@ -1432,38 +1438,128 @@ body.modal-open {
    MODAL NUEVO ABONO
 ======================================== */
 .modal-small {
-    max-width: 500px !important;
+    max-width: 700px !important;
 }
 
-.info-box {
-    background-color: #e3f2fd;
-    border: 1px solid #90caf9;
-    border-left: 4px solid #2196f3;
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 20px;
+.modal-small .modal-body {
+    padding: 25px 30px !important;
+}
+
+/* Layout en dos columnas para el formulario de abono */
+.modal-small .info-box {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3f7fb 100%);
+    border-left: 3px solid #1976d2;
+    padding: 18px;
+    border-radius: 8px;
+    margin-bottom: 22px;
     display: flex;
     gap: 12px;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+    grid-column: 1 / -1;
 }
 
-.info-box svg {
+.modal-small .info-box svg {
     flex-shrink: 0;
-    stroke: #2196f3;
+    stroke: #1976d2;
+    width: 22px;
+    height: 22px;
 }
 
-.info-box p {
+.modal-small .info-box p {
     margin: 0;
-    font-size: 14px;
-    color: #333;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
 }
 
-.info-box strong {
-    color: #1976d2;
+.modal-small .info-box strong {
+    color: #1565c0;
+    font-weight: 700;
+    font-size: 15px;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Grid de dos columnas para los inputs */
+.modal-small .modal-body > form,
+.modal-small .modal-body > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.modal-small .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-small .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.modal-small .form-group input,
+.modal-small .form-group select,
+.modal-small .form-group textarea {
+    padding: 11px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.modal-small .form-group input:focus,
+.modal-small .form-group select:focus {
+    outline: none;
+    border-color: #70b8f2;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    background-color: #fafbfc;
+}
+
+.modal-small .form-group textarea {
+    grid-column: 1 / -1;
+    min-height: 70px;
+    resize: vertical;
+}
+
+.modal-small .form-group textarea:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.modal-small .form-group textarea::placeholder {
+    color: #999;
+    font-style: italic;
+    font-size: 12px;
 }
 
 /* ========================================
    RESPONSIVE - GESTIÓN DE ABONOS
 ======================================== */
+@media (max-width: 900px) {
+    .modal-small {
+        max-width: 100% !important;
+        margin: 0 10px;
+    }
+    
+    .modal-small .modal-body > form,
+    .modal-small .modal-body > div {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .modal-small .form-group textarea {
+        grid-column: 1;
+    }
+}
+
 @media (max-width: 768px) {
     .detalle-grid {
         grid-template-columns: 1fr;
@@ -1496,6 +1592,25 @@ body.modal-open {
     .lista-abonos {
         max-height: 200px;
     }
+    
+    .modal-small .modal-body {
+        padding: 20px !important;
+    }
+    
+    .modal-small .info-box {
+        padding: 15px;
+        margin-bottom: 18px;
+    }
+    
+    .modal-footer {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .modal-footer button {
+        flex: 1;
+        min-width: 120px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1511,6 +1626,52 @@ body.modal-open {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+    
+    .modal-small {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    .modal-small .modal-header {
+        padding: 18px 20px;
+    }
+    
+    .modal-small .modal-header h2 {
+        font-size: 20px;
+    }
+    
+    .modal-small .modal-body {
+        padding: 18px !important;
+    }
+    
+    .modal-small .form-group input,
+    .modal-small .form-group select,
+    .modal-small .form-group textarea {
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    .modal-small .info-box {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-small .info-box svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 18px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 12px;
     }
     
     .payment-item strong {
