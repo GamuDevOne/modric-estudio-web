@@ -137,7 +137,7 @@ function editarVendedor(id) {
     const vendedor = vendedoresData.find(v => v.ID_Usuario === id);
     
     if (!vendedor) {
-        alert('Vendedor no encontrado');
+        mostrarModal('Vendedor no encontrado');
         return;
     }
     
@@ -173,7 +173,7 @@ function guardarVendedor(event) {
     
     // Validación de contraseña
     if (!modoEdicion && formData.contrasena.length < 6) {
-        alert('La contraseña debe tener al menos 6 caracteres');
+        mostrarModal('La contraseña debe tener al menos 6 caracteres');
         return;
     }
     
@@ -191,17 +191,17 @@ function guardarVendedor(event) {
         hideLoadingModal();
         
         if (data.success) {
-            alert(modoEdicion ? 'Vendedor actualizado correctamente' : 'Vendedor agregado correctamente');
+            mostrarModal(modoEdicion ? 'Vendedor actualizado correctamente' : 'Vendedor agregado correctamente');
             closeModal();
             cargarVendedores();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión. Intenta nuevamente.');
+        mostrarModal('Error de conexión. Intenta nuevamente.');
     });
 }
 
@@ -234,17 +234,17 @@ function confirmarEliminar() {
         hideLoadingModal();
         
         if (data.success) {
-            alert('Vendedor eliminado correctamente');
+            mostrarModal('Vendedor eliminado correctamente');
             closeModalEliminar();
             cargarVendedores();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión. Intenta nuevamente.');
+        mostrarModal('Error de conexión. Intenta nuevamente.');
     });
 }
 
@@ -255,7 +255,7 @@ function verEstadisticas(id) {
     const vendedor = vendedoresData.find(v => v.ID_Usuario === id);
     
     if (!vendedor) {
-        alert('Vendedor no encontrado');
+        mostrarModal('Vendedor no encontrado');
         return;
     }
     
@@ -295,13 +295,13 @@ function verEstadisticas(id) {
             
             document.getElementById('modalEstadisticas').classList.add('active');
         } else {
-            alert('Error al cargar estadísticas');
+            mostrarModal('Error al cargar estadísticas');
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión.');
+        mostrarModal('Error de conexión.');
     });
 }
 
@@ -335,7 +335,7 @@ function hideLoadingModal() {
 }
 
 function mostrarError(mensaje) {
-    alert(mensaje);
+    mostrarModal(mensaje);
 }
 
 // Cerrar modales al hacer clic fuera

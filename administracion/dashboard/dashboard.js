@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (user.tipo !== 'CEO') {
-        alert('Acceso denegado. Solo el CEO puede ver esta página.');
+        mostrarModal('Acceso denegado. Solo el CEO puede ver esta página.');
         window.location.href = '../administracion.html';
         return;
     }
@@ -286,7 +286,7 @@ function formatFecha(fecha) {
 // VER DETALLE / MARCAR COMPLETADO / CANCELAR
 // ========================================
 function verDetallePedido(idPedido) {
-    alert(`Ver detalle del pedido #${idPedido}\n\nFunción en desarrollo`);
+    mostrarModal(`Ver detalle del pedido #${idPedido}\n\nFunción en desarrollo`);
 }
 
 // MARCAR PEDIDO COMO COMPLETADO
@@ -347,7 +347,7 @@ function cerrarModalConfirmacion() {
 function ejecutarAccion() {
     if (!accionPendiente || !datosAccion || !datosAccion.idPedido) {
         console.error('Error: Datos de acción incompletos', { accionPendiente, datosAccion });
-        alert('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
+        mostrarModal('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
         cerrarModalConfirmacion();
         return;
     }
@@ -389,16 +389,16 @@ function ejecutarAccion() {
         console.log('Respuesta del servidor:', data);
         
         if (data.success) {
-            alert(data.message || 'Acción completada exitosamente');
+            mostrarModal(data.message || 'Acción completada exitosamente');
             loadDashboardData(); // ← Recargar dashboard completo
         } else {
-            alert('Error: ' + (data.message || 'Respuesta inesperada'));
+            mostrarModal('Error: ' + (data.message || 'Respuesta inesperada'));
         }
     })
     .catch(err => {
         hideLoadingModal();
         console.error('Error en fetch:', err);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -428,7 +428,7 @@ function hideLoadingModal() {
 }
 
 function showErrorMessage(message) {
-    alert(message);
+    mostrarModal(message);
 }
 
 // ========================================
@@ -498,3 +498,4 @@ window.onclick = function(event) {
         cerrarModalTodosPedidos();
     }
 };
+

@@ -1472,3 +1472,96 @@ nav ul li a.active {
     }
 }
  
+/* ========================================
+   MODAL DE RETROALIMENTACIÓN MINIMAL
+======================================== */
+.feedback-modal {
+    display: none;
+    position: fixed;
+    bottom: 30px; /* Abajo centro */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    animation: fadeInUp 0.3s ease;
+}
+
+.feedback-modal.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.feedback-content {
+    background-color: #333; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    padding: 12px 24px;
+    border-radius: 24px; /* Redondeado tipo "pill" */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.feedback-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.feedback-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: #fff; /* Íconos blancos */
+}
+
+.feedback-icon.success svg {
+    stroke: #4caf50;
+}
+
+.feedback-icon.error svg {
+    stroke: #f44336;
+}
+
+.feedback-icon.warning svg {
+    stroke: #ff9800;
+}
+
+#feedbackMessage {
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* ========================================
+   RESPONSIVE MODAL RETROALIMENTACIÓN (telefonos)
+======================================== */
+@media (max-width: 768px) {
+    .feedback-content {
+        min-width: auto;
+        max-width: calc(100vw - 40px);
+        margin: 0 20px;
+    }
+    
+    .feedback-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .feedback-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    #feedbackMessage {
+        font-size: 13px;
+    }
+}

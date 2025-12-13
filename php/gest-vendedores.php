@@ -95,7 +95,7 @@ function getAllVendedores($pdo) {
 }
 
 // ========================================
-// FUNCIÓN: CREAR VENDEDOR
+// FUNCIÓN: CREAR VENDEDOR 
 // ========================================
 function createVendedor($pdo, $data) {
     try {
@@ -135,20 +135,19 @@ function createVendedor($pdo, $data) {
             return;
         }
         
-        // Insertar vendedor
         $stmt = $pdo->prepare("
             INSERT INTO Usuario (
                 NombreCompleto, 
                 Usuario,
                 Correo, 
                 Contrasena, 
-                TipoUsuario, 
+                TipoUsuario
             ) VALUES (
                 :nombreCompleto,
                 :usuario,
                 :correo,
                 :contrasena,
-                'Vendedor',
+                'Vendedor'
             )
         ");
         
@@ -156,7 +155,7 @@ function createVendedor($pdo, $data) {
             ':nombreCompleto' => $data['nombreCompleto'],
             ':usuario' => $data['usuario'],
             ':correo' => $data['correo'],
-            ':contrasena' => $data['contrasena'], // all: Implementar hash
+            ':contrasena' => $data['contrasena'], // TODO: Implementar hash
         ]);
         
         echo json_encode([
@@ -245,7 +244,7 @@ function updateVendedor($pdo, $data) {
             return;
         }
                 
-        // Actualizar vendedor
+        //FIX: se quitola coma antes del WHERE
         if (!empty($data['contrasena'])) {
             // Actualizar con contraseña nueva
             $stmt = $pdo->prepare("
@@ -253,7 +252,7 @@ function updateVendedor($pdo, $data) {
                     NombreCompleto = :nombreCompleto,
                     Usuario = :usuario,
                     Correo = :correo,
-                    Contrasena = :contrasena,
+                    Contrasena = :contrasena
                 WHERE ID_Usuario = :id
             ");
             
@@ -261,7 +260,7 @@ function updateVendedor($pdo, $data) {
                 ':nombreCompleto' => $data['nombreCompleto'],
                 ':usuario' => $data['usuario'],
                 ':correo' => $data['correo'],
-                ':contrasena' => $data['contrasena'], // all: Implementar hash
+                ':contrasena' => $data['contrasena'], // TODO: Implementar hash
                 ':id' => $data['id']
             ]);
         } else {
@@ -270,7 +269,7 @@ function updateVendedor($pdo, $data) {
                 UPDATE Usuario SET
                     NombreCompleto = :nombreCompleto,
                     Usuario = :usuario,
-                    Correo = :correo,
+                    Correo = :correo
                 WHERE ID_Usuario = :id
             ");
             
@@ -358,7 +357,7 @@ function getVendedorStats($pdo, $data) {
             return;
         }
         
-        //FIX: Obtener asignación ACTUAL (del día de HOY) (12/12/25)
+        // Obtener asignación ACTUAL (del día de HOY)
         $stmt = $pdo->prepare("
             SELECT c.NombreColegio 
             FROM AsignacionVendedor av
@@ -371,7 +370,6 @@ function getVendedorStats($pdo, $data) {
         $stmt->execute([':id' => $data['id']]);
         $asignacionHoy = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Si tiene asignación hoy, usar ese nombre; si no, indicar que no tiene
         $lugarTrabajo = $asignacionHoy ? $asignacionHoy['NombreColegio'] : 'Sin asignación hoy';
         
         // Total de ventas (considerando abonos)
@@ -390,7 +388,7 @@ function getVendedorStats($pdo, $data) {
         $stmt->execute([':id' => $data['id']]);
         $totalVentas = $stmt->fetch(PDO::FETCH_ASSOC)['totalVentas'];
         
-        // Pedidos activos (no completados ni cancelados)
+        // Pedidos activos
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as pedidosActivos
             FROM Pedido
@@ -461,7 +459,7 @@ function getVendedorStats($pdo, $data) {
             'success' => true,
             'stats' => [
                 'totalVentas' => $totalVentas,
-                'lugarTrabajo' => $lugarTrabajo, //Ahora muestra asignación del día (12/12/25)
+                'lugarTrabajo' => $lugarTrabajo,
                 'pedidosActivos' => $pedidosActivos,
                 'ultimoPedido' => $ultimoPedidoTexto,
                 'estadoPendientes' => $estadoPendientes,

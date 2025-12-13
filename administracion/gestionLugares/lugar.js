@@ -98,7 +98,7 @@ function asignarVendedor() {
     const fecha = document.getElementById('fechaAsignacion').value;
     
     if (!idVendedor) {
-        alert('Debes seleccionar un vendedor');
+        mostrarModal('Debes seleccionar un vendedor');
         return;
     }
     
@@ -124,18 +124,18 @@ function asignarVendedor() {
         console.log('Respuesta asignación:', data); // Debug
         
         if (data.success) {
-            alert('Vendedor asignado correctamente');
+            mostrarModal('Vendedor asignado correctamente');
             document.getElementById('selectVendedor').value = '';
             cargarAsignaciones();
             cargarColegios(); // Actualizar contador de vendedores
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -153,8 +153,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (user.tipo !== 'CEO') {
-        alert('Acceso denegado. Solo el CEO puede acceder a esta página.');
+        mostrarModal('Acceso denegado. Solo el CEO puede acceder a esta página.');
+        setTimeout(() => {
         window.location.href = '../administracion.html';
+        }, 2000);
         return;
     }
     
@@ -373,7 +375,7 @@ function editarColegio(id) {
     const colegio = colegiosData.find(c => c.ID_Colegio == id);
     
     if (!colegio) {
-        alert('Lugar no encontrado');
+        mostrarModal('Lugar no encontrado');
         return;
     }
     
@@ -404,7 +406,7 @@ function guardarColegio(event) {
     const notas = document.getElementById('notasColegio').value.trim();
     
     if (!nombreColegio) {
-        alert('El nombre del lugar es requerido');
+        mostrarModal('El nombre del lugar es requerido');
         return;
     }
     
@@ -435,29 +437,38 @@ function guardarColegio(event) {
         hideLoadingModal();
         
         if (data.success) {
-            alert(id ? 'Lugar actualizado correctamente' : 'Lugar creado correctamente');
-            closeModalColegio();
-            cargarColegios();
+        //Cerrar modal primero
+        closeModalColegio();
+        //Mostrar mensaje después
+        setTimeout(() => {
+            mostrarModal(
+                id ? 'Lugar actualizado correctamente' : 'Lugar creado correctamente',
+                'success'
+            );
+        }, 300); // Pequeño delay para que el cierre sea suave
+        
+        //Recargar datos
+        cargarColegios();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
 function cerrarColegio(id, nombre) {
-    // ✅ CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO
+    //CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO
     lugarIdCerrar = parseInt(id);
     
     console.log('Cerrar colegio - ID recibido:', id, 'Tipo:', typeof id);
     console.log('Cerrar colegio - ID guardado:', lugarIdCerrar, 'Tipo:', typeof lugarIdCerrar);
     
     if (!lugarIdCerrar || isNaN(lugarIdCerrar)) {
-        alert('Error: ID de lugar inválido');
+        mostrarModal('Error: ID de lugar inválido');
         return;
     }
     
@@ -479,7 +490,7 @@ function confirmarCerrarLugar() {
     // VALIDACIÓN CON LA VARIABLE LOCAL
     if (!idAUsar || isNaN(idAUsar)) {
         console.error('Error: ID inválido', idAUsar);
-        alert('Error: No se pudo identificar el lugar a cerrar');
+        mostrarModal('Error: No se pudo identificar el lugar a cerrar');
         closeModalCerrarLugar();
         return;
     }
@@ -508,16 +519,16 @@ function confirmarCerrarLugar() {
         console.log('Respuesta cerrar colegio:', data);
         
         if (data.success) {
-            alert('Lugar cerrado correctamente');
+            mostrarModal('Lugar cerrado correctamente');
             cargarColegios();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -529,7 +540,7 @@ function eliminarColegio(id, nombre) {
     console.log('Eliminar colegio - ID guardado:', lugarIdEliminar, 'Tipo:', typeof lugarIdEliminar);
     
     if (!lugarIdEliminar || isNaN(lugarIdEliminar)) {
-        alert('Error: ID de lugar inválido');
+        mostrarModal('Error: ID de lugar inválido');
         return;
     }
     
@@ -551,7 +562,7 @@ function confirmarEliminarLugar() {
     // VALIDACIÓN CON LA VARIABLE LOCAL
     if (!idAUsar || isNaN(idAUsar)) {
         console.error('Error: ID inválido', idAUsar);
-        alert('Error: No se pudo identificar el lugar a eliminar');
+        mostrarModal('Error: No se pudo identificar el lugar a eliminar');
         closeModalEliminarLugar();
         return;
     }
@@ -580,16 +591,16 @@ function confirmarEliminarLugar() {
         console.log('Respuesta eliminar colegio:', data);
         
         if (data.success) {
-            alert('Lugar eliminado correctamente');
+            mostrarModal('Lugar eliminado correctamente');
             cargarColegios();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -664,13 +675,13 @@ function quitarAsignacion(idAsignacion) {
             cargarAsignaciones();
             cargarColegios();
         } else {
-            alert('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message);
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -698,13 +709,13 @@ function verEstadisticas(id, nombre) {
             document.getElementById('modalEstadisticas').classList.add('active');
             document.body.classList.add('modal-open');
         } else {
-            alert('Error al cargar estadísticas');
+            mostrarModal('Error al cargar estadísticas');
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 
@@ -756,7 +767,7 @@ function hideLoadingModal() {
 }
 
 function mostrarError(mensaje) {
-    alert(mensaje);
+    mostrarModal(mensaje);
 }
 
 window.onclick = function(event) {
