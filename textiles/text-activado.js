@@ -188,45 +188,56 @@ if (prod.imagenes && prod.imagenes.length > 1) {
     }
 
     // Actualizar interfaz del carrito
-    function actualizarCarritoUI() {
-        const totalItems = cart.reduce((total, item) => total + item.cantidad, 0);
-        cartCount.textContent = totalItems;
-        
-        if (cart.length === 0) {
-            cartItemsList.innerHTML = `
-                <li class="cart-empty">
-                    <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                    <p>Tu carrito está vacío</p>
-                </li>
-            `;
-            cartTotal.textContent = 'Total: $0.00';
-            checkoutBtn.disabled = true;
-            return;
-        }
+function actualizarCarritoUI() {
+    const totalItems = cart.reduce((total, item) => total + item.cantidad, 0);
+    cartCount.textContent = totalItems;
 
-        cartItemsList.innerHTML = cart.map((item, index) => `
-            <li class="cart-item">
-                <div class="item-details">
-                    <strong class="item-nombre">${item.nombre}</strong>
-                    <div class="item-info">
-                        <span class="item-talla">Talla: ${item.talla.toUpperCase()}</span>
-                        <span class="item-cantidad">Cantidad: ${item.cantidad}</span>
-                        <span class="item-precio">$${item.precio} c/u</span>
-                    </div>
-                </div>
-                <div class="item-actions">
-                    <span class="item-subtotal">$${(item.precio * item.cantidad).toFixed(2)}</span>
-                    <button class="remove-btn" onclick="removerDelCarrito(${index})" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+    if (cart.length === 0) {
+        cartItemsList.innerHTML = `
+            <li class="cart-empty">
+                <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Tu carrito está vacío</p>
             </li>
-        `).join('');
-
-        const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-        cartTotal.textContent = `Total: $${total.toFixed(2)}`;
-        checkoutBtn.disabled = false;
+        `;
+        cartTotal.textContent = 'Total: $0.00';
+        checkoutBtn.disabled = true;
+        return;
     }
+
+    cartItemsList.innerHTML = cart.map((item, index) => `
+        <li class="cart-item">
+            <div class="item-details">
+                <strong class="item-nombre">${item.nombre}</strong>
+                <div class="item-info">
+                    <span class="item-talla">Talla: ${item.talla.toUpperCase()}</span>
+
+                    <div class="cantidad-control">
+                        <button onclick="cambiarCantidad(${index}, -1)">−</button>
+                        <span class="cantidad-numero">${item.cantidad}</span>
+                        <button onclick="cambiarCantidad(${index}, 1)">+</button>
+                    </div>
+
+                    <span class="item-precio">$${item.precio} c/u</span>
+                </div>
+            </div>
+
+            <div class="item-actions">
+                <span class="item-subtotal">
+                    $${(item.precio * item.cantidad).toFixed(2)}
+                </span>
+
+                <button class="remove-btn" onclick="removerDelCarrito(${index})" title="Eliminar todo">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </li>
+    `).join('');
+
+    const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+    checkoutBtn.disabled = false;
+}
+
 
     // Función global para remover items del carrito
     window.removerDelCarrito = function(index) {
@@ -235,24 +246,29 @@ if (prod.imagenes && prod.imagenes.length > 1) {
         actualizarCarritoUI();
         mostrarNotificacion(`${item.nombre} removido del carrito`, 'info');
     };
+window.cambiarCantidad = function(index, cambio) {
+    cart[index].cantidad += cambio;
+
+    if (cart[index].cantidad <= 0) {
+        const nombre = cart[index].nombre;
+        cart.splice(index, 1);
+        mostrarNotificacion(`${nombre} eliminado del carrito`, 'info');
+    }
+
+    actualizarCarritoUI();
+};
 
     // Abrir/cerrar carrito
-    cartIcon.addEventListener('click', (e) => {
-        e.stopPropagation();
-        cartPanel.classList.add('active');
-    });
+  cartIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cartPanel.classList.toggle('active');
+});
 
     cartClose.addEventListener('click', () => {
         cartPanel.classList.remove('active');
     });
 
-    // Cerrar carrito al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (!cartPanel.contains(e.target) && !cartIcon.contains(e.target)) {
-            cartPanel.classList.remove('active');
-        }
-    });
-
+ 
    // Cotizar por WhatsApp
 checkoutBtn.addEventListener('click', () => {
     if (cart.length === 0) {
