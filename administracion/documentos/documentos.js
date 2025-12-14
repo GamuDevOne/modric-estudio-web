@@ -230,12 +230,10 @@ function crearAlbumCard(album) {
                 ` : ''}
                 
                 ${album.Estado !== 'Activo' ? `
-                    <button class="btn-icon" style="border-color: #f44336;" title="Eliminar álbum" onclick="confirmarEliminarAlbum(${album.ID_Album}, '${tituloEscapado}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f44336" stroke-width="2">
+                    <button class="btn-icon" title="Eliminar álbum" onclick="confirmarEliminarAlbum(${album.ID_Album}, '${tituloEscapado}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
                         </svg>
                     </button>
                 ` : ''}
@@ -899,7 +897,7 @@ function cerrarModalConfirmacion() {
 function ejecutarAccion() {
     if (!accionPendiente || !datosAccion) {
         console.error('Error: Datos de acción incompletos', { accionPendiente, datosAccion });
-        alert('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
+        mostrarModal('Error: No se pudo procesar la acción. Por favor, intenta nuevamente.');
         cerrarModalConfirmacion();
         return;
     }
@@ -956,7 +954,7 @@ function ejecutarAccion() {
         console.log('Respuesta del servidor:', data);
         
         if (data.success) {
-            alert(data.message || 'Acción completada exitosamente');
+            mostrarModal(data.message || 'Acción completada exitosamente');
             
             // Recargar datos según la acción
             if (accionAEjecutar === 'cerrar_album') {
@@ -968,15 +966,17 @@ function ejecutarAccion() {
                     cargarFotosAlbum(album.ID_Album);
                 }
                 cargarAlbums();
-            }
+            }else if (accionAEjecutar === 'eliminar_album') { //nueva integracion (12/13/25)
+                cargarAlbums();
+            }   
         } else {
-            alert('Error: ' + (data.message || 'Respuesta inesperada'));
+            mostrarModal('Error: ' + (data.message || 'Respuesta inesperada'));
         }
     })
     .catch(err => {
         hideLoadingModal();
         console.error('Error en fetch:', err);
-        alert('Error de conexión');
+        mostrarModal('Error de conexión');
     });
 }
 

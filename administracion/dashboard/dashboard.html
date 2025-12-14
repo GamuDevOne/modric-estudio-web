@@ -46,7 +46,7 @@
             <div class="dashboard-header">
                 <div class="header-content">
                     <h1>Dashboard</h1>
-                    <p>Resumen general del negocio y control de pagos</p>
+                    <p>Resumen general del negocio, control de pagos y reportes</p>
                 </div>
                 <div class="header-actions">
                     <button class="refresh-btn" onclick="refreshDashboard()" title="Actualizar datos">
@@ -415,6 +415,43 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE REPORTES -->
+        <div class="reportes-section">
+        <div class="reportes-header">
+            <h2>Generar Reportes</h2>
+            <p>Exporta información del negocio en diferentes formatos</p>
+        </div>
+        
+        <div class="reportes-grid">
+            <div class="reporte-card">
+                <h3>Reporte de Ventas</h3>
+                <p>Ventas por período, vendedor, colegio</p>
+                <button class="btn-primary" onclick="generarReporteVentas()">
+                    <svg>...</svg>
+                    Generar
+                </button>
+            </div>
+            
+            <div class="reporte-card">
+                <h3>Reporte de Abonos</h3>
+                <p>Historial de pagos y saldos pendientes</p>
+                <button class="btn-primary" onclick="generarReporteAbonos()">
+                    <svg>...</svg>
+                    Generar
+                </button>
+            </div>
+            
+            <div class="reporte-card">
+                <h3>Reporte de Documentos</h3>
+                <p>Álbumes subidos y descargas de clientes</p>
+                <button class="btn-primary" onclick="generarReporteDocumentos()">
+                    <svg>...</svg>
+                    Generar
+                </button>
+            </div>
         </div>
     </div>
 

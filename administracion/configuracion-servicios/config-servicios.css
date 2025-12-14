@@ -40,19 +40,24 @@
 /* Grid de cuadros */
 .panel-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px 50px;
     width: 100%;
+    padding: 20px 0;
 }
 
 /* Tarjeta/cuadro individual */
 .panel-card {
     background-color: #fff;
-    padding: 40px 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 50px 35px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
     text-align: center;
     transition: all 0.3s ease;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .panel-card:hover {
@@ -71,16 +76,17 @@
 
 /* Título y descripción */
 .panel-card h3 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .panel-card p {
-    font-size: 14px;
+    font-size: 15px;
     color: #666;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    line-height: 1.6;
 }
 
 /* Botón del cuadro */
@@ -88,19 +94,32 @@
     background-color: #000;
     color: #fff;
     border: none;
-    padding: 12px 30px;
-    font-size: 14px;
+    padding: 14px 30px;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border-radius: 5px;
+    border-radius: 6px;
+    width: 100%;
+    font-weight: 600;
 }
 
 .panel-btn:hover {
     background-color: #333;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Segundo botón con estilo diferenciado */
+.panel-btn:nth-child(2) {
+    background-color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.panel-btn:nth-child(2):hover {
+    background-color: #5568d3;
+    border-color: #5568d3;
 }
 
 /* Responsivo   tal ves se quite after testeo*/
@@ -222,9 +241,25 @@
     }
 }
 
+/* Contenedor de botones mejorado */
 .botones-container {
-    display: flex;          /* convierte el div en un contenedor flex */
-    justify-content: center; /* centra horizontalmente los botones */
-    gap: 15px;               /* espacio entre los botones */
-    margin-top: 10px;        /* opcional, para separar de otros elementos */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+/* Estado del servicio más visible */
+.panel-card p span {
+    font-weight: 700;
+    font-size: 16px;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+.panel-card p span[id*="estado"] {
+    background-color: rgba(76, 175, 80, 0.15);
 }

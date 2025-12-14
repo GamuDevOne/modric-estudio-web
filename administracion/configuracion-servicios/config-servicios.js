@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const activo = localStorage.getItem("textilActivo") === "true";
         localStorage.setItem("textilActivo", (!activo).toString());
         actualizarEstado();
-        alert(`Textil ${!activo ? "activado" : "desactivado"} correctamente`);
+        mostrarModal(`Textil ${!activo ? "activado" : "desactivado"} correctamente`);
     });
 
 
@@ -93,13 +93,13 @@ botonEditar.addEventListener("click", () => {
             estadoCombos.textContent = "Desactivado";
             estadoCombos.style.color = "#f44336";
             botonCombos.textContent = "Activar Combos";
-            alert("Combos desactivado correctamente");
+            mostrarModal("Combos desactivado correctamente");
         } else {
             localStorage.setItem("combosActivo", "true");
             estadoCombos.textContent = "Activo";
             estadoCombos.style.color = "#4caf50";
             botonCombos.textContent = "Desactivar Combos";
-            alert("Combos activado correctamente");
+            mostrarModal("Combos activado correctamente");
         }
     });
 
