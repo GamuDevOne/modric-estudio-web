@@ -61,34 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // === 🧩 BOTÓN PARA GENERAR PDF ===
-    const btnPDF = document.getElementById("btnGenerarPDF");
     const btnWhatsApp = document.getElementById("btnWhatsApp");
 
-    if (btnPDF) {
-        btnPDF.addEventListener("click", () => {
-            fetch("../php/factura_pdf.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(datosFactura)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exito) {
-                    alert("Factura PDF generada correctamente");
-                    window.open(data.url, "_blank");
-
-                    // Guarda la URL generada
-                    window.pdfUrl = data.url;
-
-                    // Activa el botón de WhatsApp
-                    btnWhatsApp.disabled = false;
-                } else {
-                    alert("Error al generar el PDF");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        });
-    }
 
     // === 💬 BOTÓN PARA ENVIAR POR WHATSAPP ===
     if (btnWhatsApp) {

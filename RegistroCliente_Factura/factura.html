@@ -85,6 +85,7 @@
 
     };  
     // Enviamos los datos al PHP por POST
+    console.log(factura);
     fetch("../php/facturas_pdf.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

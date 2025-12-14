@@ -13,10 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ]);
     exit;
 }
-require_once 'dompdf/autoload.inc.php';
+require_once __DIR__ . '/vendor/autoload.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
-var_dump(1);
 // Recibir datos del formulario (JSON)
 $datos = json_decode(file_get_contents("php://input"), true);
 
