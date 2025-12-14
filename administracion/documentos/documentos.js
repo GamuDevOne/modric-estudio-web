@@ -928,6 +928,13 @@ function ejecutarAccion() {
                 idFoto: datosAEnviar.idFoto
             };
             break;
+
+        case 'eliminar_album':  //nueva integracion (12/13/25)
+            payload = {
+                action: 'eliminar_album',
+                idAlbum: datosAEnviar.idAlbum
+            };
+            break;
             
         default:
             hideLoadingModal();
@@ -971,6 +978,32 @@ function ejecutarAccion() {
         console.error('Error en fetch:', err);
         alert('Error de conexión');
     });
+}
+
+
+function confirmarEliminarAlbum(idAlbum, tituloAlbum) { //modal de confirmacion para eliminar (12/13/25)
+    accionPendiente = 'eliminar_album';
+    datosAccion = { idAlbum: idAlbum };
+    
+    const modal = document.getElementById('modalConfirmacion');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const inputContainer = document.getElementById('confirmInputContainer');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    title.textContent = 'Eliminar Álbum';
+    message.innerHTML = `
+        ¿Deseas eliminar el álbum "<strong>${tituloAlbum}</strong>"?
+        <p style="color: #c62828; margin-top: 15px; font-size: 14px;">
+            ⚠️ Esta acción eliminará todas las fotos del álbum y no se puede deshacer.
+        </p>
+    `;
+    inputContainer.style.display = 'none';
+    confirmBtn.textContent = 'Eliminar Álbum';
+    confirmBtn.style.background = '#c62828';
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 // ========================================

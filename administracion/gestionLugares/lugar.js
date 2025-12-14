@@ -300,7 +300,7 @@ function crearColegioCard(colegio) {
                     </svg>
                 </button>
                 
-                ${colegio.TotalVentas == 0 ? `
+                ${colegio.TotalVentas == 0 || colegio.Estado === 'Cerrado' ? `
                     <button class="btn-icon" title="Eliminar colegio" onclick="eliminarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -533,7 +533,7 @@ function confirmarCerrarLugar() {
 }
 
 function eliminarColegio(id, nombre) {
-    // FIZ CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO(11/12/25)
+    // FIx CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO(11/12/25)
     lugarIdEliminar = parseInt(id);
     
     console.log('Eliminar colegio - ID recibido:', id, 'Tipo:', typeof id);
