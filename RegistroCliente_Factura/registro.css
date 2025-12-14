@@ -5,125 +5,176 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #3f4044 0%, #818081 100%);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 40px 20px;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     overflow: hidden;
 }
 
+/* ==== HEADER ==== */
 .header {
-    background: linear-gradient(135deg, #3f4044 0%, #818081 100%);
+    background: #333;
     color: white;
-    padding: 30px;
+    padding: 40px 30px;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
 }
 
 .header h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
+    font-size: 32px;
+    font-weight: 300;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .header p {
-    font-size: 14px;
+    font-size: 15px;
     opacity: 0.9;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
 }
 
+/* ==== FORM CONTAINER ==== */
 .form-container {
-    padding: 40px;
+    padding: 50px 40px;
 }
 
 .form-section {
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section:last-child {
+    border-bottom: none;
 }
 
 .form-section h2 {
-    color: black;
-    font-size: 20px;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e0e0e0;
+    color: #333;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #333;
+    letter-spacing: 1px;
 }
 
+/* ==== FORM GROUPS ==== */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    position: relative;
 }
 
 label {
     display: block;
     margin-bottom: 8px;
     color: #333;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
+    letter-spacing: 0.3px;
 }
 
 input[type="text"],
 input[type="tel"],
-select {
+select,
+textarea {
     width: 100%;
-    padding: 12px 15px;
+    padding: 14px 16px;
     border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-size: 15px;
     font-family: inherit;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
 }
 
 input[type="text"]:focus,
 input[type="tel"]:focus,
-select:focus {
+select:focus,
+textarea:focus {
     outline: none;
-    border-color: #000000;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #333;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(51, 51, 51, 0.05);
 }
 
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ==== ROW LAYOUT ==== */
 .row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
+/* ==== RADIO BUTTONS ==== */
 .radio-group {
     display: flex;
-    gap: 20px;
-    margin-top: 10px;
+    gap: 25px;
+    margin-top: 12px;
 }
 
 .radio-option {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
 }
 
 input[type="radio"] {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    accent-color: blue;
+    accent-color: #333;
 }
 
 .radio-option label {
     margin: 0;
     cursor: pointer;
     font-weight: 500;
+    color: #333;
 }
 
+/* ==== ABONO SECTION ==== */
 .abono-section {
     display: none;
-    margin-top: 15px;
-    padding: 20px;
+    margin-top: 20px;
+    padding: 25px;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid blue;
+    border-left: 4px solid #333;
 }
 
 .abono-section.active {
@@ -134,7 +185,7 @@ input[type="radio"] {
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-15px);
     }
     to {
         opacity: 1;
@@ -142,71 +193,125 @@ input[type="radio"] {
     }
 }
 
+/* ==== TOTAL INFO ==== */
+.total-info {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* ==== SUBMIT BUTTON ==== */
 .submit-btn {
     width: 100%;
-    padding: 15px;
-    background: black;
+    padding: 16px;
+    background: #333;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 16px;
     font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.3s ease;
+    margin-top: 10px;
 }
 
 .submit-btn:hover {
+    background: #000;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .submit-btn:active {
     transform: translateY(0);
 }
 
+/* ==== ERROR STYLES ==== */
 .error {
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 6px;
     display: none;
+    font-weight: 500;
 }
 
 .error.active {
     display: block;
 }
 
-input.invalid {
-    border-color: #dc3545;
+input.invalid,
+select.invalid,
+textarea.invalid {
+    border-color: #d32f2f;
+    background-color: #ffebee;
 }
 
-@media (max-width: 768px) {
-    .row {
-        grid-template-columns: 1fr;
-    }
-
-    .form-container {
-        padding: 20px;
-    }
-
-    .header {
-        padding: 20px;
-    }
-
-    .header h1 {
-        font-size: 24px;
-    }
-}
-
+/* ==== INFO ICON ==== */
 .info-icon {
     display: inline-block;
-    width: 16px;
-    height: 16px;
-    background: red;
+    width: 18px;
+    height: 18px;
+    background: #333;
     color: white;
     border-radius: 50%;
     text-align: center;
-    line-height: 16px;
+    line-height: 18px;
     font-size: 12px;
-    margin-left: 5px;
+    margin-left: 6px;
     cursor: help;
+    font-style: normal;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 10px;
+    }
+
+    .form-container {
+        padding: 30px 20px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .header h1 {
+        font-size: 26px;
+    }
+
+    .form-section h2 {
+        font-size: 19px;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 30px 20px;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .form-container {
+        padding: 25px 15px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    select,
+    textarea {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
 }

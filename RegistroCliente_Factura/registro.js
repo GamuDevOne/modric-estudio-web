@@ -26,6 +26,26 @@ tipoPagoRadios.forEach(radio => {
     });
 });
 
+// === 🏫 Mostrar/ocultar campo "Otra escuela" ===
+const escuelaSelect = document.getElementById('escuela');
+const otraEscuelaSection = document.getElementById('otraEscuelaSection');
+const otraEscuelaInput = document.getElementById('otraEscuela');
+
+escuelaSelect.addEventListener('change', function() {
+    if (this.value === 'Otra') {
+        otraEscuelaSection.style.display = 'block';
+        otraEscuelaSection.classList.add('active');
+        otraEscuelaInput.required = true;
+    } else {
+        otraEscuelaSection.style.display = 'none';
+        otraEscuelaSection.classList.remove('active');
+        otraEscuelaInput.required = false;
+        otraEscuelaInput.value = '';
+        hideError('otraEscuela');
+    }
+});
+
+
 // === 💵 Formateo de cantidad de abono ===
 cantidadAbonoInput.addEventListener('input', function (e) {
     let value = e.target.value.replace(/[^\d.]/g, '');

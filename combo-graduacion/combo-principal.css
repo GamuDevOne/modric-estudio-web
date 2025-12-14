@@ -9,6 +9,7 @@ body {
     gap: 40px;
     flex-wrap: wrap;
     padding: 50px 0;
+    padding-top: 110px; /* compensa el header fijo (ajustar si es necesario) */
 }
 
 .producto-card {
