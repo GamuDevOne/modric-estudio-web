@@ -418,42 +418,93 @@
         </div>
     </div>
 
-    <!-- SECCIÓN DE REPORTES -->
-        <div class="reportes-section">
-        <div class="reportes-header">
-            <h2>Generar Reportes</h2>
-            <p>Exporta información del negocio en diferentes formatos</p>
+    <!-- SECCIÓN DE REPORTES - CON BOTONES CSV Y EXCEL -->
+<div class="reportes-section">
+    <div class="reportes-header">
+        <h2>Generar Reportes</h2>
+        <p>Exporta información del negocio en diferentes formatos</p>
+    </div>
+    
+    <div class="reportes-grid">
+        <!-- REPORTE DE VENTAS -->
+        <div class="reporte-card">
+            <h3>Reporte de Ventas</h3>
+            <p>Ventas por período, vendedor, colegio</p>
+            <div class="reporte-buttons">
+                <button class="btn-primary btn-csv" onclick="generarReporteVentas()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    CSV
+                </button>
+                <button class="btn-primary btn-excel" onclick="generarReporteVentasExcel()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Excel
+                </button>
+            </div>
         </div>
         
-        <div class="reportes-grid">
-            <div class="reporte-card">
-                <h3>Reporte de Ventas</h3>
-                <p>Ventas por período, vendedor, colegio</p>
-                <button class="btn-primary" onclick="generarReporteVentas()">
-                    <svg>...</svg>
-                    Generar
+        <!-- REPORTE DE ABONOS -->
+        <div class="reporte-card">
+            <h3>Reporte de Abonos</h3>
+            <p>Historial de pagos y saldos pendientes</p>
+            <div class="reporte-buttons">
+                <button class="btn-primary btn-csv" onclick="generarReporteAbonos()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    CSV
+                </button>
+                <button class="btn-primary btn-excel" onclick="generarReporteAbonosExcel()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Excel
                 </button>
             </div>
-            
-            <div class="reporte-card">
-                <h3>Reporte de Abonos</h3>
-                <p>Historial de pagos y saldos pendientes</p>
-                <button class="btn-primary" onclick="generarReporteAbonos()">
-                    <svg>...</svg>
-                    Generar
+        </div>
+        
+        <!-- REPORTE DE DOCUMENTOS -->
+        <div class="reporte-card">
+            <h3>Reporte de Documentos</h3>
+            <p>Álbumes subidos y descargas de clientes</p>
+            <div class="reporte-buttons">
+                <button class="btn-primary btn-csv" onclick="generarReporteDocumentos()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    CSV
                 </button>
-            </div>
-            
-            <div class="reporte-card">
-                <h3>Reporte de Documentos</h3>
-                <p>Álbumes subidos y descargas de clientes</p>
-                <button class="btn-primary" onclick="generarReporteDocumentos()">
-                    <svg>...</svg>
-                    Generar
+                <button class="btn-primary btn-excel" onclick="generarReporteDocumentosExcel()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Excel
                 </button>
             </div>
         </div>
     </div>
+</div>
 
     <script src="../../js/global-script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>

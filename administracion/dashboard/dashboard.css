@@ -1673,3 +1673,217 @@ body.modal-open {
 #montoNuevoAbono{
     margin-bottom: 10px;  /* Agregá espacio solo debajo de este input */
 }
+
+/* ========================================
+   SECCIÓN DE REPORTES
+======================================== */
+.reportes-section {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.reportes-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.reportes-header h2 {
+    font-size: 28px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.reportes-header p {
+    font-size: 14px;
+    color: #666;
+}
+
+.reportes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.reporte-card {
+    background-color: #f8f9fa;
+    border: 2px solid #e6e6e6;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.reporte-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-color: #333;
+}
+
+.reporte-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.reporte-card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.reporte-card .btn-primary {
+    width: 100%;
+    justify-content: center;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.reporte-card .btn-primary:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.reporte-card .btn-primary svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+}
+
+/* Icono de descarga para botones */
+.reporte-card .btn-primary svg {
+    margin-right: 8px;
+}
+
+/* ========================================
+   RESPONSIVE - REPORTES
+======================================== */
+@media (max-width: 768px) {
+    .reportes-section {
+        padding: 20px 15px;
+        margin-top: 20px;
+    }
+    
+    .reportes-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .reportes-header h2 {
+        font-size: 22px;
+    }
+    
+    .reportes-header p {
+        font-size: 13px;
+    }
+    
+    .reportes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .reporte-card {
+        padding: 20px;
+    }
+    
+    .reporte-card h3 {
+        font-size: 18px;
+    }
+    
+    .reporte-card p {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .reportes-section {
+        padding: 15px 10px;
+    }
+    
+    .reportes-header h2 {
+        font-size: 20px;
+    }
+    
+    .reporte-card {
+        padding: 15px;
+    }
+    
+    .reporte-card h3 {
+        font-size: 17px;
+    }
+    
+    .reporte-card .btn-primary {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+}
+
+/* ========================================
+   BOTONES DE REPORTES (CSV Y EXCEL)
+======================================== */
+.reporte-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.reporte-card .btn-primary {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 20px;
+    font-size: 14px;
+}
+
+.btn-csv {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-csv:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #217346 0%, #1a5c37 100%);
+    box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);
+}
+
+.btn-excel:hover {
+    background: linear-gradient(135deg, #1a5c37 0%, #144528 100%);
+    box-shadow: 0 6px 16px rgba(33, 115, 70, 0.4);
+}
+
+/* ========================================
+   RESPONSIVE - BOTONES DE REPORTES
+======================================== */
+@media (max-width: 768px) {
+    .reporte-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .reporte-card .btn-primary {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .reporte-card .btn-primary {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .reporte-card .btn-primary svg {
+        width: 16px;
+        height: 16px;
+    }
+}

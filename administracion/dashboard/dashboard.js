@@ -778,6 +778,389 @@ function registrarNuevoAbono(event) {
 }
 
 // ========================================
+// FUNCIONES DE REPORTES
+// ========================================
+
+// Generar Reporte de Ventas
+function generarReporteVentas() {
+    // Abrir modal para seleccionar período
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte de ventas...');
+    
+    fetch('../../php/reportes.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_reporte_ventas',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            descargarReporteCSV(data.reporte, 'ventas');
+            mostrarModal('Reporte generado exitosamente', 'success');
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al generar reporte', 'error');
+    });
+}
+
+// Generar Reporte de Abonos
+function generarReporteAbonos() {
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte de abonos...');
+    
+    fetch('../../php/reportes.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_reporte_abonos',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            descargarReporteCSV(data.reporte, 'abonos');
+            mostrarModal('Reporte generado exitosamente', 'success');
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al generar reporte', 'error');
+    });
+}
+
+// Generar Reporte de Documentos
+function generarReporteDocumentos() {
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte de documentos...');
+    
+    fetch('../../php/reportes.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_reporte_documentos',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success) {
+            descargarReporteCSV(data.reporte, 'documentos');
+            mostrarModal('Reporte generado exitosamente', 'success');
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al generar reporte', 'error');
+    });
+}
+
+// Descargar reporte como CSV
+function descargarReporteCSV(reporte, tipo) {
+    let csv = '';
+    let filename = '';
+    
+    if (tipo === 'ventas') {
+        filename = `Reporte_Ventas_${reporte.periodo.inicio}_${reporte.periodo.fin}.csv`;
+        
+        // Encabezado del resumen
+        csv += '===== RESUMEN DE VENTAS =====\n';
+        csv += `Periodo,${reporte.periodo.inicio} - ${reporte.periodo.fin}\n`;
+        csv += `Total Ventas,${reporte.resumen.totalVentas}\n`;
+        csv += `Monto Total,$${reporte.resumen.montoTotal.toFixed(2)}\n`;
+        csv += `Monto Pendiente,$${reporte.resumen.montoPendiente.toFixed(2)}\n`;
+        csv += `Ventas Completas,${reporte.resumen.ventasCompletas}\n`;
+        csv += `Ventas con Abono,${reporte.resumen.ventasAbono}\n`;
+        csv += '\n===== DETALLE DE VENTAS =====\n';
+        
+        // Encabezados de columnas
+        csv += 'ID Pedido,Fecha,Cliente,Vendedor,Colegio,Servicio,Total Pedido,Estado Pago,Monto Abonado,Monto Real,Saldo Pendiente,Estado Pedido,Prioridad\n';
+        
+        // Datos
+        reporte.ventas.forEach(v => {
+            csv += `${v.ID_Pedido},"${v.Fecha}","${v.Cliente}","${v.Vendedor}","${v.Colegio}","${v.Servicio}",${v.TotalPedido},"${v.EstadoPago}",${v.MontoAbonado},${v.MontoReal},${v.SaldoPendiente},"${v.EstadoPedido}",${v.Prioridad}\n`;
+        });
+        
+    } else if (tipo === 'abonos') {
+        filename = `Reporte_Abonos_${reporte.periodo.inicio}_${reporte.periodo.fin}.csv`;
+        
+        csv += '===== RESUMEN DE ABONOS =====\n';
+        csv += `Periodo,${reporte.periodo.inicio} - ${reporte.periodo.fin}\n`;
+        csv += `Total Abonos,${reporte.resumen.totalAbonos}\n`;
+        csv += `Monto Total,$${reporte.resumen.montoTotal.toFixed(2)}\n`;
+        csv += '\nAbonos por Método de Pago:\n';
+        
+        for (const [metodo, datos] of Object.entries(reporte.resumen.abonosPorMetodo)) {
+            csv += `${metodo},${datos.cantidad} abonos,$${datos.monto.toFixed(2)}\n`;
+        }
+        
+        csv += '\n===== DETALLE DE ABONOS =====\n';
+        csv += 'ID Abono,Fecha,ID Pedido,Cliente,Vendedor,Monto,Método Pago,Acumulado Hasta,Saldo Restante,Registrado Por,Notas\n';
+        
+        reporte.abonos.forEach(a => {
+            const notas = (a.Notas || '').replace(/"/g, '""');
+            csv += `${a.ID_Abono},"${a.FechaRegistro}",${a.ID_Pedido},"${a.Cliente}","${a.Vendedor}",${a.Monto},"${a.MetodoPago}",${a.AcumuladoHasta},${a.SaldoRestante},"${a.RegistradoPor}","${notas}"\n`;
+        });
+        
+    } else if (tipo === 'documentos') {
+        filename = `Reporte_Documentos_${reporte.periodo.inicio}_${reporte.periodo.fin}.csv`;
+        
+        csv += '===== RESUMEN DE DOCUMENTOS =====\n';
+        csv += `Periodo,${reporte.periodo.inicio} - ${reporte.periodo.fin}\n`;
+        csv += `Total Álbumes,${reporte.resumen.totalAlbumes}\n`;
+        csv += `Álbumes Activos,${reporte.resumen.albumesActivos}\n`;
+        csv += `Álbumes Cerrados,${reporte.resumen.albumesCerrados}\n`;
+        csv += `Álbumes Vencidos,${reporte.resumen.albumesVencidos}\n`;
+        csv += `Total Fotos Subidas,${reporte.resumen.totalFotosSubidas}\n`;
+        csv += `Total Fotos Descargadas,${reporte.resumen.totalFotosDescargadas}\n`;
+        csv += `Total Descargas,${reporte.resumen.totalDescargas}\n`;
+        csv += '\n===== DETALLE DE ÁLBUMES =====\n';
+        csv += 'ID Álbum,Título,Fecha Subida,Fecha Caducidad,Estado,Cliente,Correo,Total Fotos,Fotos Descargadas,Total Descargas,Días Restantes\n';
+        
+        reporte.albumes.forEach(a => {
+            csv += `${a.ID_Album},"${a.Titulo}","${a.FechaSubida}","${a.FechaCaducidad}","${a.Estado}","${a.Cliente}","${a.CorreoCliente}",${a.TotalFotos},${a.FotosDescargadas},${a.TotalDescargas},${a.DiasRestantes}\n`;
+        });
+    }
+    
+    // Crear y descargar archivo
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Funciones auxiliares para fechas
+function getFirstDayOfMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+function getLastDayOfMonth() {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${lastDay}`;
+}
+
+// ========================================
+// FUNCIONES DE REPORTES EXCEL
+// ========================================
+
+// Generar Reporte de Ventas en Excel
+function generarReporteVentasExcel() {
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte Excel...');
+    
+    fetch('../../php/reportes-excel.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_excel',
+            tipo: 'ventas',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(response => {
+        hideLoadingModal();
+        
+        // Verificar si es un error JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+                throw new Error(data.message);
+            });
+        }
+        
+        // Si no es JSON, es el archivo Excel
+        return response.blob();
+    })
+    .then(blob => {
+        if (blob) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Reporte_Ventas_${fechaInicio}_${fechaFin}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            mostrarModal('Reporte Excel generado exitosamente', 'success');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        if (!err.message.includes('Error:')) {
+            mostrarModal('Error de conexión al generar reporte', 'error');
+        }
+    });
+}
+
+// Generar Reporte de Abonos en Excel
+function generarReporteAbonosExcel() {
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte Excel...');
+    
+    fetch('../../php/reportes-excel.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_excel',
+            tipo: 'abonos',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(response => {
+        hideLoadingModal();
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+                throw new Error(data.message);
+            });
+        }
+        
+        return response.blob();
+    })
+    .then(blob => {
+        if (blob) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Reporte_Abonos_${fechaInicio}_${fechaFin}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            mostrarModal('Reporte Excel generado exitosamente', 'success');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        if (!err.message.includes('Error:')) {
+            mostrarModal('Error de conexión al generar reporte', 'error');
+        }
+    });
+}
+
+// Generar Reporte de Documentos en Excel
+function generarReporteDocumentosExcel() {
+    const fechaInicio = prompt('Fecha inicio (YYYY-MM-DD):', getFirstDayOfMonth());
+    if (!fechaInicio) return;
+    
+    const fechaFin = prompt('Fecha fin (YYYY-MM-DD):', getLastDayOfMonth());
+    if (!fechaFin) return;
+    
+    showLoadingModal('Generando reporte Excel...');
+    
+    fetch('../../php/reportes-excel.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'generar_excel',
+            tipo: 'documentos',
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin
+        })
+    })
+    .then(response => {
+        hideLoadingModal();
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                mostrarModal('Error: ' + (data.message || 'No se pudo generar el reporte'), 'error');
+                throw new Error(data.message);
+            });
+        }
+        
+        return response.blob();
+    })
+    .then(blob => {
+        if (blob) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Reporte_Documentos_${fechaInicio}_${fechaFin}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            mostrarModal('Reporte Excel generado exitosamente', 'success');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        if (!err.message.includes('Error:')) {
+            mostrarModal('Error de conexión al generar reporte', 'error');
+        }
+    });
+}
+
+// ========================================
 // CERRAR MODALES AL HACER CLIC FUERA
 // ========================================
 window.addEventListener('click', function(event) {
