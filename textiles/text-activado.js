@@ -276,12 +276,12 @@ checkoutBtn.addEventListener('click', () => {
         return;
     }
 
-    let mensaje = '¡Hola! Me gustaría cotizar los siguientes productos textiles:\n\n';
+    let mensaje = ' (•◡•) / ¡Hola! Me gustaría cotizar los siguientes productos textiles:\n\n';
     let total = 0;
     
     cart.forEach(item => {
         const subtotal = item.precio * item.cantidad;
-        mensaje += `🔹 ${item.nombre}\n`;
+        mensaje += `   *${item.nombre}*\n`;
         mensaje += `   • Talla: ${item.talla.toUpperCase()}\n`;
         mensaje += `   • Cantidad: ${item.cantidad}\n`;
         mensaje += `   • Precio unitario: $${item.precio}\n`;
@@ -289,9 +289,9 @@ checkoutBtn.addEventListener('click', () => {
         total += subtotal;
     });
 
-    mensaje += `💰 *TOTAL: $${total.toFixed(2)}*\n\n`;
-    mensaje += `🏫 *Perfecto para escuelas y empresas*\n`;
-    mensaje += `🎨 *Productos personalizados*\n\n`;
+    mensaje += `𖤘 *TOTAL: $${total.toFixed(2)}*\n\n`;
+    mensaje += `𖠿 *Perfecto para escuelas y empresas*\n`;
+    mensaje += `𖠜 *Productos personalizados*\n\n`;
     mensaje += `Por favor, necesito información sobre:\n`;
     mensaje += `• Tiempos de entrega\n`;
     mensaje += `• Opciones de personalización\n`;
