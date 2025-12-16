@@ -4,16 +4,22 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
+// Configuración de la base de datos
+$host = 'localhost';
+$dbname = 'ModricEstudio00';
+$username = 'root';
+$password = '';
 
 // Verificar que sea POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode([
-        "exito" => false, 
+        "exito" => false,
         "mensaje" => "Solo se permiten peticiones POST"
     ]);
     exit;
 }
 require_once __DIR__ . '/vendor/autoload.php';
+
 use Dompdf\Dompdf;
 use Dompdf\Options;
 // Recibir datos del formulario (JSON)
@@ -25,7 +31,7 @@ if (!$datos) {
 }
 
 // Extraer datos
-$numero = htmlspecialchars($datos['numero']);
+$numeroOrden = htmlspecialchars($datos['numero']);
 $fecha = htmlspecialchars($datos['fecha']);
 $nombre = htmlspecialchars($datos['clienteNombre']);
 $correo = htmlspecialchars($datos['clienteCorreo']);
@@ -55,7 +61,7 @@ $html = "
 </head>
 <body>
 <div class='factura-container'>
-    <h1>Factura No. $numero</h1>
+    <h1>Factura No. $numeroOrden</h1>
     <div class='info'>
         <p><strong>Fecha:</strong> $fecha</p>
         <p><strong>Cliente:</strong> $nombre</p>
@@ -100,13 +106,34 @@ if (!file_exists($ruta)) {
 }
 
 // Guardar PDF
-$nombreArchivo = "Factura_" . $numero . ".pdf";
+$nombreArchivo = "Factura_" . $numeroOrden . ".pdf";
 $rutaCompleta = $ruta . $nombreArchivo;
 file_put_contents($rutaCompleta, $dompdf->output());
 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Insertar cotización
+    $stmt = $pdo->prepare("
+            INSERT INTO factura (
+                NumeroOrden,
+                RutaFacturacion
+            ) VALUES (
+                :numeroOrden,
+                :rutaFacturacion
+            )
+        ");
+
+    $stmt->execute([
+        ':numeroOrden' => $numeroOrden,
+        ':rutaFacturacion' => $rutaCompleta
+    ]);
+} catch (PDOException $e) {
+    echo json_encode(["exito" => false, "mensaje" => "Error de conexión a la base de datos: " . $e->getMessage()]);
+    exit;
+}
 // Responder al frontend
 echo json_encode([
     "exito" => true,
     "url" => $rutaCompleta
 ]);
-?>
