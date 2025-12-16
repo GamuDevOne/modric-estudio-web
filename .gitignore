@@ -1,2 +1,8 @@
-php/vendor/ 
-node_modules/ 
+# Dependencias
+php/vendor/
+node_modules/
+
+# Logs (NUNCA versionar)
+logs/
+php/logs/
+*.log
