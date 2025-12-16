@@ -18,7 +18,8 @@ define('JWT_SECRET', 'tu-clave-super-secreta-cambiar-en-produccion-' . md5(__DIR
 define('APP_ENV', 'development'); // 'production' en servidor real
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
-define('LOG_DIR', __DIR__ . '/logs/');
+define('LOG_DIR', __DIR__ . '/php/logs/');
+
 
 // Crear directorios si no existen
 if (!file_exists(LOG_DIR)) {
