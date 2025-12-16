@@ -5,6 +5,7 @@
 [2025-12-16 07:27:41] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
 [2025-12-16 07:28:05] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"genjicliente696","tipo":"Cliente"}
 [2025-12-16 07:28:35] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"limonagrio@modric.com","tipo":"Vendedor"}
+<<<<<<< HEAD
 [2025-12-16 19:56:00] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
 [2025-12-16 19:56:23] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
 [2025-12-16 19:56:24] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
@@ -15,3 +16,13 @@
 [2025-12-16 19:56:25] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
 [2025-12-16 19:56:26] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
 [2025-12-16 19:58:51] LOGIN_ERROR - IP: ::1 - Detalles: {"error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'Usuario' in 'field list'"}
+=======
+[2025-12-16 08:06:40] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-16 08:06:48] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 08:17:16] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 08:24:53] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 08:35:09] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
+[2025-12-16 09:11:48] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 09:14:21] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 09:14:54] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+>>>>>>> e82695f (reportes cvs lista)
