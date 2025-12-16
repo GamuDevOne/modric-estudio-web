@@ -1,34 +1,24 @@
 <?php
-// Configuración de la base de datos
-$host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+// ========================================
+// DASHBOARD - SOLO CEO MEJORA DE SEGURIDAD HECHA(12/15/25)
+// ========================================
+require_once '../config.php';
 
-// Headers para permitir CORS y JSON
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
 
-// Manejar preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+//AUTORIZACIÓN: Solo CEO puede acceder
+$user = verificarSesion(['CEO']);
 
 try {
-    // Conectar a la base de datos
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDBConnection();
     
-    // Obtener datos del POST
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
 
-    // Log para debug
-    error_log("Dashboard Action: " . $action);
-    error_log("Dashboard Input: " . json_encode($input));
+    logSeguridad('DASHBOARD_ACCESS', [
+        'usuario' => $user['nombre'],
+        'action' => $action
+    ]);
 
     switch ($action) {
         case 'get_dashboard_data':
@@ -42,11 +32,11 @@ try {
             break;
             
         case 'marcar_completado':
-            marcarCompletado($pdo, $input);
+            marcarCompletado($pdo, $input, $user);
             break;
             
         case 'cancelar_pedido':
-            cancelarPedido($pdo, $input);
+            cancelarPedido($pdo, $input, $user);
             break;
             
         case 'get_all_pedidos':
@@ -61,13 +51,13 @@ try {
     }
     
 } catch (PDOException $e) {
-    error_log("Dashboard PDO Error: " . $e->getMessage());
+    logSeguridad('DASHBOARD_ERROR', ['error' => $e->getMessage()]);
     echo json_encode([
         'success' => false,
         'message' => 'Error de conexión: ' . $e->getMessage()
     ]);
 } catch (Exception $e) {
-    error_log("Dashboard Error: " . $e->getMessage());
+    logSeguridad('DASHBOARD_ERROR', ['error' => $e->getMessage()]);
     echo json_encode([
         'success' => false,
         'message' => 'Error: ' . $e->getMessage()
@@ -75,12 +65,11 @@ try {
 }
 
 // ========================================
-// FUNCIÓN: OBTENER ESTADÍSTICAS
+// FUNCIONES 
 // ========================================
 function getEstadisticas($pdo) {
     $stats = [];
     
-    //ACTUALIZADO: Ventas del mes CON abonos considerados (11/12/25)
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -97,7 +86,6 @@ function getEstadisticas($pdo) {
     ");
     $stats['ventasMes'] = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMes'];
     
-    //ACTUALIZADO: Ventas del mes anterior (11/12/25)
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -114,36 +102,32 @@ function getEstadisticas($pdo) {
     ");
     $ventasMesAnterior = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMesAnterior'];
     
-    // Calcular cambio porcentual
     if ($ventasMesAnterior > 0) {
         $stats['cambioVentas'] = round((($stats['ventasMes'] - $ventasMesAnterior) / $ventasMesAnterior) * 100, 2);
     } else {
         $stats['cambioVentas'] = 0;
     }
     
-   // Pedidos activos (NO cancelados ni completados)
-$stmt = $pdo->query("
-    SELECT COUNT(*) as pedidosActivos
-    FROM Pedido
-    WHERE Estado NOT IN ('Cancelado', 'Completado')
-");
-$stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
+    $stmt = $pdo->query("
+        SELECT COUNT(*) as pedidosActivos
+        FROM Pedido
+        WHERE Estado NOT IN ('Cancelado', 'Completado')
+    ");
+    $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
 
-// Pedidos pendientes de pago (SOLO de los activos)
-$stmt = $pdo->query("
-    SELECT COUNT(DISTINCT p.ID_Pedido) as pedidosPendientes
-    FROM Pedido p
-    LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-    WHERE p.Estado NOT IN ('Cancelado', 'Completado')
-    AND (
-        vi.EstadoPago IS NULL 
-        OR vi.EstadoPago = 'Pendiente'
-        OR (vi.EstadoPago = 'Abono' AND vi.MontoAbonado < p.Total)
-    )
-");
-$stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
+    $stmt = $pdo->query("
+        SELECT COUNT(DISTINCT p.ID_Pedido) as pedidosPendientes
+        FROM Pedido p
+        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        WHERE p.Estado NOT IN ('Cancelado', 'Completado')
+        AND (
+            vi.EstadoPago IS NULL 
+            OR vi.EstadoPago = 'Pendiente'
+            OR (vi.EstadoPago = 'Abono' AND vi.MontoAbonado < p.Total)
+        )
+    ");
+    $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
     
-    // Total de clientes (igual)
     $stmt = $pdo->query("
         SELECT COUNT(*) as totalClientes
         FROM Usuario
@@ -151,7 +135,6 @@ $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'
     ");
     $stats['totalClientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['totalClientes'];
     
-    // Clientes nuevos este mes (igual)
     $stmt = $pdo->query("
         SELECT COUNT(*) as clientesNuevos
         FROM Usuario
@@ -161,7 +144,6 @@ $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'
     ");
     $stats['clientesNuevos'] = $stmt->fetch(PDO::FETCH_ASSOC)['clientesNuevos'];
     
-    //ACTUALIZADO: Ingresos totales reales(11/12/25)
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -179,13 +161,9 @@ $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'
     return $stats;
 }
 
-// ========================================
-// FUNCIÓN: OBTENER DATOS PARA GRÁFICOS
-// ========================================
 function getGraficos($pdo) {
     $graficos = [];
     
-    // Ventas de los últimos 6 meses
     $stmt = $pdo->query("
         SELECT 
             DATE_FORMAT(Fecha, '%Y-%m') as mes,
@@ -200,7 +178,6 @@ function getGraficos($pdo) {
     
     $ventasMensuales = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Si no hay datos, devolver arrays vacíos
     if (empty($ventasMensuales)) {
         $graficos['ventasMensuales'] = [
             'labels' => [],
@@ -213,7 +190,6 @@ function getGraficos($pdo) {
         ];
     }
     
-    // Top 5 servicios más vendidos
     $stmt = $pdo->query("
         SELECT 
             COALESCE(s.NombreServicio, pk.NombrePaquete, 'Sin especificar') as Servicio,
@@ -244,13 +220,9 @@ function getGraficos($pdo) {
     return $graficos;
 }
 
-// ========================================
-// FUNCIÓN: OBTENER PEDIDOS
-// ========================================
 function getPedidos($pdo) {
     $pedidos = [];
     
-    // Últimos 10 pedidos
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
@@ -271,7 +243,6 @@ function getPedidos($pdo) {
     ");
     $pedidos['ultimos'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    //FIX: Pedidos pendientes (EXCLUIR CANCELADOS) 12/12/25
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
@@ -296,10 +267,7 @@ function getPedidos($pdo) {
     return $pedidos;
 }
 
-// ========================================
-// FUNCIÓN: MARCAR PEDIDO COMO COMPLETADO
-// ========================================
-function marcarCompletado($pdo, $data) {
+function marcarCompletado($pdo, $data, $user) {
     try {
         if (empty($data['idPedido'])) {
             throw new Exception('ID de pedido requerido');
@@ -307,13 +275,14 @@ function marcarCompletado($pdo, $data) {
         
         $idPedido = intval($data['idPedido']);
         
-        error_log("Marcando pedido como completado: " . $idPedido);
+        logSeguridad('PEDIDO_COMPLETADO', [
+            'id_pedido' => $idPedido,
+            'usuario' => $user['nombre']
+        ]);
         
-        // Actualizar estado del pedido
         $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
-        // Actualizar estado de pago si existe registro en VentaInfo
         $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
@@ -322,7 +291,7 @@ function marcarCompletado($pdo, $data) {
             'message' => 'Pedido #' . $idPedido . ' marcado como completado'
         ]);
     } catch (Exception $e) {
-        error_log("Error en marcarCompletado: " . $e->getMessage());
+        logSeguridad('ERROR_MARCAR_COMPLETADO', ['error' => $e->getMessage()]);
         echo json_encode([
             'success' => false,
             'message' => 'Error: ' . $e->getMessage()
@@ -330,10 +299,7 @@ function marcarCompletado($pdo, $data) {
     }
 }
 
-// ========================================
-// FUNCIÓN: CANCELAR PEDIDO
-// ========================================
-function cancelarPedido($pdo, $data) {
+function cancelarPedido($pdo, $data, $user) {
     try {
         if (empty($data['idPedido'])) {
             throw new Exception('ID de pedido requerido');
@@ -342,13 +308,15 @@ function cancelarPedido($pdo, $data) {
         $idPedido = intval($data['idPedido']);
         $motivo = $data['motivo'] ?? '';
         
-        error_log("Cancelando pedido: " . $idPedido . " - Motivo: " . $motivo);
+        logSeguridad('PEDIDO_CANCELADO', [
+            'id_pedido' => $idPedido,
+            'usuario' => $user['nombre'],
+            'motivo' => $motivo
+        ]);
         
-        // Actualizar estado del pedido
         $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Cancelado' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
-        // Si hay motivo, actualizar notas en VentaInfo
         if (!empty($motivo)) {
             $stmt = $pdo->prepare("
                 UPDATE VentaInfo 
@@ -363,7 +331,7 @@ function cancelarPedido($pdo, $data) {
             'message' => 'Pedido #' . $idPedido . ' cancelado correctamente'
         ]);
     } catch (Exception $e) {
-        error_log("Error en cancelarPedido: " . $e->getMessage());
+        logSeguridad('ERROR_CANCELAR_PEDIDO', ['error' => $e->getMessage()]);
         echo json_encode([
             'success' => false,
             'message' => 'Error: ' . $e->getMessage()
@@ -371,9 +339,6 @@ function cancelarPedido($pdo, $data) {
     }
 }
 
-// ========================================
-// FUNCIÓN: OBTENER TODOS LOS PEDIDOS
-// ========================================
 function getAllPedidos($pdo) {
     try {
         $stmt = $pdo->prepare("

@@ -1,4 +1,23 @@
 // ========================================
+// SANITIZACIÓN ANTI-XSS (mejora de seguridad hecha (12/15/25))
+// ========================================
+function sanitizeHTML(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+        .replace(/\//g, "&#x2F;");
+}
+
+// Uso: const safe = sanitizeHTML(userInput);
+
+
+
+// ========================================
 // EFECTO SCROLL EN EL HEADER
 // ========================================
 window.addEventListener('scroll', function() {
@@ -66,14 +85,28 @@ function toggleDropdownMenu(event) {
 }
 
 // ========================================
-// VERIFICAR SESIÓN ACTIVA
+// VERIFICAR SESIÓN ACTIVA (mejora de seguridad hecha (12/15/25))
 // ========================================
 function checkSession() {
     const session = localStorage.getItem('userSession');
     
     if (session) {
-        const user = JSON.parse(session);
-        return user;
+        try {
+            const user = JSON.parse(session);
+            
+            // Validación básica de estructura
+            if (!user.id || !user.tipo || !user.nombre) {
+                console.error('Sesión corrupta');
+                localStorage.removeItem('userSession');
+                return null;
+            }
+            
+            return user;
+        } catch (e) {
+            console.error('Error al parsear sesión:', e);
+            localStorage.removeItem('userSession');
+            return null;
+        }
     }
     return null;
 }

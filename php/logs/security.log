@@ -1,0 +1,5 @@
+[2025-12-16 05:49:12] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 05:49:28] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 05:53:10] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 05:53:17] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 05:56:02] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}

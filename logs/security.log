@@ -1,0 +1,7 @@
+[2025-12-16 07:14:16] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 07:14:55] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 07:22:47] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-16 07:23:07] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 07:27:41] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
+[2025-12-16 07:28:05] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"genjicliente696","tipo":"Cliente"}
+[2025-12-16 07:28:35] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"limonagrio@modric.com","tipo":"Vendedor"}
