@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendario de Reservas - Modric</title>
+  <link rel="stylesheet" href="calendario_cliente.css" />
+</head>
+<body>
+
+  <div class="wrap">
+    <header class="top">
+      <h1 class="brand">MODRIC</h1>
+      <div class="crumb">Selecciona una fecha y hora</div>
+      <div class="tz">
+        Zona horaria:
+        <select id="tzSelect">
+          <option value="local">Hora local</option>
+          <option value="UTC">UTC</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- CALENDARIO -->
+      <section class="card calendar">
+        <div class="cardTitle">
+          <button class="iconBtn" id="prevMonth" aria-label="Mes anterior">‹</button>
+          <div class="month" id="monthLabel">Mayo 2024</div>
+          <button class="iconBtn" id="nextMonth" aria-label="Mes siguiente">›</button>
+        </div>
+
+        <div class="dow">
+          <div>Dom</div><div>Lun</div><div>Mar</div>
+          <div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+        </div>
+
+        <div class="grid" id="daysGrid"></div>
+      </section>
+
+      <!-- HORAS -->
+      <section class="card slots">
+        <div class="cardTitle centerTitle">
+          <div id="selectedDayLabel">Selecciona un día</div>
+        </div>
+
+        <div class="slotGrid" id="slotGrid"></div>
+
+        <button class="linkBtn" id="showAllBtn" type="button">
+          Mostrar todas las sesiones
+        </button>
+      </section>
+
+      <!-- DETALLES -->
+      <aside class="card details">
+        <div class="detailsHead">
+          <h2>Detalles del servicio</h2>
+          <button class="iconBtn" id="collapseBtn" aria-label="Contraer">^</button>
+        </div>
+
+        <div id="detailsBody">
+          <div class="serviceTitle" id="svcName">SESIÓN DE FOTOS</div>
+
+          <div class="summaryLine">
+            <span id="svcDate">—</span> a las <span id="svcTime">—</span>
+          </div>
+
+          <div class="meta">
+            <div class="metaRow"><span class="k">Cliente:</span> <span class="v" id="svcClient">—</span></div>
+            <div class="metaRow"><span class="k">Paquete:</span> <span class="v" id="svcPack">—</span></div>
+            <div class="metaRow"><span class="k">Duración:</span> <span class="v" id="svcDuration">—</span></div>
+            <div class="metaRow"><span class="k">Precio:</span> <span class="v" id="svcPrice">—</span></div>
+            <div class="metaRow"><span class="k">Prioridad:</span> <span class="v" id="svcPriority">—</span></div>
+          </div>
+
+          <button class="primary" id="nextBtn" type="button" disabled>
+            Continuar
+          </button>
+
+          <div class="small">
+            ¿Ya tienes una cuenta?
+            <a href="#" id="loginLink">Iniciar sesión</a>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="calendario_cliente.js"></script>
+</body>
+</html>
