@@ -106,7 +106,7 @@
 
 .btn-cotizar {
   display: inline-block;
-  background: #25d366;
+  background: #000000;
   color: #fff;
   padding: 10px 18px;
   border-radius: 8px;
@@ -117,7 +117,7 @@
 }
 
 .btn-cotizar:hover {
-  background: #20b457;
+  background: #000000;
 }
 
 /* ---------- ANIMACIÓN ---------- */
