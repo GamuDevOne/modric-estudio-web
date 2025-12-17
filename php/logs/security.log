@@ -3,3 +3,30 @@
 [2025-12-16 05:53:10] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
 [2025-12-16 05:53:17] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
 [2025-12-16 05:56:02] LOGIN_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY093]: Invalid parameter number"}
+[2025-12-16 21:59:31] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-16 22:42:40] LOGIN_FALLIDO - IP: 127.0.0.1 - Detalles: {"intento_usuario":"modric","razon":"Usuario no existe"}
+[2025-12-16 22:51:55] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-16 22:52:25] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 22:56:19] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-16 22:56:42] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-16 23:52:18] LOGIN_FALLIDO - IP: 127.0.0.1 - Detalles: {"intento_usuario":"ceo@modri.com","razon":"Usuario no existe"}
+[2025-12-17 00:04:49] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 00:13:05] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"genjicliente696","tipo":"Cliente"}
+[2025-12-17 00:13:49] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"limonagrio@modric.com","tipo":"Vendedor"}
+[2025-12-17 00:14:03] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 00:19:04] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 01:13:22] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"limonagrio@modric.com","tipo":"Vendedor"}
+[2025-12-17 01:23:43] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 01:23:51] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 01:24:06] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 01:30:22] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"nombreejemplo937","tipo":"Cliente"}
+[2025-12-17 01:32:15] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 01:32:22] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 02:10:58] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 02:18:14] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 02:18:37] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
+[2025-12-17 02:18:47] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
+[2025-12-17 02:23:43] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 02:28:24] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
+[2025-12-17 03:13:27] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-17 03:26:01] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}

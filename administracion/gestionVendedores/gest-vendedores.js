@@ -157,7 +157,7 @@ function editarVendedor(id) {
 }
 
 // ========================================
-// GUARDAR VENDEDOR (✅ CORREGIDO - SIN DELAY)
+// GUARDAR VENDEDOR 
 // ========================================
 function guardarVendedor(event) {
     event.preventDefault();
@@ -177,10 +177,10 @@ function guardarVendedor(event) {
         return;
     }
     
-    // ✅ FIX 1: CERRAR MODAL PRIMERO (antes del fetch)
+    //FIX 1: CERRAR MODAL PRIMERO (antes del fetch)
     closeModal();
     
-    // ✅ FIX 2: Pequeño delay para suavizar transición
+    //FIX 2: Pequeño delay para suavizar transición
     setTimeout(() => {
         showLoadingModal();
     }, 100);
@@ -196,7 +196,7 @@ function guardarVendedor(event) {
     .then(data => {
         hideLoadingModal();
         
-        // ✅ FIX 3: Mostrar mensaje DESPUÉS de cerrar loading
+        //FIX 3: Mostrar mensaje DESPUÉS de cerrar loading
         setTimeout(() => {
             if (data.success) {
                 mostrarModal(
@@ -229,7 +229,14 @@ function eliminarVendedor(id, nombre) {
 }
 
 function confirmarEliminar() {
-    if (!vendedorIdEliminar) return;
+    if (!vendedorIdEliminar) {
+        console.error('Error: vendedorIdEliminar está vacío');
+        mostrarModal('Error: No se pudo obtener el ID del vendedor', 'error');
+        return;
+    }
+    
+    // Guardar el ID ANTES de cerrar el modal
+    const idAEliminar = vendedorIdEliminar;
     
     // ✅ CERRAR MODAL PRIMERO
     closeModalEliminar();
@@ -238,6 +245,8 @@ function confirmarEliminar() {
         showLoadingModal();
     }, 100);
     
+    console.log('Eliminando vendedor con ID:', idAEliminar); // DEBUG
+    
     fetch('../../php/gest-vendedores.php', {
         method: 'POST',
         headers: {
@@ -245,12 +254,14 @@ function confirmarEliminar() {
         },
         body: JSON.stringify({
             action: 'delete',
-            id: vendedorIdEliminar
+            id: parseInt(idAEliminar) // ✅ Asegurar que sea número
         })
     })
     .then(response => response.json())
     .then(data => {
         hideLoadingModal();
+        
+        console.log('Respuesta del servidor:', data); // DEBUG
         
         setTimeout(() => {
             if (data.success) {
@@ -263,7 +274,7 @@ function confirmarEliminar() {
     })
     .catch(error => {
         hideLoadingModal();
-        console.error('Error:', error);
+        console.error('Error en fetch:', error);
         setTimeout(() => {
             mostrarModal('Error de conexión. Intenta nuevamente.', 'error');
         }, 200);

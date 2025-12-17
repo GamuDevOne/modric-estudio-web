@@ -1,7 +1,8 @@
 <?php
 // ========================================
-// CONFIGURACIÓN GLOBAL DE LA SEGURIDAD  
+// CONFIGURACIÓN GLOBAL DE LA SEGURIDAD
 // se mantendra al mismo nivel de index principall
+// no se usará de momento 
 // ========================================
 
 
@@ -111,7 +112,7 @@ function verificarSesion($tiposPermitidos = []) {
 // ========================================
 // RATE LIMITING SIMPLE
 // ========================================
-function verificarRateLimit($accion, $limite = 20, $tiempo = 300) {
+function verificarRateLimit($accion, $limite = 50, $tiempo = 200) {
     $ip = $_SERVER['REMOTE_ADDR'];
     $archivo = LOG_DIR . "rate_{$accion}_{$ip}.txt";
     
@@ -175,4 +176,3 @@ function configurarHeadersSeguridad() {
 
 // Aplicar headers automáticamente
 configurarHeadersSeguridad();
-?>

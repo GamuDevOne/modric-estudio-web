@@ -60,16 +60,16 @@ function handleLoginSubmit(event) {
                 tipo: data.user.TipoUsuario,
                 foto: data.user.Foto
             };
-            
+
             localStorage.setItem('userSession', JSON.stringify(sessionData));
-            
+
             // Redirigir según el tipo de usuario
             if (data.user.TipoUsuario === 'CEO') {
-                window.location.replace('../administracion/administracion.html');
-            }else if (data.user.TipoUsuario === 'Vendedor') {
-                window.location.replace('../administracion/vistaVendedor/vendedor.html');
-            }else if (data.user.TipoUsuario === 'Cliente') {
-                window.location.replace('../clientes/mis-albumes.html');
+                globalThis.location.replace('../administracion/administracion.html');
+            } else if (data.user.TipoUsuario === 'Vendedor') {
+                globalThis.location.replace('../administracion/vistaVendedor/vendedor.html');
+            } else if (data.user.TipoUsuario === 'Cliente') {
+                globalThis.location.replace('../clientes/mis-albumes.html');
             }
         } else {
             errorMessage.textContent = data.message || 'Credenciales incorrectas';
@@ -94,7 +94,7 @@ function handleLoginSubmit(event) {
 // Verificar sesión existente SOLO en página de login
 function checkExistingSession() {
     // Solo ejecutar en página de login
-    if (!window.location.pathname.includes('login.html')) {
+    if (!globalThis.location.pathname.includes('login.html')) {
         return false;
     }
     
@@ -102,11 +102,11 @@ function checkExistingSession() {
     if (userSession) {
         try {
             const user = JSON.parse(userSession);
-            if (user && user.tipo && user.id) {
+            if (user?.tipo && user?.id) {
                 if (user.tipo === 'CEO' || user.tipo === 'Vendedor') {
-                    window.location.replace('../administracion/administracion.html');
+                    globalThis.location.replace('../administracion/administracion.html');
                 } else if (user.tipo === 'Cliente') {
-                    window.location.replace('../index.html');
+                    globalThis.location.replace('../clientes/mis-albumes.html');
                 }
                 return true;
             }
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Solo verificar sesión si estamos en login
-    if (window.location.pathname.includes('login.html')) {
+    if (globalThis.location.pathname.includes('login.html')) {
         checkExistingSession();
     }
 });
