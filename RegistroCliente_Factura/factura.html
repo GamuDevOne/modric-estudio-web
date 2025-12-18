@@ -10,14 +10,12 @@
     <div class="contenedor-factura">
       <header>
         <div class="logo">
-          <!-- Aquí colocarás la imagen definitiva -->
           <img src="../imagenes/logo.png" alt="Ejemplo Carné Estudiantil" />
         </div>
         <div class="info-empresa">
-          <h1>MODRIC ESTUDIO</h1>
           <p><strong>Borcelle</strong></p>
           <p>Calle Cualquiera 123,<br />Cualquier Lugar, CP: 12345</p>
-          <p>hola@unsitiogenial.es</p>
+          <p>Modricestudio@gmail.com</p>
           <p>91-1234-567</p>
         </div>
         <div class="info-factura">
@@ -114,11 +112,12 @@
         📄 Generar PDF
       </button>
 
-      <button id="btnWhatsApp" class="btn-whatsapp" >
+      <button id="btnWhatsApp" class="btn-whatsapp" onclick="enviarPorWhatsApp()">
         📱 Enviar por WhatsApp
       </button>
     </div>
 
+    <script src="../js/global-script.js"></script>
     <script src="factura.js"></script>
   </body>
 </html>

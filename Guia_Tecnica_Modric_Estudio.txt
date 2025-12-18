@@ -1,0 +1,184 @@
+# Guía de instalación y configuración
+
+Este documento explica paso a paso cómo instalar, configurar y dejar funcionando el sistema
+ **Modric Estudio Web**, incluyendo dependencias,
+ generación de PDFs (DomPDF) y la base de datos.
+
+---
+
+## 1. Requisitos del sistema
+
+* Windows 10 / 11
+* XAMPP (Apache + MySQL + PHP 8.2 o superior)
+* Navegador web actualizado
+* Composer (administrador de dependencias de PHP)
+
+---
+
+## 2. Instalación de XAMPP
+
+1. Descargar XAMPP (si no lo tiene) desde:
+   [https://www.apachefriends.org](https://www.apachefriends.org)
+2. Instalarlo en la ruta recomendada:
+
+   ```
+   C:\xampp\
+   ```
+3. Iniciar **Apache** y **MySQL** desde el panel de control de XAMPP.
+
+---
+
+## 3. Ubicación del proyecto
+
+El proyecto debe colocarse dentro de:
+
+```
+C:\xampp\htdocs\PaginaWebMS\     ("PaginaWebMS" o el nombre de la raiz que tenga)
+```
+
+Estructura principal:
+
+```
+PaginaWebMS/
+└── php/
+    ├── composer.json       
+    ├── composer.lock
+    ├── vendor/        (se genera automáticamente)
+    └── ...
+```
+
+---
+
+## 4. Instalación de Composer
+
+### 4.1 Descarga
+
+Descargar Composer (si no lo tiene) desde:
+[https://getcomposer.org/download/](https://getcomposer.org/download/)
+
+Ejecutar el instalador **Composer-Setup.exe**.
+
+### 4.2 Configuración durante la instalación
+
+* Cuando pida la ruta de PHP, seleccionar:
+
+  ```
+  C:\xampp\php\php.exe
+  ```
+* Continuar con **Next** en las demás pantallas.   
+
+´´´´
+(si luego de darle a "next" no le permite, 
+significa que esa version que tiene de xampp no es compatible, 
+debera instalar la mas reciente 
+[link de descarga en pasos anteriores])
+´´´´
+
+
+### 4.3 Verificación
+
+Abrir CMD y ejecutar:
+
+```bash (cmd)
+composer --version
+```
+
+Si muestra la versión, Composer está correctamente instalado.
+
+---
+
+## 5. Instalación de dependencias (DomPDF)
+
+1. Abrir CMD
+2. Ir a la carpeta `php` del proyecto:
+
+```bash
+cd C:\xampp\htdocs\PaginaWebMS\php
+```
+
+3. Ejecutar:
+
+```bash
+composer install
+```
+
+Esto creará automáticamente la carpeta:
+
+```
+php/vendor/
+```
+
+e instalará **dompdf** y sus dependencias.
+
+---
+
+## 6. Generación de PDFs
+
+En los archivos PHP donde se genera el PDF debe existir:
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+                         
+use Dompdf\Dompdf;   
+```                 (ya está incluido en "facturas_pdf.php", se aclara por si acaso)
+
+Si `vendor/` no existe, el PDF **no funcionará**.
+
+---
+
+## 7. Base de datos
+
+### 7.1 Crear la base de datos
+
+1. Abrir navegador y entrar a:
+   [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+2. Ir a **Importar**
+3. Seleccionar el archivo:
+
+   ```
+   modricestudio00.sql
+   ```
+4. Presionar **Continuar**
+
+El archivo ya incluye:
+
+```sql
+CREATE DATABASE IF NOT EXISTS modricestudio00;
+```
+
+---
+
+## 8. Configuración de conexión a la BD
+
+Verificar en el archivo de conexión:
+
+```php
+$host = "localhost";
+$user = "root";
+$password = "";
+$database = "modricestudio00";  (espesifico, por si pasa algo con la direccion)
+```
+
+---
+
+## 9. Entrega al cliente (importante)
+
+* El repositorio **NO incluye** `vendor/`
+* Para el cliente final:
+
+  * Ejecutar `composer install`
+  * O entregar el proyecto **ya con `vendor/` incluido** lo veremos más adelante !
+
+El cliente **no necesita usar Composer**.
+
+---
+
+## 10. Notas finales
+
+* No eliminar `composer.lock` ni `composer.json`
+* No subir `vendor/` a GitHub  (ya esta incluido en el gitignore, pero es bueno revisar antes de subir algo)
+* Usar siempre rutas relativas con `__DIR__`
+
+---
+
+Documento preparado para entrega técnica y mantenimiento futuro.

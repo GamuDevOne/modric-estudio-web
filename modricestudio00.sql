@@ -3,9 +3,10 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-12-2025 a las 20:35:39
+-- Tiempo de generación: 18-12-2025 a las 15:11:54
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
+-- SQL BACKUP PARA IMPORTAR EN PHPMYADMIN 
 
 CREATE DATABASE IF NOT EXISTS modricestudio00;
 USE modricestudio00;
@@ -70,17 +71,6 @@ CREATE TABLE `albumcliente` (
   `Estado` varchar(20) NOT NULL DEFAULT 'Activo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `albumcliente`
---
-
-INSERT INTO `albumcliente` (`ID_Album`, `ID_Cliente`, `Titulo`, `Descripcion`, `FechaSubida`, `FechaCaducidad`, `Estado`) VALUES
-(2, 7, 'Sesion graduacion 2026', 'combo 2, no se cuanto cuesta', '2025-11-10 16:09:41', '2025-11-30 20:09:00', 'Cerrado'),
-(3, 18, 'Sesion de graduacion 2040', 'usuario y contraseña del cliente:\nUsuario: pepinodemar648\nContraseña: temp2750', '2025-11-30 20:14:50', '2025-12-06 02:14:49', 'Cerrado'),
-(4, 3, 'sesion de ana lia', 'Sesion hecha en museo de panama', '2025-12-06 19:07:58', '2025-12-09 01:07:58', 'Cerrado'),
-(5, 60, 'Sesion de ejemplo', 'pos, es de ejemplo ', '2025-12-10 20:08:49', '2025-12-12 02:08:49', 'Activo'),
-(6, 12, 'sesion de ejmplo 2', 'jsfksjfkas', '2025-12-10 20:21:19', '2025-12-24 02:21:19', 'Activo');
-
 -- --------------------------------------------------------
 
 --
@@ -114,7 +104,8 @@ INSERT INTO `asignacionvendedor` (`ID_Asignacion`, `ID_Vendedor`, `ID_Colegio`, 
 (38, 9, 8, '2025-12-11', 'Activo', '2025-12-11 22:40:50'),
 (39, 21, 8, '2025-12-11', 'Activo', '2025-12-11 22:41:00'),
 (40, 21, 5, '2025-12-12', 'Activo', '2025-12-12 02:20:37'),
-(41, 19, 5, '2025-12-12', 'Activo', '2025-12-12 02:20:45');
+(41, 19, 5, '2025-12-12', 'Activo', '2025-12-12 02:20:45'),
+(42, 19, 8, '2025-12-18', 'Activo', '2025-12-18 08:46:24');
 
 -- --------------------------------------------------------
 
@@ -283,22 +274,30 @@ CREATE TABLE `fotoalbum` (
   `FechaDescarga` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `fotoalbum`
+-- Estructura de tabla para la tabla `historialabonos`
 --
 
-INSERT INTO `fotoalbum` (`ID_Foto`, `ID_Album`, `NombreArchivo`, `RutaArchivo`, `TamanoBytes`, `FechaSubida`, `Descargada`, `FechaDescarga`) VALUES
-(1, 2, 'peroHacker.jpg', '../uploads/clientes/7/album_2/foto_6918ad76c8be06.43459329.jpg', 59765, '2025-11-15 11:42:30', 0, NULL),
-(2, 2, 'michiLanzado.jpg', '../uploads/clientes/7/album_2/foto_6918ad76e79256.13355103.jpg', 26506, '2025-11-15 11:42:30', 0, NULL),
-(3, 2, 'nazuna.jpg', '../uploads/clientes/7/album_2/foto_6918ad9deefbc9.82318992.jpg', 163486, '2025-11-15 11:43:10', 0, NULL),
-(6, 2, 'Best Anime Style_ A Deep Dive Into the Iconic Art 2024.jpeg', '../uploads/clientes/7/album_2/foto_69293b47e93fa4.43613191.jpeg', 163695, '2025-11-28 01:03:51', 0, NULL),
-(7, 5, 'celeblo.jpg', '../uploads/clientes/60/album_5/foto_693a19f2261d45.87036470.jpg', 88360, '2025-12-10 20:10:10', 1, '2025-12-11 15:51:19'),
-(8, 5, 'veo que.jpg', '../uploads/clientes/60/album_5/foto_693a19f24491e4.55518189.jpg', 59172, '2025-12-10 20:10:10', 1, '2025-12-11 15:51:33'),
-(9, 5, 'granada.png', '../uploads/clientes/60/album_5/foto_693a19f263c616.94656892.png', 35967, '2025-12-10 20:10:10', 1, '2025-12-11 15:51:38'),
-(15, 6, 'pixel art wallpapers.jpeg', '../uploads/clientes/12/album_6/foto_693a7b85dc8c35.00311685.jpeg', 40892, '2025-12-11 03:06:29', 1, '2025-12-11 03:08:40'),
-(16, 6, 'simula 67.jpg', '../uploads/clientes/12/album_6/foto_693a7b85ec7953.10729102.jpg', 32351, '2025-12-11 03:06:29', 1, '2025-12-11 03:30:13'),
-(17, 6, 'fondo eva.jpeg', '../uploads/clientes/12/album_6/foto_693a7b86362ab7.22428479.jpeg', 63887, '2025-12-11 03:06:30', 1, '2025-12-11 03:08:40'),
-(18, 6, '1n6a6zuy7jl41.webp', '../uploads/clientes/12/album_6/foto_693a7b8659a187.28128293.webp', 83368, '2025-12-11 03:06:30', 1, '2025-12-11 03:08:40');
+CREATE TABLE `historialabonos` (
+  `ID_Abono` int(11) NOT NULL,
+  `ID_Pedido` int(11) NOT NULL,
+  `Monto` decimal(10,2) NOT NULL,
+  `MetodoPago` varchar(50) DEFAULT NULL,
+  `Notas` text DEFAULT NULL,
+  `FechaRegistro` datetime DEFAULT current_timestamp(),
+  `ID_RegistradoPor` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `historialabonos`
+--
+
+INSERT INTO `historialabonos` (`ID_Abono`, `ID_Pedido`, `Monto`, `MetodoPago`, `Notas`, `FechaRegistro`, `ID_RegistradoPor`) VALUES
+(1, 13, 60.00, 'Efectivo', 'Abono inicial registrado por el vendedor', '2025-12-18 09:05:29', 19),
+(2, 14, 340.00, 'Yappy', 'Abono inicial registrado por el vendedor', '2025-12-18 09:06:29', 19),
+(3, 13, 90.00, 'Yappy', '', '2025-12-18 09:08:47', 1);
 
 -- --------------------------------------------------------
 
@@ -313,49 +312,6 @@ CREATE TABLE `logdescarga` (
   `FechaDescarga` datetime NOT NULL DEFAULT current_timestamp(),
   `IPCliente` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `logdescarga`
---
-
-INSERT INTO `logdescarga` (`ID_Log`, `ID_Foto`, `ID_Cliente`, `FechaDescarga`, `IPCliente`) VALUES
-(1, 9, 60, '2025-12-10 20:12:37', '127.0.0.1'),
-(2, 8, 60, '2025-12-10 20:12:38', '127.0.0.1'),
-(32, 8, 60, '2025-12-10 21:46:31', '127.0.0.1'),
-(33, 9, 60, '2025-12-10 21:46:32', '127.0.0.1'),
-(34, 7, 60, '2025-12-10 21:47:37', '127.0.0.1'),
-(35, 9, 60, '2025-12-10 21:47:38', '127.0.0.1'),
-(36, 8, 60, '2025-12-10 21:47:39', '127.0.0.1'),
-(37, 9, 60, '2025-12-11 02:13:25', '127.0.0.1'),
-(38, 9, 60, '2025-12-11 02:13:24', '127.0.0.1'),
-(39, 9, 60, '2025-12-11 02:13:34', '127.0.0.1'),
-(40, 8, 60, '2025-12-11 02:13:34', '127.0.0.1'),
-(41, 9, 60, '2025-12-11 02:42:53', '127.0.0.1'),
-(42, 8, 60, '2025-12-11 02:42:54', '127.0.0.1'),
-(43, 7, 60, '2025-12-11 02:42:54', '127.0.0.1'),
-(44, 9, 60, '2025-12-11 02:42:59', '127.0.0.1'),
-(45, 9, 60, '2025-12-11 02:42:59', '127.0.0.1'),
-(46, 9, 60, '2025-12-11 02:51:33', '127.0.0.1'),
-(47, 8, 60, '2025-12-11 02:51:33', '127.0.0.1'),
-(48, 15, 12, '2025-12-11 03:08:06', '127.0.0.1'),
-(49, 18, 12, '2025-12-11 03:08:06', '127.0.0.1'),
-(50, 16, 12, '2025-12-11 03:08:07', '127.0.0.1'),
-(51, 15, 12, '2025-12-11 03:08:16', '127.0.0.1'),
-(52, 16, 12, '2025-12-11 03:08:16', '127.0.0.1'),
-(53, 17, 12, '2025-12-11 03:08:16', '127.0.0.1'),
-(54, 17, 12, '2025-12-11 03:08:40', '127.0.0.1'),
-(55, 15, 12, '2025-12-11 03:08:40', '127.0.0.1'),
-(56, 16, 12, '2025-12-11 03:08:40', '127.0.0.1'),
-(57, 18, 12, '2025-12-11 03:08:40', '127.0.0.1'),
-(58, 16, 12, '2025-12-11 03:30:13', '127.0.0.1'),
-(59, 16, 12, '2025-12-11 03:30:13', '127.0.0.1'),
-(60, 8, 60, '2025-12-11 15:51:19', '127.0.0.1'),
-(61, 7, 60, '2025-12-11 15:51:19', '127.0.0.1'),
-(62, 9, 60, '2025-12-11 15:51:19', '127.0.0.1'),
-(63, 9, 60, '2025-12-11 15:51:33', '127.0.0.1'),
-(64, 8, 60, '2025-12-11 15:51:33', '127.0.0.1'),
-(65, 9, 60, '2025-12-11 15:51:38', '127.0.0.1'),
-(66, 9, 60, '2025-12-11 15:51:38', '127.0.0.1');
 
 -- --------------------------------------------------------
 
@@ -431,8 +387,10 @@ INSERT INTO `pedido` (`ID_Pedido`, `Fecha`, `Estado`, `Prioridad`, `FechaSesion`
 (5, '2025-11-29 14:53:44', 'Cancelado', 0, NULL, NULL, 5, 'Limon Dulce', 5, NULL, 1, 2, 150.00),
 (6, '2025-11-30 19:52:01', 'Completado', 0, NULL, NULL, 2, 'Ramona pilgrin', 2, NULL, 1, 5, 150.00),
 (9, '2025-12-11 23:09:33', 'Completado', 1, NULL, NULL, 9, 'Don cangrejo', 9, 1, NULL, 8, 500.00),
-(10, '2025-12-12 02:23:30', 'Pendiente', 1, NULL, NULL, 19, 'oldarei', 19, 2, NULL, 5, 350.00),
-(11, '2025-12-12 02:25:30', 'Cancelado', 2, NULL, NULL, 19, 'jigmaei', 19, NULL, 1, 5, 150.00);
+(10, '2025-12-12 02:23:30', 'Cancelado', 1, NULL, NULL, 19, 'oldarei', 19, 2, NULL, 5, 350.00),
+(11, '2025-12-12 02:25:30', 'Cancelado', 2, NULL, NULL, 19, 'jigmaei', 19, NULL, 1, 5, 150.00),
+(13, '2025-12-18 09:05:29', 'Pendiente', 2, NULL, NULL, 19, 'cliente a', 19, NULL, 1, 8, 150.00),
+(14, '2025-12-18 09:06:29', 'Pendiente', 1, NULL, NULL, 19, 'cliente b', 19, NULL, 2, 8, 450.00);
 
 -- --------------------------------------------------------
 
@@ -508,22 +466,22 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`ID_Usuario`, `NombreCompleto`, `Correo`, `Usuario`, `Contrasena`, `TipoUsuario`, `Foto`, `GrupoGrado`, `LugarTrabajo`, `ContrasenaTemporal`, `FechaCreacionTemp`, `EsUsuarioTemporal`) VALUES
-(1, 'CEO Admin', 'ceo@modric.com', NULL, 'admin123', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
-(2, 'Luis Vendedor', 'vendedor@modric.com', NULL, 'vend123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(3, 'Ana Cliente', 'ana@cliente.com', NULL, 'cliente123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(5, 'Limon Vendedor', 'limonagrio@modric.com', NULL, 'vend123', 'Vendedor', NULL, 'A/12', 'Escuela pedro pablo sanchez', NULL, NULL, 0),
-(7, 'Asucar Salada', '', NULL, 'temp8410', 'Cliente', NULL, NULL, NULL, 'temp8410', '2025-11-10 16:07:32', 1),
-(9, 'Delfin Morado', 'delfin12@modric.com', 'delfin vendedor', 'vend123', 'Vendedor', NULL, 'Grupo E.Pedro', 'Pedro Pablo Sanchez', NULL, NULL, 0),
-(12, 'arroz conpollo(temporal)', 'arrozconpollo@cliente.com', 'arrozconpollo(temporal)455', 'temp9669', 'Cliente', NULL, NULL, NULL, 'temp9669', '2025-11-30 20:09:09', 1),
-(18, 'pepino demar', 'pepinodemar@modric.com', 'pepinodemar648', 'temp2750', 'Cliente', NULL, NULL, NULL, 'temp2750', '2025-11-30 20:13:33', 1),
-(19, 'Carlos Martínez', 'carlos@modric.com', 'cmartinez', 'vend123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(21, 'Pedro Sánchez', 'pedro@modric.com', 'psanchez', 'vend123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(24, 'Roberto Silva', 'roberto@cliente.com', NULL, 'cliente123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(25, 'Laura Martínez', 'laura@cliente.com', NULL, 'cliente123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(27, 'Carmen Ruiz', 'carmen@cliente.com', NULL, 'cliente123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(30, 'Andrés Castro', 'andres@cliente.com', NULL, 'cliente123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(47, 'Delfín Morado', 'delfin1@modric.com', 'delfinazul', 'vend123', 'Vendedor', NULL, 'Grupo D', 'Colegio Abel Bravo', NULL, NULL, 0),
-(60, 'genji cliente', 'genticliente@modric.com', 'genjicliente696', 'temp2727', 'Cliente', NULL, NULL, NULL, 'temp2727', '2025-12-10 20:07:53', 1);
+(1, 'CEO Admin', 'ceo@modric.com', 'modric', 'password123', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
+(2, 'Luis Vendedor', 'vendedor@modric.com', NULL, 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
+(3, 'Ana Cliente', 'ana@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
+(5, 'Limon Vendedor', 'limonagrio@modric.com', NULL, 'password123', 'Vendedor', NULL, 'A/12', 'Escuela pedro pablo sanchez', NULL, NULL, 0),
+(7, 'Asucar Salada', '', NULL, 'password123', 'Cliente', NULL, NULL, NULL, 'temp8410', '2025-11-10 16:07:32', 1),
+(9, 'Delfin Morado', 'delfin12@modric.com', 'delfin vendedor', 'password123', 'Vendedor', NULL, 'Grupo E.Pedro', 'Pedro Pablo Sanchez', NULL, NULL, 0),
+(12, 'arroz conpollo(temporal)', 'arrozconpollo@cliente.com', 'arrozconpollo(temporal)455', 'password123', 'Cliente', NULL, NULL, NULL, 'temp9669', '2025-11-30 20:09:09', 1),
+(18, 'pepino demar', 'pepinodemar@modric.com', 'pepinodemar648', 'password123', 'Cliente', NULL, NULL, NULL, 'temp2750', '2025-11-30 20:13:33', 1),
+(19, 'Carlos Martínez', 'carlos@modric.com', 'cmartinez', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
+(21, 'Pedro Sánchez', 'pedro@modric.com', 'psanchez', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
+(24, 'Roberto Silva', 'roberto@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
+(25, 'Laura Martínez', 'laura@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
+(27, 'Carmen Ruiz', 'carmen@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
+(30, 'Andrés Castro', 'andres@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
+(47, 'Delfín Morado', 'delfin1@modric.com', 'delfinazul', 'password123', 'Vendedor', NULL, 'Grupo D', 'Colegio Abel Bravo', NULL, NULL, 0),
+(60, 'genji cliente', 'genticliente@modric.com', 'genjicliente696', 'password123', 'Cliente', NULL, NULL, NULL, 'temp2727', '2025-12-10 20:07:53', 1);
 
 -- --------------------------------------------------------
 
@@ -553,7 +511,9 @@ INSERT INTO `ventainfo` (`ID_VentaInfo`, `ID_Pedido`, `NombreCliente`, `MetodoPa
 (5, 6, 'Ramona pilgrin', 'Transferencia', 'Completo', NULL, 'Pidio info sobre el lugar\ntelefono: 65543421\n', '2025-11-30 19:52:01'),
 (6, 9, 'Don cangrejo', 'Transferencia', 'Completo', 275.00, 'La clienta pidio que la sesion fuera en el museo nacional (de dia)\n\nMotivo cancelación: ggjh', '2025-12-11 23:09:33'),
 (7, 10, 'oldarei', 'Yappy', 'Abono', 167.00, 'La sesion sera en el salon de conferencias de la sede principal', '2025-12-12 02:23:31'),
-(8, 11, 'jigmaei', 'Yappy', 'Abono', 90.00, 'La sesion será en el salon D1 edificio 3\n\nMotivo cancelación: No canceló', '2025-12-12 02:25:30');
+(8, 11, 'jigmaei', 'Yappy', 'Abono', 90.00, 'La sesion será en el salon D1 edificio 3\n\nMotivo cancelación: No canceló', '2025-12-12 02:25:30'),
+(10, 13, 'cliente a', 'Efectivo', 'Completo', 150.00, 'menciono que terminará de cancelar la quincena que viene', '2025-12-18 09:05:29'),
+(11, 14, 'cliente b', 'Yappy', 'Abono', 340.00, 'Cancelara la cuota en dos quincenas', '2025-12-18 09:06:29');
 
 -- --------------------------------------------------------
 
@@ -661,6 +621,15 @@ ALTER TABLE `fotoalbum`
   ADD KEY `IX_Foto_Album` (`ID_Album`);
 
 --
+-- Indices de la tabla `historialabonos`
+--
+ALTER TABLE `historialabonos`
+  ADD PRIMARY KEY (`ID_Abono`),
+  ADD KEY `ID_RegistradoPor` (`ID_RegistradoPor`),
+  ADD KEY `IX_Abono_Pedido` (`ID_Pedido`),
+  ADD KEY `IX_Abono_Fecha` (`FechaRegistro`);
+
+--
 -- Indices de la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
@@ -737,7 +706,7 @@ ALTER TABLE `albumcliente`
 -- AUTO_INCREMENT de la tabla `asignacionvendedor`
 --
 ALTER TABLE `asignacionvendedor`
-  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de la tabla `bloqueofecha`
@@ -788,6 +757,12 @@ ALTER TABLE `fotoalbum`
   MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
+-- AUTO_INCREMENT de la tabla `historialabonos`
+--
+ALTER TABLE `historialabonos`
+  MODIFY `ID_Abono` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
@@ -809,7 +784,7 @@ ALTER TABLE `paquete`
 -- AUTO_INCREMENT de la tabla `pedido`
 --
 ALTER TABLE `pedido`
-  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -833,7 +808,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
-  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Restricciones para tablas volcadas
@@ -885,6 +860,13 @@ ALTER TABLE `factura`
 --
 ALTER TABLE `fotoalbum`
   ADD CONSTRAINT `FK_Foto_Album` FOREIGN KEY (`ID_Album`) REFERENCES `albumcliente` (`ID_Album`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `historialabonos`
+--
+ALTER TABLE `historialabonos`
+  ADD CONSTRAINT `historialabonos_ibfk_1` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE,
+  ADD CONSTRAINT `historialabonos_ibfk_2` FOREIGN KEY (`ID_RegistradoPor`) REFERENCES `usuario` (`ID_Usuario`);
 
 --
 -- Filtros para la tabla `logdescarga`
@@ -944,8 +926,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-ALTER TABLE 'factura' ADD COLUMN `RutaFacturacion` VARCHAR(255) NULL AFTER `NumeroOrden`;
-
-ALTER TABLE 'factura' MODIFY COLUMN MedioEnvio VARCHAR(20) DEFAULT NULL;
-ALTER TABLE 'factura' MODIFY COLUMN ID_Pedido int(11) DEFAULT NULL;
