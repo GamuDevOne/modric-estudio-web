@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 // =====================================
 // STATE
 // =====================================
@@ -19,13 +21,11 @@ const STATE = {
 
 // Horarios
 const DEFAULT_SLOTS = [
-  "08:30","09:00","09:30","10:00",
-  "10:30","11:00","11:30","12:00",
-  "12:30","13:00"
+  "09:00 - 11:00","12:00 - 2:00","3:00 - 5:00", 
 ];
 
 // =====================================
-// DOM
+// DOM (AHORA ES SEGURO)
 // =====================================
 const daysGrid = document.getElementById("daysGrid");
 const monthLabel = document.getElementById("monthLabel");
@@ -62,12 +62,12 @@ renderDetails();
 // =====================================
 // EVENTS
 // =====================================
-tzSelect.addEventListener("change", () => {
+tzSelect?.addEventListener("change", () => {
   STATE.tzMode = tzSelect.value;
   renderDetails();
 });
 
-prevMonth.addEventListener("click", () => {
+prevMonth?.addEventListener("click", () => {
   STATE.viewMonth--;
   if (STATE.viewMonth < 0) {
     STATE.viewMonth = 11;
@@ -77,7 +77,7 @@ prevMonth.addEventListener("click", () => {
   renderCalendar();
 });
 
-nextMonth.addEventListener("click", () => {
+nextMonth?.addEventListener("click", () => {
   STATE.viewMonth++;
   if (STATE.viewMonth > 11) {
     STATE.viewMonth = 0;
@@ -87,20 +87,20 @@ nextMonth.addEventListener("click", () => {
   renderCalendar();
 });
 
-collapseBtn.addEventListener("click", () => {
+collapseBtn?.addEventListener("click", () => {
   const hidden = detailsBody.style.display === "none";
   detailsBody.style.display = hidden ? "block" : "none";
   collapseBtn.textContent = hidden ? "^" : "v";
 });
 
-showAllBtn.addEventListener("click", () => {
+showAllBtn?.addEventListener("click", () => {
   alert("Más sesiones próximamente.");
 });
 
 // =====================================
-// BOTÓN FINAL → CREA COTIZACIÓN
+// BOTÓN FINAL → API NUEVA
 // =====================================
-nextBtn.addEventListener("click", () => {
+nextBtn?.addEventListener("click", () => {
 
   if (!STATE.selectedDate || !STATE.selectedTime) {
     alert("Selecciona una fecha y una hora");
@@ -113,21 +113,18 @@ nextBtn.addEventListener("click", () => {
     return;
   }
 
-  fetch("../php/cotizaciones.php", {
+  fetch("/modric-estudio-web/api/cotizaciones/crear.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      action: "crear_cotizacion",
-
-      idCliente: session.id,
-      nombreCliente: session.nombre,
-      correoCliente: session.correo,
-
-      tipoSesion: STATE.purchase.paquete,
-      descripcion: STATE.purchase.servicio,
-
-      fechaSolicitada: fmtDate(STATE.selectedDate),
-      horaSolicitada: STATE.selectedTime
+      ID_Cliente: session.id,
+      NombreCliente: session.nombre,
+      CorreoCliente: session.correo,
+      TelefonoCliente: session.telefono || "",
+      TipoSesion: STATE.purchase.paquete,
+      DescripcionSesion: STATE.purchase.servicio,
+      FechaSolicitada: fmtDate(STATE.selectedDate),
+      HoraSolicitada: STATE.selectedTime + ":00"
     })
   })
   .then(res => res.json())
@@ -136,7 +133,7 @@ nextBtn.addEventListener("click", () => {
       localStorage.removeItem("paqueteSeleccionado");
       window.location.href = "../clientes/cotizaciones.html";
     } else {
-      alert(data.message);
+      alert(data.message || "Error al crear cotización");
     }
   })
   .catch(() => {
@@ -154,9 +151,7 @@ function initFromLocalStorage(){
 
     if (user) STATE.purchase.cliente = user.nombre;
     if (paquete) STATE.purchase.paquete = paquete;
-  } catch (e) {
-    console.error("Error cargando datos", e);
-  }
+  } catch {}
 }
 
 function renderHeader(){
@@ -265,3 +260,5 @@ function prettyTime(hhmm){
   const ampm = h >= 12 ? "pm" : "am";
   return `${(h % 12)||12}:${pad(m)} ${ampm}`;
 }
+
+});
