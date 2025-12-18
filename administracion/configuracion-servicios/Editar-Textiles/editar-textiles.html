@@ -35,7 +35,7 @@
                 <div class="imagenes-section">
                     <h3>Galería de Imágenes</h3>
                     <div class="galeria-container">
-                        <button class="galeria-btn prev-btn">
+                        <button type="button" class="galeria-btn prev-btn" title="Imagen anterior">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         
@@ -43,27 +43,27 @@
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 1" class="producto-imagen" data-index="0">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="0" hidden>
-                                <button class="upload-btn" data-index="0">
+                                <button type="button" class="upload-btn" data-index="0" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 2" class="producto-imagen" data-index="1">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="1" hidden>
-                                <button class="upload-btn" data-index="1">
+                                <button type="button" class="upload-btn" data-index="1" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 3" class="producto-imagen" data-index="2">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="2" hidden>
-                                <button class="upload-btn" data-index="2">
+                                <button type="button" class="upload-btn" data-index="2" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                         </div>
                         
-                        <button class="galeria-btn next-btn">
+                        <button type="button" class="galeria-btn next-btn" title="Siguiente imagen">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -118,7 +118,7 @@
                 <div class="imagenes-section">
                     <h3>Galería de Imágenes</h3>
                     <div class="galeria-container">
-                        <button class="galeria-btn prev-btn">
+                        <button type="button" class="galeria-btn prev-btn" title="Imagen anterior">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         
@@ -126,27 +126,27 @@
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 1" class="producto-imagen" data-index="0">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="0" hidden>
-                                <button class="upload-btn" data-index="0">
+                                <button type="button" class="upload-btn" data-index="0" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 2" class="producto-imagen" data-index="1">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="1" hidden>
-                                <button class="upload-btn" data-index="1">
+                                <button type="button" class="upload-btn" data-index="1" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                             <div class="imagen-item">
                                 <img src="" alt="Imagen 3" class="producto-imagen" data-index="2">
                                 <input type="file" class="imagen-input" accept="image/*" data-index="2" hidden>
-                                <button class="upload-btn" data-index="2">
+                                <button type="button" class="upload-btn" data-index="2" title="Subir imagen">
                                     <i class="fas fa-upload"></i> Subir
                                 </button>
                             </div>
                         </div>
                         
-                        <button class="galeria-btn next-btn">
+                        <button type="button" class="galeria-btn next-btn" title="Siguiente imagen">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -193,10 +193,10 @@
         <!-- Acciones Simplificadas -->
         <div class="acciones-footer">
             <div class="acciones-buttons">
-                <button class="btn-guardar" id="guardarCambios">
+                <button type="button" class="btn-guardar" id="guardarCambios" title="Guardar cambios">
                     <i class="fas fa-save"></i> Guardar Cambios
                 </button>
-                <button class="btn-cotizar" id="verCotizacion">
+                <button type="button" class="btn-cotizar" id="verCotizacion" title="Ver cotización por WhatsApp">
                     <i class="fas fa-whatsapp"></i> Ver Cotización WhatsApp
                 </button>
             </div>
@@ -208,13 +208,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-whatsapp"></i> Cotización para WhatsApp</h3>
-                <button class="modal-close">&times;</button>
+                <button type="button" class="modal-close" title="Cerrar modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="cotizacion-content">
                     <p>Esta es la cotización generada para enviar por WhatsApp:</p>
                     <div class="cotizacion-text" id="textoCotizacion"></div>
-                    <button class="btn-copiar" id="copiarCotizacion">
+                    <button type="button" class="btn-copiar" id="copiarCotizacion" title="Copiar cotización al portapapeles">
                         <i class="fas fa-copy"></i> Copiar al Portapapeles
                     </button>
                 </div>
