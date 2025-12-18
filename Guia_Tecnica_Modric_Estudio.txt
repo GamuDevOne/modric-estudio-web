@@ -68,8 +68,8 @@ Ejecutar el instalador **Composer-Setup.exe**.
 * Continuar con **Next** en las demás pantallas.   
 
 ´´´´
-(si luego de darle a "next" no le permite, 
-significa que esa version que tiene de xampp no es compatible, 
+(si luego de darle a "next" no le permite, lo más seguro es que 
+esa version que tiene de xampp no es compatible, 
 debera instalar la mas reciente 
 [link de descarga en pasos anteriores])
 ´´´´
@@ -89,14 +89,14 @@ Si muestra la versión, Composer está correctamente instalado.
 
 ## 5. Instalación de dependencias (DomPDF)
 
-1. Abrir CMD
+1. Abrir CMD  "windows + r"
 2. Ir a la carpeta `php` del proyecto:
 
 ```bash
-cd C:\xampp\htdocs\PaginaWebMS\php
+cd C:\xampp\htdocs\nombreDeLaCarpetaRaiz\php
 ```
 
-3. Ejecutar:
+3. Ejecutar (estando en la ubicacion anterior):
 
 ```bash
 composer install
