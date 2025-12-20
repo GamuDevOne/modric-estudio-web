@@ -30,6 +30,7 @@
 [2025-12-17 02:28:24] LOGIN_EXITOSO - IP: 127.0.0.1 - Detalles: {"usuario":"modric","tipo":"CEO"}
 [2025-12-17 03:13:27] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-17 03:26:01] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+<<<<<<< HEAD
 [2025-12-17 19:31:46] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-17 20:20:48] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-17 20:22:11] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
@@ -101,3 +102,7 @@
 [2025-12-20 14:35:00] PEDIDO_CANCELADO - IP: 127.0.0.1 - Detalles: {"id_pedido":18,"usuario":"CEO Admin","motivo":""}
 [2025-12-20 14:35:00] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-20 14:35:23] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+=======
+[2025-12-18 17:29:52] DASHBOARD_ACCESS - IP: ::1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-18 18:22:30] DASHBOARD_ACCESS - IP: ::1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+>>>>>>> aa465c2339878f9e5bbf1005dab75aac12acd516
