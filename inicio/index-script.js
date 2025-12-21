@@ -1,14 +1,13 @@
 // ========================================
 // ARRAY DE IMÁGENES PARA EL LIGHTBOX
 // ========================================
-// IMPORTANTE: Las rutas deben coincidir EXACTAMENTE con las del HTML
 const galleryImages = [
-    './imagenes/SBN/IMG_0757.jpg',      // Foto 1
-    './imagenes/SBN/_MG_0430.jpg',      // Foto 2
-    './imagenes/SBN/_MG_0505.jpg',      // Foto 3
-    './imagenes/SBN/_MG_9245.JPG',      // Foto 4
-    './imagenes/SBN/IMG_0758.jpeg',     // Foto 5
-    './imagenes/SBN/IMG_1571.jpeg'      // Foto 6
+    './imagenes/SBN/IMG_0757.jpg',
+    './imagenes/SBN/_MG_0430.jpg',
+    './imagenes/SBN/_MG_0505.jpg',
+    './imagenes/SBN/_MG_9245.JPG',
+    './imagenes/SBN/IMG_0758.jpeg',
+    './imagenes/SBN/IMG_1571.jpeg'
 ];
 
 let currentImageIndex = 0;
@@ -16,20 +15,16 @@ let currentImageIndex = 0;
 // ========================================
 // LIGHTBOX/CARRUSEL FUNCIONES
 // ========================================
-
-// Abrir lightbox
 function openLightbox(index) {
     currentImageIndex = index;
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightbox-image');
     
-    // Verificar que la imagen existe
     console.log('Abriendo imagen:', galleryImages[currentImageIndex]);
     
     lightbox.classList.add('active');
     lightboxImage.src = galleryImages[currentImageIndex];
     
-    // Agregar evento de error para debugging
     lightboxImage.onerror = function() {
         console.error('Error al cargar imagen:', this.src);
         alert('Error al cargar la imagen. Verifica que el archivo existe en: ' + this.src);
@@ -40,25 +35,18 @@ function openLightbox(index) {
     };
     
     updateCounter();
-    
-    // Prevenir scroll del body cuando el lightbox está abierto
     document.body.style.overflow = 'hidden';
 }
 
-// Cerrar lightbox
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
     lightbox.classList.remove('active');
-    
-    // Restaurar scroll del body
     document.body.style.overflow = 'auto';
 }
 
-// Cambiar imagen (siguiente/anterior)
 function changeImage(direction) {
     currentImageIndex += direction;
     
-    // Loop: si llega al final, vuelve al inicio y viceversa
     if (currentImageIndex >= galleryImages.length) {
         currentImageIndex = 0;
     } else if (currentImageIndex < 0) {
@@ -70,20 +58,17 @@ function changeImage(direction) {
     updateCounter();
 }
 
-// Actualizar contador de imágenes
 function updateCounter() {
     const counter = document.getElementById('image-counter');
     counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
 }
 
-// Cerrar lightbox con tecla ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeLightbox();
     }
 });
 
-// Navegación con flechas del teclado
 document.addEventListener('keydown', function(e) {
     const lightbox = document.getElementById('lightbox');
     if (lightbox.classList.contains('active')) {
@@ -95,7 +80,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Cerrar lightbox al hacer clic fuera de la imagen
 document.getElementById('lightbox').addEventListener('click', function(e) {
     if (e.target === this) {
         closeLightbox();
@@ -103,45 +87,84 @@ document.getElementById('lightbox').addEventListener('click', function(e) {
 });
 
 // ========================================
-// FORMULARIO DE CONTACTO
+// FORMULARIO DE CONTACTO - FIX COMPLETO
 // ========================================
 function handleSubmit(event) {
     event.preventDefault();
 
     const form = event.target;
-    const formData = new FormData(form);
-    const payload = {
-        nombre: formData.get('nombre') || '',
-        email: formData.get('email') || '',
-        telefono: formData.get('telefono') || '',
-        mensaje: formData.get('mensaje') || ''
-    };
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnOriginalText = submitBtn.textContent;
+    
+    // Obtener valores del formulario
+    const nombre = form.querySelector('input[name="nombre"]').value.trim();
+    const email = form.querySelector('input[name="email"]').value.trim();
+    const telefono = form.querySelector('input[name="telefono"]').value.trim();
+    const mensaje = form.querySelector('textarea[name="mensaje"]').value.trim();
 
     // Validación básica
-    if (!payload.nombre || !payload.email || !payload.mensaje) {
-        alert('Por favor completa los campos obligatorios (Nombre, Email y Mensaje).');
+    if (!nombre || !email || !mensaje) {
+        mostrarModal('Por favor completa los campos obligatorios (Nombre, Email y Mensaje).', 'warning');
         return;
     }
 
-    fetch('/api/contacto', {
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        mostrarModal('Por favor ingresa un email válido.', 'warning');
+        return;
+    }
+
+    // Deshabilitar botón y mostrar carga
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'ENVIANDO...';
+
+    // Preparar datos
+    const payload = {
+        nombre: nombre,
+        email: email,
+        telefono: telefono || '',
+        mensaje: mensaje
+    };
+
+    // Enviar al servidor
+    fetch('./php/contacto.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error del servidor: ' + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data && data.ok) {
-            mostrarModal(data.message || '¡Mensaje enviado correctamente!');
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = btnOriginalText;
+
+        if (data.success) {
+            mostrarModal(data.message || '¡Mensaje enviado correctamente!', 'success');
             form.reset();
         } else {
-            mostrarModal((data && data.error) ? data.error : 'Error al enviar el mensaje.');
+            mostrarModal(data.message || 'Error al enviar el mensaje.', 'error');
         }
     })
     .catch(error => {
         console.error('Error al enviar contacto:', error);
-        mostrarModal('Error al enviar el mensaje. Por favor, intenta de nuevo.');
+        
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = btnOriginalText;
+        
+        if (error.name === 'TypeError') {
+            mostrarModal('Error de conexión. Verifica que XAMPP esté activo.', 'error');
+        } else {
+            mostrarModal('Error al enviar el mensaje. Por favor, intenta de nuevo.', 'error');
+        }
     });
 }
 
@@ -166,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Verificando imágenes de la galería...');
     console.log('Rutas definidas:', galleryImages);
     
-    // Verificar que las imágenes existan
     galleryImages.forEach((img, index) => {
         const testImg = new Image();
         testImg.src = img;

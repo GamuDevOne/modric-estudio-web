@@ -1068,3 +1068,228 @@ body.modal-open {
     }
 }
 
+/* ========================================
+   ESTILOS ADICIONALES PARA USUARIOS TEMPORALES
+======================================== */
+
+/* ========================================
+   SEPARADOR DE SECCIONES
+======================================== */
+.section-divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+    margin: 60px 0 40px;
+}
+
+/* ========================================
+   HEADER SECUNDARIO
+======================================== */
+.secondary-header {
+    margin-top: 30px;
+}
+
+.secondary-header h2 {
+    font-size: 28px;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* ========================================
+   BOTÓN WARNING (LIMPIAR VENCIDOS)
+======================================== */
+.btn-warning {
+    background-color: #ff9800;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-warning:hover {
+    background-color: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+}
+
+/* ========================================
+   BADGE PARA ÁLBUMES
+======================================== */
+.badge-album {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ========================================
+   CLASES DE TEXTO
+======================================== */
+.text-danger {
+    color: #f44336;
+    font-weight: 600;
+}
+
+.text-warning {
+    color: #ff9800;
+    font-weight: 600;
+}
+
+.info-text {
+    color: #2196f3;
+    font-size: 13px;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e3f2fd;
+    border-radius: 5px;
+    border-left: 3px solid #2196f3;
+}
+
+/* ========================================
+   BOTÓN ICONO PASSWORD
+======================================== */
+.btn-icon.password:hover {
+    background-color: #ff9800;
+    border-color: #ff9800;
+}
+
+.btn-icon.password:hover svg {
+    stroke: #fff;
+}
+
+/* ========================================
+   MODAL CAMBIAR CONTRASEÑA
+======================================== */
+.info-usuario-temp {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.info-usuario-temp p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.info-usuario-temp strong {
+    font-weight: 600;
+}
+
+.credenciales-preview-temp {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+    border-left: 4px solid #4caf50;
+}
+
+.success-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.success-message svg {
+    stroke: #4caf50;
+    flex-shrink: 0;
+}
+
+.nueva-credencial {
+    font-size: 14px;
+    color: #333;
+}
+
+.nueva-credencial code {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 4px 12px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #2e7d32;
+}
+
+/* ========================================
+   RESPONSIVE - USUARIOS TEMPORALES
+======================================== */
+
+/* MÓVIL (768px y menor) */
+@media (max-width: 768px) {
+    .section-divider {
+        margin: 40px 0 30px;
+    }
+    
+    .secondary-header {
+        margin-top: 20px;
+    }
+    
+    .secondary-header h2 {
+        font-size: 22px;
+    }
+    
+    .btn-warning {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .badge-album {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+    
+    .info-usuario-temp {
+        padding: 12px;
+    }
+    
+    .info-usuario-temp p {
+        font-size: 13px;
+    }
+    
+    .credenciales-preview-temp {
+        padding: 12px;
+    }
+    
+    .nueva-credencial {
+        font-size: 13px;
+    }
+    
+    .nueva-credencial code {
+        display: block;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px y menor) */
+@media (max-width: 480px) {
+    .secondary-header h2 {
+        font-size: 20px;
+    }
+    
+    .btn-warning {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
+    .info-text {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
