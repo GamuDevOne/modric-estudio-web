@@ -1,4 +1,8 @@
-// Este archivo recibe datos del formulario usando localStorage
+// ========================================
+// FACTURA.JS - VERSIÓN CORREGIDA
+// FIX: Detección correcta de abonos y visualización
+// ========================================
+
 document.addEventListener("DOMContentLoaded", () => {
   const datosFactura = JSON.parse(localStorage.getItem("facturaData"));
 
@@ -12,19 +16,27 @@ document.addEventListener("DOMContentLoaded", () => {
     day: "2-digit",
   });
 
-  // === Generar número de factura automático ===
-  let ultimoNumero = localStorage.getItem("ultimoNumeroFactura");
-
-  if (!ultimoNumero) {
-    ultimoNumero = 1;
+  // === Generar número de factura ===
+  let numeroFactura = '';
+  
+  // Si viene desde guardar-venta.php, usar número de orden
+  if (datosFactura && datosFactura.numeroOrden) {
+    numeroFactura = datosFactura.numeroOrden;
+    console.log('✓ Usando número de orden desde BD:', numeroFactura);
   } else {
-    ultimoNumero = parseInt(ultimoNumero) + 1;
+    // Fallback: generar número local
+    let ultimoNumero = localStorage.getItem("ultimoNumeroFactura");
+    if (!ultimoNumero) {
+      ultimoNumero = 1;
+    } else {
+      ultimoNumero = parseInt(ultimoNumero) + 1;
+    }
+    localStorage.setItem("ultimoNumeroFactura", ultimoNumero);
+    
+    const fechaHoy = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    numeroFactura = `F-${fechaHoy}-${String(ultimoNumero).padStart(3, "0")}`;
+    console.log('⚠️ Generando número de factura local:', numeroFactura);
   }
-
-  localStorage.setItem("ultimoNumeroFactura", ultimoNumero);
-
-  const fechaHoy = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const numeroFactura = `F-${fechaHoy}-${String(ultimoNumero).padStart(3, "0")}`;
 
   // === Mostrar datos ===
   if (datosFactura) {
@@ -64,40 +76,69 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("totalFactura").textContent = total.toFixed(2) + " $";
     
     // ==========================================
-    // MOSTRAR DETALLES DE PAGO SI ES ABONO
+    // FIX PRINCIPAL: DETECCIÓN Y VISUALIZACIÓN DE ABONOS
     // ==========================================
-    console.log('Verificando tipoPago:', datosFactura.tipoPago, 'cantidadAbono:', datosFactura.cantidadAbono);
+    console.log('🔍 Verificando tipo de pago...');
+    console.log('  - tipoPago:', datosFactura.tipoPago);
+    console.log('  - cantidadAbono:', datosFactura.cantidadAbono);
     
-    // Detectar y mostrar detalles de pago si es abono
-    const esAbono = datosFactura.tipoPago && datosFactura.tipoPago.toLowerCase() === 'abono';
-    const tieneAbono = datosFactura.cantidadAbono && datosFactura.cantidadAbono !== 'N/A';
+    // Normalizar tipoPago (puede venir como 'abono', 'Abono', o desde ventaInfo.estadoPago)
+    let tipoPago = null;
+    if (datosFactura.tipoPago) {
+      tipoPago = datosFactura.tipoPago.toLowerCase();
+    } else if (datosFactura.ventaInfo && datosFactura.ventaInfo.estadoPago) {
+      tipoPago = datosFactura.ventaInfo.estadoPago.toLowerCase();
+    }
     
-    console.log('Verificando abono - tipoPago:', datosFactura.tipoPago, '| cantidadAbono:', datosFactura.cantidadAbono);
+    console.log('  - tipoPago normalizado:', tipoPago);
     
-    if (esAbono && tieneAbono) {
-      // Extraer el valor numérico del monto abonado (puede ser "$5.00" o "5.00" o "5")
-      let montoAbonado = parseFloat(datosFactura.cantidadAbono.toString().replace(/[$,]/g, ''));
+    // Detectar si es abono
+    const esAbono = tipoPago === 'abono';
+    
+    // Obtener monto abonado
+    let montoAbonado = 0;
+    
+    if (datosFactura.cantidadAbono && datosFactura.cantidadAbono !== 'N/A') {
+      // Limpiar el valor (puede ser "$50.00", "50.00", o 50)
+      const valorLimpio = datosFactura.cantidadAbono.toString().replace(/[$,\s]/g, '');
+      montoAbonado = parseFloat(valorLimpio);
+      console.log('  - cantidadAbono limpiado:', montoAbonado);
+    } else if (datosFactura.ventaInfo && datosFactura.ventaInfo.montoAbonado) {
+      // Fallback: usar montoAbonado de ventaInfo
+      montoAbonado = parseFloat(datosFactura.ventaInfo.montoAbonado);
+      console.log('  - montoAbonado desde ventaInfo:', montoAbonado);
+    }
+    
+    console.log('✓ Detección completa:');
+    console.log('  - esAbono:', esAbono);
+    console.log('  - montoAbonado:', montoAbonado);
+    console.log('  - total:', total);
+    
+    // Mostrar sección de abonos si aplica
+    if (esAbono && montoAbonado > 0 && montoAbonado <= total) {
+      const saldoPendiente = total - montoAbonado;
       
-      // Validar que el monto sea válido y menor o igual al total
-      if (!isNaN(montoAbonado) && montoAbonado > 0 && montoAbonado <= total) {
-        const saldoPendiente = total - montoAbonado;
+      const detallesPago = document.getElementById('detallesPago');
+      if (detallesPago) {
+        detallesPago.style.display = 'block';
+        document.getElementById('montoAbonado').textContent = '$' + montoAbonado.toFixed(2);
+        document.getElementById('saldoPendiente').textContent = '$' + saldoPendiente.toFixed(2);
         
-        // Mostrar sección de detalles de pago
-        const detallesPago = document.getElementById('detallesPago');
-        if (detallesPago) {
-          detallesPago.style.display = 'block';
-          document.getElementById('montoAbonado').textContent = '$' + montoAbonado.toFixed(2);
-          document.getElementById('saldoPendiente').textContent = '$' + saldoPendiente.toFixed(2);
-          
-          console.log('✓ Abono detectado correctamente - Monto: $' + montoAbonado.toFixed(2) + ', Saldo: $' + saldoPendiente.toFixed(2));
-        } else {
-          console.warn('⚠️ Elemento detallesPago no encontrado en el DOM');
-        }
+        console.log('✅ Sección de abonos mostrada correctamente');
+        console.log('  - Monto abonado: $' + montoAbonado.toFixed(2));
+        console.log('  - Saldo pendiente: $' + saldoPendiente.toFixed(2));
       } else {
-        console.warn('⚠️ Monto abonado inválido:', montoAbonado, '(total:', total, ')');
+        console.error('❌ Elemento #detallesPago no encontrado en el DOM');
       }
     } else {
-      console.log('⚠️ No se detectó abono - esAbono:', esAbono, '| tieneAbono:', tieneAbono);
+      console.log('ℹ️ No se muestra sección de abonos');
+      if (!esAbono) {
+        console.log('  → Razón: No es un abono (tipoPago=' + tipoPago + ')');
+      } else if (montoAbonado <= 0) {
+        console.log('  → Razón: Monto abonado es 0 o inválido');
+      } else if (montoAbonado > total) {
+        console.log('  → Razón: Monto abonado excede el total');
+      }
     }
   } else {
     console.error('❌ No hay datos de factura en localStorage');
@@ -106,7 +147,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// === MODAL PERSONALIZADO SIMPLE ===
+// ========================================
+// MODAL PERSONALIZADO
+// ========================================
 function mostrarNotificacion(mensaje, tipo = 'success') {
   let modal = document.getElementById('notificacionFactura');
   
@@ -126,7 +169,9 @@ function mostrarNotificacion(mensaje, tipo = 'success') {
   }, 3000);
 }
 
-// === GENERAR PDF ===
+// ========================================
+// GENERAR PDF
+// ========================================
 function generarPDF() {
   const facturaData = JSON.parse(localStorage.getItem("facturaData"));
   
@@ -140,6 +185,15 @@ function generarPDF() {
     totalFactura += parseFloat(p.total);
   });
 
+  // Obtener información de abono
+  let tipoPago = facturaData.tipoPago || 'completo';
+  let montoAbonado = 0;
+  
+  if (facturaData.cantidadAbono && facturaData.cantidadAbono !== 'N/A') {
+    const valorLimpio = facturaData.cantidadAbono.toString().replace(/[$,\s]/g, '');
+    montoAbonado = parseFloat(valorLimpio);
+  }
+
   const factura = {
     numero: document.getElementById("numeroFactura").textContent,
     fecha: document.getElementById("fechaFactura").textContent,
@@ -149,9 +203,13 @@ function generarPDF() {
     paquete: facturaData.paquete,
     total: totalFactura.toFixed(2),
     comentario: facturaData.comentario || "Sin comentarios",
+    // NUEVO: Enviar info de abono al PDF
+    tipoPago: tipoPago,
+    montoAbonado: montoAbonado.toFixed(2),
+    saldoPendiente: (totalFactura - montoAbonado).toFixed(2)
   };
 
-  console.log("Enviando factura:", factura);
+  console.log("📄 Enviando factura al servidor:", factura);
 
   fetch("../php/facturas_pdf.php", {
     method: "POST",
@@ -170,7 +228,6 @@ function generarPDF() {
       if (data.exito) {
         mostrarNotificacion("✓ Factura PDF descargada correctamente", "success");
         
-        // Descargar el PDF
         const urlCompleta = window.location.origin + "/PaginaWebMS/" + data.url;
         const link = document.createElement("a");
         link.href = urlCompleta;
@@ -188,7 +245,9 @@ function generarPDF() {
     });
 }
 
-// === ENVIAR POR WHATSAPP ===
+// ========================================
+// ENVIAR POR WHATSAPP
+// ========================================
 function enviarPorWhatsApp() {
   const facturaData = JSON.parse(localStorage.getItem("facturaData"));
   
@@ -199,7 +258,6 @@ function enviarPorWhatsApp() {
     return;
   }
 
-  // Calcular el total desde los productos
   let totalFactura = 0;
   let detalleProductos = "";
   
@@ -208,8 +266,15 @@ function enviarPorWhatsApp() {
       totalFactura += parseFloat(p.total);
       detalleProductos += `• ${p.descripcion}: $${parseFloat(p.total).toFixed(2)}\n`;
     });
-  } else {
-    console.warn('⚠️ No hay productos en facturaData');
+  }
+
+  // Obtener información de abono
+  let tipoPago = facturaData.tipoPago || 'completo';
+  let montoAbonado = 0;
+  
+  if (facturaData.cantidadAbono && facturaData.cantidadAbono !== 'N/A') {
+    const valorLimpio = facturaData.cantidadAbono.toString().replace(/[$,\s]/g, '');
+    montoAbonado = parseFloat(valorLimpio);
   }
 
   const factura = {
@@ -221,12 +286,13 @@ function enviarPorWhatsApp() {
     metodoPago: facturaData.metodoPago,
     paquete: facturaData.paquete,
     total: totalFactura.toFixed(2),
-    tipoPago: facturaData.tipoPago,
-    montoAbonado: facturaData.cantidadAbono,
+    tipoPago: tipoPago,
+    montoAbonado: montoAbonado.toFixed(2),
+    saldoPendiente: (totalFactura - montoAbonado).toFixed(2),
     comentario: facturaData.comentario || "Sin comentarios",
   };
 
-  console.log("✓ Datos de factura calculados:", factura);
+  console.log("✓ Datos de factura preparados:", factura);
 
   fetch("../php/facturas_pdf.php", {
     method: "POST",
@@ -252,29 +318,24 @@ function enviarPorWhatsApp() {
         // ==========================================
         let detallesPago = "";
         
-        if (factura.tipoPago && factura.tipoPago.toLowerCase() === 'abono') {
-          // Extraer el monto abonado (quitar el símbolo $)
-          const montoAbonado = factura.montoAbonado === 'N/A' ? 0 : parseFloat(factura.montoAbonado.replace('$', ''));
-          const saldoPendiente = parseFloat(factura.total) - montoAbonado;
+        if (tipoPago.toLowerCase() === 'abono' && montoAbonado > 0) {
+          const saldoPendiente = totalFactura - montoAbonado;
           
-          detallesPago = `\n💰 DETALLES DE PAGO (ABONO):\n• Total: $${factura.total}\n• Abonado: $${montoAbonado.toFixed(2)}\n• Saldo Pendiente: $${saldoPendiente.toFixed(2)}`;
+          detallesPago = `\n💰 DETALLES DE PAGO (ABONO):\n• Total: $${totalFactura.toFixed(2)}\n• Abonado: $${montoAbonado.toFixed(2)}\n• Saldo Pendiente: $${saldoPendiente.toFixed(2)}`;
           
           console.log(`✓ Pago por abono - Abonado: $${montoAbonado.toFixed(2)}, Saldo: $${saldoPendiente.toFixed(2)}`);
         } else {
-          detallesPago = `\n💰 DETALLES DE PAGO (PAGO COMPLETO):\n• Total a Cancelar: $${factura.total}`;
+          detallesPago = `\n💰 DETALLES DE PAGO (PAGO COMPLETO):\n• Total a Cancelar: $${totalFactura.toFixed(2)}`;
           
-          console.log(`✓ Pago completo - Total: $${factura.total}`);
+          console.log(`✓ Pago completo - Total: $${totalFactura.toFixed(2)}`);
         }
         
-        // Construir mensaje completo
         const mensaje = `¡Hola ${factura.clienteNombre}!\n\nAquí tienes tu factura digital de Modric Estudio:\n${urlCompleta}\n\n📋 FACTURA:\n• Número: ${factura.numero}\n• Fecha: ${factura.fecha}\n• Producto: ${factura.paquete}\n• Método de Pago: ${factura.metodoPago}${detallesPago}\n\n📝 ${factura.comentario}`;
         
-        // Limpiar el teléfono (quitar guiones)
         const telefonoLimpio = factura.clienteTelefono.replace(/[-\s]/g, '');
-        
         const linkWhatsApp = `https://wa.me/507${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
         
-        console.log("✓ Abriendo WhatsApp con información completa");
+        console.log("✓ Abriendo WhatsApp");
         window.open(linkWhatsApp, "_blank");
       } else {
         mostrarNotificacion("✗ Error al generar el PDF: " + (data.mensaje || "Error desconocido"), "error");

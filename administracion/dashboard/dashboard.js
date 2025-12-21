@@ -695,7 +695,7 @@ function cerrarModalNuevoAbono() {
 }
 
 // ========================================
-// REGISTRAR NUEVO ABONO
+// REGISTRAR NUEVO ABONO - VERSION CORREGIDA
 // ========================================
 function registrarNuevoAbono(event) {
     event.preventDefault();
@@ -707,9 +707,20 @@ function registrarNuevoAbono(event) {
     }
     
     const idPedido = document.getElementById('abonoIdPedido').value;
-    const monto = parseFloat(document.getElementById('montoNuevoAbono').value);
+    const montoInput = parseFloat(document.getElementById('montoNuevoAbono').value);
     const metodo = document.getElementById('metodoAbono').value;
     const notas = document.getElementById('notasAbono').value.trim();
+    
+    // Redondear monto a 2 decimales
+    const monto = Math.round(montoInput * 100) / 100;
+    const saldoPendiente = Math.round(saldoPendienteActual * 100) / 100;
+    
+    console.log('Registrando abono:', {
+        idPedido,
+        montoOriginal: montoInput,
+        montoRedondeado: monto,
+        saldoPendiente: saldoPendiente
+    });
     
     // Validaciones frontend
     if (!monto || monto <= 0) {
@@ -717,8 +728,10 @@ function registrarNuevoAbono(event) {
         return;
     }
     
-    if (monto > saldoPendienteActual) {
-        mostrarModal(`El monto ($${monto.toFixed(2)}) excede el saldo pendiente ($${saldoPendienteActual.toFixed(2)})`, 'warning');
+    // Permitir margen de error de 0.01
+    const margenError = 0.01;
+    if (monto > (saldoPendiente + margenError)) {
+        mostrarModal(`El monto ($${monto.toFixed(2)}) excede el saldo pendiente ($${saldoPendiente.toFixed(2)})`, 'warning');
         return;
     }
     
@@ -726,57 +739,7 @@ function registrarNuevoAbono(event) {
         mostrarModal('Selecciona un método de pago', 'warning');
         return;
     }
-    
-    showLoadingModal('Registrando abono...');
-    
-    fetch('../../php/gest-abonos.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            action: 'registrar_nuevo_abono',
-            idPedido: idPedido,
-            monto: monto,
-            metodo: metodo,
-            notas: notas,
-            idUsuario: user.id
-        })
-    })
-    .then(r => r.json())
-    .then(data => {
-        hideLoadingModal();
-        
-        if (data.success) {
-            // Mensaje de éxito
-            if (data.completado) {
-                mostrarModal('¡Pago completado! El cliente ha pagado la totalidad del pedido.', 'success');
-            } else {
-                mostrarModal(`Abono registrado. Nuevo saldo pendiente: $${data.saldoRestante.toFixed(2)}`, 'success');
-            }
-            
-            // Cerrar modal de nuevo abono
-            cerrarModalNuevoAbono();
-            
-            // Recargar detalles del pedido
-            setTimeout(() => {
-                verDetallePedido(idPedido);
-            }, 500);
-            
-            // Recargar dashboard completo después de 1 segundo
-            setTimeout(() => {
-                loadDashboardData();
-            }, 1000);
-            
-        } else {
-            mostrarModal('Error: ' + (data.message || 'No se pudo registrar el abono'), 'error');
-        }
-    })
-    .catch(err => {
-        hideLoadingModal();
-        console.error('Error:', err);
-        mostrarModal('Error de conexión al registrar el abono', 'error');
-    });
 }
-
 // ========================================
 // FUNCIONES DE REPORTES
 // ========================================

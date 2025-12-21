@@ -1,14 +1,16 @@
 <?php
-// Headers para permitir peticiones POST
+// ========================================
+// FACTURAS_PDF.PHP - VERSIÓN CORREGIDA
+// FIX: Incluye detalles de abonos en el PDF
+// ========================================
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Log de inicio
 error_log("=== INICIO facturas_pdf.php ===");
 
-// Verificar que sea POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode([
         "exito" => false,
@@ -17,19 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Configuración de la base de datos
 $host = 'localhost';
 $dbname = 'ModricEstudio00';
 $username = 'root';
 $password = '';
 
-// Cargar autoload de Composer
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-// Recibir datos JSON
 $inputRaw = file_get_contents("php://input");
 error_log("Datos recibidos RAW: " . $inputRaw);
 
@@ -66,12 +65,72 @@ $nombre = htmlspecialchars($datos['clienteNombre']);
 $correo = htmlspecialchars($datos['clienteCorreo'] ?? 'No proporcionado');
 $metodo = htmlspecialchars($datos['metodoPago'] ?? 'No especificado');
 $paquete = htmlspecialchars($datos['paquete']);
-$total = htmlspecialchars($datos['total']);
+$total = floatval($datos['total']);
 $comentario = htmlspecialchars($datos['comentario'] ?? 'Sin comentarios');
+
+// ==========================================
+// NUEVO: Procesar información de abono
+// ==========================================
+$tipoPago = isset($datos['tipoPago']) ? strtolower($datos['tipoPago']) : 'completo';
+$montoAbonado = isset($datos['montoAbonado']) ? floatval($datos['montoAbonado']) : 0;
+$saldoPendiente = isset($datos['saldoPendiente']) ? floatval($datos['saldoPendiente']) : 0;
+
+// Si no viene saldoPendiente pero sí montoAbonado, calcularlo
+if ($saldoPendiente == 0 && $montoAbonado > 0) {
+    $saldoPendiente = $total - $montoAbonado;
+}
+
+$esAbono = ($tipoPago === 'abono' && $montoAbonado > 0);
+
+error_log("Tipo de pago: $tipoPago");
+error_log("Es abono: " . ($esAbono ? 'SI' : 'NO'));
+error_log("Monto abonado: $montoAbonado");
+error_log("Saldo pendiente: $saldoPendiente");
+
+// ==========================================
+// GENERAR SECCIÓN DE DETALLES DE PAGO
+// ==========================================
+$seccionAbono = '';
+
+if ($esAbono) {
+    $seccionAbono = "
+    <div style='margin-top: 20px; padding: 15px; background-color: #fff3e0; border-left: 4px solid #ff9800; border-radius: 5px;'>
+        <h3 style='color: #e65100; margin: 0 0 10px 0; font-size: 16px;'>💰 Detalles de Pago (Abono)</h3>
+        <table style='width: 100%; border-collapse: collapse;'>
+            <tr>
+                <td style='padding: 5px 0; font-weight: bold;'>Total del Pedido:</td>
+                <td style='padding: 5px 0; text-align: right;'>\$" . number_format($total, 2) . "</td>
+            </tr>
+            <tr>
+                <td style='padding: 5px 0; font-weight: bold; color: #4caf50;'>Monto Abonado:</td>
+                <td style='padding: 5px 0; text-align: right; color: #4caf50;'>\$" . number_format($montoAbonado, 2) . "</td>
+            </tr>
+            <tr style='border-top: 2px solid #e65100;'>
+                <td style='padding: 10px 0 5px 0; font-weight: bold; color: #e65100; font-size: 16px;'>Saldo Pendiente:</td>
+                <td style='padding: 10px 0 5px 0; text-align: right; color: #e65100; font-weight: bold; font-size: 16px;'>\$" . number_format($saldoPendiente, 2) . "</td>
+            </tr>
+        </table>
+        <p style='margin: 10px 0 0 0; font-size: 12px; color: #666;'>
+            ⚠️ <strong>Nota:</strong> Este pedido tiene un saldo pendiente de pago. Por favor, comuníquese con nosotros para coordinar el pago del saldo restante.
+        </p>
+    </div>
+    ";
+} else {
+    $seccionAbono = "
+    <div style='margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 5px;'>
+        <h3 style='color: #2e7d32; margin: 0 0 10px 0; font-size: 16px;'>✅ Pago Completo</h3>
+        <p style='margin: 0; font-size: 14px; color: #1b5e20;'>
+            El monto total de <strong>\$" . number_format($total, 2) . "</strong> ha sido pagado en su totalidad.
+        </p>
+    </div>
+    ";
+}
 
 error_log("Procesando factura: $numeroOrden para cliente: $nombre");
 
-// Crear HTML con el diseño de la factura
+// ==========================================
+// CREAR HTML CON DETALLES DE ABONO
+// ==========================================
 $html = "
 <!DOCTYPE html>
 <html lang='es'>
@@ -161,12 +220,14 @@ $html = "
         <tbody>
             <tr>
                 <td>$paquete</td>
-                <td style='text-align: right;'>\$$total</td>
+                <td style='text-align: right;'>\$" . number_format($total, 2) . "</td>
             </tr>
         </tbody>
     </table>
 
-    <p class='total'>Total a Pagar: \$$total</p>
+    <p class='total'>Total: \$" . number_format($total, 2) . "</p>
+
+    $seccionAbono
 
     <div class='comentario'>
         <p><strong>Comentarios:</strong></p>
@@ -186,7 +247,6 @@ $html = "
 try {
     error_log("Configurando Dompdf...");
     
-    // Configurar Dompdf
     $options = new Options();
     $options->set('isRemoteEnabled', true);
     $options->set('defaultFont', 'Arial');
@@ -199,14 +259,12 @@ try {
     error_log("Renderizando PDF...");
     $dompdf->render();
 
-    // Crear carpeta si no existe
     $ruta = __DIR__ . "/../facturas/";
     if (!file_exists($ruta)) {
         error_log("Creando directorio: $ruta");
         mkdir($ruta, 0777, true);
     }
 
-    // Guardar PDF
     $nombreArchivo = "Factura_" . preg_replace('/[^a-zA-Z0-9_-]/', '_', $numeroOrden) . ".pdf";
     $rutaCompleta = $ruta . $nombreArchivo;
     
@@ -228,28 +286,34 @@ try {
         $stmt = $pdo->prepare("
             INSERT INTO factura (
                 NumeroOrden,
-                RutaFacturacion,
-                Fecha
+                Fecha,
+                MedioEnvio,
+                ID_Pedido
             ) VALUES (
                 :numeroOrden,
-                :rutaFacturacion,
-                NOW()
+                NOW(),
+                'PDF',
+                (SELECT ID_Pedido FROM Pedido WHERE ID_Pedido = :idPedido LIMIT 1)
             )
         ");
 
+        // Extraer ID_Pedido del número de orden si existe
+        $idPedido = 1; // Valor por defecto
+        if (strpos($numeroOrden, 'ORD-') === 0) {
+            $idPedido = intval(str_replace('ORD-', '', $numeroOrden));
+        }
+
         $stmt->execute([
             ':numeroOrden' => $numeroOrden,
-            ':rutaFacturacion' => $rutaCompleta
+            ':idPedido' => $idPedido
         ]);
         
         error_log("Factura registrada en BD con ID: " . $pdo->lastInsertId());
         
     } catch (PDOException $e) {
         error_log("ERROR BD: " . $e->getMessage());
-        // No detener el proceso, el PDF ya se generó
     }
 
-    // Responder al frontend con la ruta relativa
     $rutaRelativa = "facturas/" . $nombreArchivo;
     
     error_log("Respondiendo con éxito. URL: $rutaRelativa");

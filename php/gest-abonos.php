@@ -1,4 +1,8 @@
 <?php
+// ========================================
+// GEST-ABONOS.PHP - VERSIÓN CORREGIDA
+// FIX: Validación correcta considerando decimales y redondeo
+// ========================================
 
 $host = 'localhost';
 $dbname = 'ModricEstudio00';
@@ -89,8 +93,19 @@ function obtenerDetallePedido($pdo, $data) {
             return;
         }
         
-        // Calcular saldo pendiente
-        $pedido['SaldoPendiente'] = max(0, $pedido['Total'] - $pedido['TotalAbonado']);
+        // Calcular saldo pendiente con redondeo a 2 decimales
+        $total = round(floatval($pedido['Total']), 2);
+        $abonado = round(floatval($pedido['TotalAbonado']), 2);
+        $saldoPendiente = round($total - $abonado, 2);
+        
+        // Asegurar que no haya valores negativos por errores de redondeo
+        if ($saldoPendiente < 0.01) {
+            $saldoPendiente = 0;
+        }
+        
+        $pedido['SaldoPendiente'] = $saldoPendiente;
+        
+        error_log("Detalle pedido #{$data['idPedido']}: Total=$total, Abonado=$abonado, Saldo=$saldoPendiente");
         
         echo json_encode([
             'success' => true,
@@ -142,7 +157,7 @@ function obtenerHistorialAbonos($pdo, $data) {
 }
 
 // ========================================
-// REGISTRAR NUEVO ABONO
+// REGISTRAR NUEVO ABONO - VERSION CORREGIDA
 // ========================================
 function registrarNuevoAbono($pdo, $data) {
     try {
@@ -151,8 +166,15 @@ function registrarNuevoAbono($pdo, $data) {
             return;
         }
         
+        // Convertir monto a float con 2 decimales
+        $montoNuevo = round(floatval($data['monto']), 2);
+        
+        error_log("=== REGISTRAR NUEVO ABONO ===");
+        error_log("ID Pedido: {$data['idPedido']}");
+        error_log("Monto nuevo: $montoNuevo");
+        
         // Validar monto positivo
-        if ($data['monto'] <= 0) {
+        if ($montoNuevo <= 0) {
             echo json_encode(['success' => false, 'message' => 'El monto debe ser mayor a 0']);
             return;
         }
@@ -177,14 +199,28 @@ function registrarNuevoAbono($pdo, $data) {
             return;
         }
         
-        $saldoPendiente = $pedido['Total'] - $pedido['TotalAbonado'];
-        $nuevoTotal = $pedido['TotalAbonado'] + $data['monto'];
+        // Redondear valores a 2 decimales
+        $totalPedido = round(floatval($pedido['Total']), 2);
+        $totalAbonado = round(floatval($pedido['TotalAbonado']), 2);
+        $saldoPendiente = round($totalPedido - $totalAbonado, 2);
+        $nuevoTotal = round($totalAbonado + $montoNuevo, 2);
         
-        // Validar que no exceda el total
-        if ($nuevoTotal > $pedido['Total']) {
+        error_log("Total pedido: $totalPedido");
+        error_log("Total abonado: $totalAbonado");
+        error_log("Saldo pendiente: $saldoPendiente");
+        error_log("Nuevo total: $nuevoTotal");
+        
+        // ==========================================
+        // FIX CRÍTICO: Validación con margen de error
+        // ==========================================
+        // Permitir un margen de 0.01 centavos por errores de redondeo
+        $margenError = 0.01;
+        
+        if ($nuevoTotal > ($totalPedido + $margenError)) {
+            $diferencia = round($nuevoTotal - $totalPedido, 2);
             echo json_encode([
                 'success' => false, 
-                'message' => 'El monto ($' . number_format($data['monto'], 2) . ') excede el saldo pendiente ($' . number_format($saldoPendiente, 2) . ')'
+                'message' => "El monto ($" . number_format($montoNuevo, 2) . ") excede el saldo pendiente ($" . number_format($saldoPendiente, 2) . "). Diferencia: $" . number_format($diferencia, 2)
             ]);
             return;
         }
@@ -201,16 +237,23 @@ function registrarNuevoAbono($pdo, $data) {
             
             $stmt->execute([
                 ':idPedido' => $data['idPedido'],
-                ':monto' => $data['monto'],
+                ':monto' => $montoNuevo,
                 ':metodo' => $data['metodo'] ?? null,
                 ':notas' => $data['notas'] ?? null,
                 ':idUsuario' => $data['idUsuario']
             ]);
             
+            error_log("Abono registrado en HistorialAbonos");
+            
             $pagoCompletado = false;
             
-            // Si completó el pago, actualizar estado
-            if ($nuevoTotal >= $pedido['Total']) {
+            // ==========================================
+            // FIX: Considerar pago completado con margen
+            // ==========================================
+            if ($nuevoTotal >= ($totalPedido - $margenError)) {
+                // Ajustar el nuevo total al total exacto del pedido
+                $nuevoTotalAjustado = $totalPedido;
+                
                 $stmt = $pdo->prepare("
                     UPDATE VentaInfo 
                     SET EstadoPago = 'Completo',
@@ -218,11 +261,24 @@ function registrarNuevoAbono($pdo, $data) {
                     WHERE ID_Pedido = :idPedido
                 ");
                 $stmt->execute([
-                    ':nuevoTotal' => $nuevoTotal,
+                    ':nuevoTotal' => $nuevoTotalAjustado,
                     ':idPedido' => $data['idPedido']
                 ]);
                 
+                error_log("VentaInfo actualizada - EstadoPago: Completo");
+                
+                // Actualizar estado del pedido
+                $stmt = $pdo->prepare("
+                    UPDATE Pedido 
+                    SET Estado = 'Completado'
+                    WHERE ID_Pedido = :idPedido
+                ");
+                $stmt->execute([':idPedido' => $data['idPedido']]);
+                
+                error_log("Pedido actualizado - Estado: Completado");
+                
                 $pagoCompletado = true;
+                $saldoRestante = 0;
             } else {
                 // Actualizar monto abonado
                 $stmt = $pdo->prepare("
@@ -234,9 +290,15 @@ function registrarNuevoAbono($pdo, $data) {
                     ':nuevoTotal' => $nuevoTotal,
                     ':idPedido' => $data['idPedido']
                 ]);
+                
+                error_log("VentaInfo actualizada - MontoAbonado: $nuevoTotal");
+                
+                $saldoRestante = round($totalPedido - $nuevoTotal, 2);
             }
             
             $pdo->commit();
+            
+            error_log("Transacción completada exitosamente");
             
             echo json_encode([
                 'success' => true,
@@ -245,11 +307,12 @@ function registrarNuevoAbono($pdo, $data) {
                     : 'Abono registrado correctamente.',
                 'completado' => $pagoCompletado,
                 'nuevoTotal' => $nuevoTotal,
-                'saldoRestante' => $pedido['Total'] - $nuevoTotal
+                'saldoRestante' => $saldoRestante
             ]);
             
         } catch (Exception $e) {
             $pdo->rollBack();
+            error_log("Error en transacción: " . $e->getMessage());
             throw $e;
         }
         

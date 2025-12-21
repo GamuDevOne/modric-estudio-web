@@ -5,15 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Factura - Modric Estudio</title>
     <link rel="stylesheet" href="factura.css" />
+    <style>
+      /* ==========================================
+         ESTILOS ADICIONALES PARA SECCIÓN DE ABONOS
+      ========================================== */
+      #detallesPago {
+        margin-top: 20px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        border-left: 5px solid #ff9800;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+      }
+      
+      #detallesPago h3 {
+        color: #e65100;
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      #detallesPago h3::before {
+        content: "💰";
+        font-size: 22px;
+      }
+      
+      .pago-detalle-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+      
+      .pago-detalle-tabla td {
+        padding: 8px 0;
+        font-size: 15px;
+      }
+      
+      .pago-detalle-tabla td:first-child {
+        font-weight: 600;
+        color: #555;
+      }
+      
+      .pago-detalle-tabla td:last-child {
+        text-align: right;
+        font-weight: 700;
+      }
+      
+      .pago-total-row td {
+        padding-top: 15px;
+        border-top: 2px solid #e65100;
+        font-size: 17px;
+      }
+      
+      .pago-total-row td:first-child {
+        color: #e65100;
+      }
+      
+      .pago-total-row td:last-child {
+        color: #e65100;
+      }
+      
+      .pago-abonado {
+        color: #4caf50 !important;
+      }
+      
+      .pago-pendiente {
+        color: #e65100 !important;
+      }
+      
+      .pago-nota {
+        margin: 10px 0 0 0;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 5px;
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+      }
+      
+      .pago-nota strong {
+        color: #e65100;
+      }
+      
+      /* Estilo para pago completo */
+      #detallesPago.pago-completo {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-left-color: #4caf50;
+      }
+      
+      #detallesPago.pago-completo h3 {
+        color: #2e7d32;
+      }
+      
+      #detallesPago.pago-completo h3::before {
+        content: "✅";
+      }
+    </style>
   </head>
   <body>
     <div class="contenedor-factura">
       <header>
         <div class="logo">
-          <img src="../imagenes/logo.png" alt="Ejemplo Carné Estudiantil" />
+          <img src="../imagenes/logo.png" alt="Modric Estudio Logo" />
         </div>
         <div class="info-empresa">
-          <p><strong>Borcelle</strong></p>
+          <p><strong>Modric Estudio</strong></p>
           <p>Panamá,<br />La Chorrera</p>
           <p>Modricestudio@gmail.com</p>
         </div>
@@ -25,7 +124,7 @@
 
       <section class="datos">
         <div class="col">
-          <h3>Datos cliente</h3>
+          <h3>Datos del Cliente</h3>
           <p id="clienteNombre"></p>
           <p id="clienteDireccion"></p>
           <p id="clienteCorreo"></p>
@@ -44,73 +143,52 @@
         </thead>
         <tbody id="tablaProductos"></tbody>
       </table>
-      <section class="comentario">
-        <h3>Comentario del cliente</h3>
-        <p id="comentarioCliente">No se ingresó ningún comentario.</p>
-      </section>
 
       <div class="total">
-        <p><strong>Total:</strong> <span id="totalFactura"></span></p>
-        <!-- NUEVO: Sección de detalles de pago (abono) -->
-        <div id="detallesPago" style="display: none; margin-top: 15px; padding: 12px; background-color: #fff3e0; border-radius: 5px; border-left: 4px solid #ff9800;">
-          <p style="margin: 5px 0;"><strong>Detalles de Pago (Abono):</strong></p>
-          <p style="margin: 5px 0; color: #666;">Monto Abonado: <strong id="montoAbonado">$0.00</strong></p>
-          <p style="margin: 5px 0; color: #ff9800;"><strong>Saldo Pendiente: <span id="saldoPendiente">$0.00</span></strong></p>
+        <p><strong>Total:</strong> $<span id="totalFactura"></span></p>
+      </div>
+
+      <!-- ==========================================
+           SECCIÓN DE DETALLES DE PAGO (ABONO)
+           - Se muestra solo si tipoPago === 'abono'
+           - Se oculta por defecto, JS lo activa
+      ========================================== -->
+      <div id="detallesPago" style="display: none;">
+        <h3>Detalles de Pago (Abono)</h3>
+        <table class="pago-detalle-tabla">
+          <tr>
+            <td>Total del Pedido:</td>
+            <td id="pagoTotalPedido">$0.00</td>
+          </tr>
+          <tr class="pago-abonado">
+            <td>Monto Abonado:</td>
+            <td id="montoAbonado">$0.00</td>
+          </tr>
+          <tr class="pago-total-row pago-pendiente">
+            <td>Saldo Pendiente:</td>
+            <td id="saldoPendiente">$0.00</td>
+          </tr>
+        </table>
+        <div class="pago-nota">
+          ⚠️ <strong>Nota:</strong> Este pedido tiene un saldo pendiente de pago. 
+          Por favor, comuníquese con nosotros para coordinar el pago del saldo restante.
         </div>
       </div>
+
+      <section class="comentario">
+        <h3>Comentario del Cliente</h3>
+        <p id="comentarioCliente">No se ingresó ningún comentario.</p>
+      </section>
 
       <footer>
         <p>
           El pago se realizará en un plazo de tres meses desde la emisión de
           esta factura,<br />
-          se realizará mediante transferencia bancaria.
+          se realizará mediante el método especificado.
         </p>
       </footer>
     </div>
 
-    <script>
-      function generarPDF() {
-        const facturaData = JSON.parse(localStorage.getItem("facturaData"));
-        let totalFactura = 0;
-
-        facturaData.productos.forEach((p) => {
-          totalFactura += parseFloat(p.total);
-        });
-        let factura = {
-          // Obtenemos todos los datos que ya están en pantalla
-          numero: document.getElementById("numeroFactura").textContent,
-          fecha: document.getElementById("fechaFactura").textContent,
-          clienteNombre: document.getElementById("clienteNombre").textContent,
-          clienteCorreo: document.getElementById("clienteCorreo").textContent,
-          metodoPago: facturaData.metodoPago,
-          paquete: facturaData.paquete,
-          total: totalFactura,
-          comentario: facturaData.comentario,
-        };
-        // Enviamos los datos al PHP por POST
-        console.log(factura);
-        fetch("../php/facturas_pdf.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(factura),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.exito) {
-              alert("Factura PDF generada correctamente");
-              var link = document.createElement("a");
-              link.href = data.url;
-              link.download = "factura.pdf";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } else {
-              alert("Error al generar el PDF");
-            }
-          })
-          .catch((error) => console.error("Error:", error));
-      }
-    </script>
     <div class="acciones-factura">
       <button id="btnGenerarPDF" class="btn-pdf" onclick="generarPDF()">
         📄 Generar PDF

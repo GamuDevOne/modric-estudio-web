@@ -1,11 +1,10 @@
 // ========================================
-// DEBUG: Verificar localStorage al cargar
+// REGISTRO.JS - VERSIÓN CORREGIDA
+// Ahora guarda en BD antes de generar factura
+// fecha: 12/21/25
 // ========================================
+
 console.log('📝 registro.js cargado');
-console.log('Datos en localStorage:', {
-    ventaDesdeVendedor: localStorage.getItem('ventaDesdeVendedor'),
-    facturaData: localStorage.getItem('facturaData')
-});
 
 // ========================================
 // CARGAR DATOS PREVIOS DESDE LOCALSTORAGE
@@ -15,7 +14,7 @@ function cargarDatosDesdeVendedor() {
     
     if (!ventaData) {
         console.log('No hay datos desde vendedor');
-        return; // No hay datos desde vendedor
+        return;
     }
     
     try {
@@ -29,9 +28,7 @@ function cargarDatosDesdeVendedor() {
             console.log('Indicador mostrado');
         }
         
-        // ==========================================
-        // 1. CARGAR DATOS DEL CLIENTE
-        // ==========================================
+        // Cargar datos del cliente
         if (datos.cliente) {
             document.getElementById('nombre').value = datos.cliente.nombre || '';
             document.getElementById('apellido').value = datos.cliente.apellido || '';
@@ -39,107 +36,79 @@ function cargarDatosDesdeVendedor() {
             document.getElementById('telefono').value = datos.cliente.telefono || '';
             document.getElementById('comentario').value = datos.cliente.comentario || '';
             
-            console.log('Campos básicos cargados');
-            
             // Seleccionar escuela
             const escuelaSelect = document.getElementById('escuela');
             if (datos.cliente.escuela) {
-                // Buscar si la escuela existe en el select
                 let found = false;
                 for (let option of escuelaSelect.options) {
                     if (option.value === datos.cliente.escuela) {
                         escuelaSelect.value = datos.cliente.escuela;
                         found = true;
-                        console.log('Escuela encontrada y seleccionada:', datos.cliente.escuela);
                         break;
                     }
                 }
-                // Si no se encuentra, seleccionar "Otra"
                 if (!found) {
                     escuelaSelect.value = 'Otra';
                     document.getElementById('otraEscuelaSection').style.display = 'block';
                     document.getElementById('otraEscuela').value = datos.cliente.escuela;
                     document.getElementById('otraEscuela').required = true;
-                    console.log('Escuela no encontrada, seleccionada "Otra":', datos.cliente.escuela);
                 }
             }
         }
         
-        // ==========================================
-        // 2. CARGAR DATOS DE PAQUETE/SERVICIO
-        // ==========================================
+        // Cargar datos de paquete/servicio
         if (datos.venta && datos.venta.nombreServicio) {
             const paqueteSelect = document.getElementById('paquete');
             let paqueteEncontrado = false;
             const nombreServicioLower = datos.venta.nombreServicio.toLowerCase();
             
-            // Buscar el paquete en el select
             for (let option of paqueteSelect.options) {
                 const textoOption = option.textContent.toLowerCase();
                 const valueOption = option.value.toLowerCase();
                 
-                // Intenta varias estrategias de búsqueda
                 if (textoOption.includes(nombreServicioLower) || 
                     nombreServicioLower.includes(textoOption) ||
                     nombreServicioLower.includes(valueOption) ||
                     valueOption.includes(nombreServicioLower)) {
                     paqueteSelect.value = option.value;
                     paqueteEncontrado = true;
-                    console.log('Paquete encontrado en select:', datos.venta.nombreServicio, '→', option.value);
                     break;
                 }
             }
             
-            // Si no se encontró, crear una opción nueva dinámicamente
             if (!paqueteEncontrado) {
-                console.log('⚠️ Paquete no encontrado en select, creando opción dinámica:', datos.venta.nombreServicio);
-                
-                // Crear un value único basado en el nombre del servicio
                 const newValue = datos.venta.nombreServicio.toLowerCase().replace(/\s+/g, '-');
                 const newOption = document.createElement('option');
                 newOption.value = newValue;
                 newOption.textContent = `${datos.venta.nombreServicio} - $${datos.venta.precio.toFixed(2)}`;
                 newOption.selected = true;
-                
                 paqueteSelect.appendChild(newOption);
                 paqueteSelect.value = newValue;
-                
-                console.log('✓ Opción dinámica creada y seleccionada:', newValue);
             }
         }
         
-        // ==========================================
-        // 3. CARGAR INFORMACIÓN DE PAGO
-        // ==========================================
+        // Cargar información de pago
         if (datos.venta) {
-            // Seleccionar método de pago (solo si está en formato compatible)
+            // Método de pago
             if (datos.venta.metodoPago) {
-                // Convertir el método de pago a minúsculas para que coincida
                 const metodoPagoNormalizado = datos.venta.metodoPago.toLowerCase();
-                
                 const metodoPagoRadios = document.querySelectorAll('input[name="metodoPago"]');
                 for (let radio of metodoPagoRadios) {
                     if (radio.value === metodoPagoNormalizado) {
                         radio.checked = true;
-                        console.log('Método de pago seleccionado:', metodoPagoNormalizado);
                         break;
                     }
                 }
             }
             
-            // Seleccionar tipo de pago
+            // Tipo de pago
             if (datos.venta.estadoPago) {
-                const tipoPagoSelect = document.getElementById('tipoPago');
-                // Convertir "Completo" a "completo" y "Abono" a "abono" si es necesario
                 const tipoPagoValue = datos.venta.estadoPago.toLowerCase();
-                
                 const tipoPagoRadios = document.querySelectorAll('input[name="tipoPago"]');
                 for (let radio of tipoPagoRadios) {
                     if (radio.value === tipoPagoValue) {
                         radio.checked = true;
-                        console.log('Tipo de pago seleccionado:', tipoPagoValue);
                         
-                        // Si es abono, mostrar sección y cargar monto
                         if (tipoPagoValue === 'abono') {
                             const abonoSection = document.getElementById('abonoSection');
                             if (abonoSection) {
@@ -147,10 +116,8 @@ function cargarDatosDesdeVendedor() {
                                 
                                 if (datos.venta.montoAbonado) {
                                     const montoAbonadoInput = document.getElementById('cantidadAbono');
-                                    // Formatear con "$" para que coincida con el formato esperado
                                     const montoFormateado = '$' + parseFloat(datos.venta.montoAbonado).toFixed(2);
                                     montoAbonadoInput.value = montoFormateado;
-                                    console.log('Monto abonado cargado y formateado:', montoFormateado);
                                 }
                             }
                         }
@@ -160,21 +127,22 @@ function cargarDatosDesdeVendedor() {
             }
         }
         
-        console.log('✓ Todos los datos cargados desde vendedor correctamente');
+        console.log('✓ Todos los datos cargados correctamente');
         
     } catch (error) {
         console.error('Error al cargar datos desde vendedor:', error);
     }
 }
 
-// Cargar y configurar todo cuando el DOM esté listo
+// ========================================
+// INICIALIZACIÓN
+// ========================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded - Inicializando registro.js');
     
-    // 1. Cargar datos previos desde vendedor
     cargarDatosDesdeVendedor();
     
-    // 2. Configurar formateo de teléfono
+    // Configurar formateo de teléfono
     const telefonoInput = document.getElementById('telefono');
     if (telefonoInput) {
         telefonoInput.addEventListener('input', function (e) {
@@ -186,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 3. Configurar sección de abono
+    // Configurar sección de abono
     const tipoPagoRadios = document.querySelectorAll('input[name="tipoPago"]');
     const abonoSection = document.getElementById('abonoSection');
     const cantidadAbonoInput = document.getElementById('cantidadAbono');
@@ -204,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 4. Configurar escuela
+    // Configurar escuela
     const escuelaSelect = document.getElementById('escuela');
     const otraEscuelaSection = document.getElementById('otraEscuelaSection');
     const otraEscuelaInput = document.getElementById('otraEscuela');
@@ -223,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 5. Configurar formateo de abono
+    // Configurar formateo de abono
     cantidadAbonoInput.addEventListener('input', function (e) {
         let value = e.target.value.replace(/[^\d.]/g, '');
         const parts = value.split('.');
@@ -232,7 +200,9 @@ document.addEventListener('DOMContentLoaded', function() {
         e.target.value = value ? '$' + value : '';
     });
     
-    // 6. Configurar validación del formulario
+    // ========================================
+    // CONFIGURAR VALIDACIÓN DEL FORMULARIO
+    // ========================================
     document.getElementById('facturaForm').addEventListener('submit', function (e) {
         e.preventDefault();
         let isValid = true;
@@ -249,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const telefonoPattern = /^6\d{3}-\d{4}$/;
 
-        // === Validaciones básicas ===
+        // Validaciones
         if (!nombre.value.trim()) { showError('nombre'); isValid = false; } else hideError('nombre');
         if (!apellido.value.trim()) { showError('apellido'); isValid = false; } else hideError('apellido');
         if (!telefonoPattern.test(telefono.value)) { showError('telefono'); isValid = false; } else hideError('telefono');
@@ -266,99 +236,132 @@ document.addEventListener('DOMContentLoaded', function() {
             } else hideError('abono');
         }
 
-        // === Si todo está bien, guardar datos ===
-        if (isValid) {
-            // Detectar si viene desde vendedor
-            const ventaData = localStorage.getItem('ventaDesdeVendedor');
-            const desdeVendedor = ventaData ? JSON.parse(ventaData) : null;
-            
-            // ==========================================
-            // Calcular precio y ITBMS (7%)
-            // ==========================================
-            let precioBásico = 50.00; // valor por defecto
-            let paqueteNombre = paquete.options[paquete.selectedIndex].text;
-            
-            // Si viene desde vendedor, usar el precio del servicio
-            if (desdeVendedor && desdeVendedor.venta.precio) {
-                precioBásico = parseFloat(desdeVendedor.venta.precio);
-                paqueteNombre = desdeVendedor.venta.nombreServicio;
-            } else {
-                // Si es un paquete del formulario, extraer el precio del texto
-                const precioMatch = paqueteNombre.match(/\$(\d+\.?\d*)/);
-                if (precioMatch) {
-                    precioBásico = parseFloat(precioMatch[1]);
-                }
-            }
-            
-            const itbms = precioBásico * 0.07;
-            const totalConItbms = precioBásico + itbms;
-            
-            // Obtener los valores de tipoPago y cantidadAbono
-            const tipoPagoValue = tipoPago.value; // 'completo' o 'abono'
-            let cantidadAbonoValue = 'N/A';
-            
-            if (tipoPagoValue === 'abono') {
-                const abonoInput = cantidadAbonoInput.value.trim();
-                if (abonoInput) {
-                    // Si viene del formateo, tendrá "$", si viene del vendedor puede tenerlo o no
-                    cantidadAbonoValue = abonoInput.includes('$') ? abonoInput : '$' + abonoInput;
-                } else if (desdeVendedor && desdeVendedor.venta.montoAbonado) {
-                    // Fallback: usar montoAbonado del vendedor si el input está vacío
-                    cantidadAbonoValue = '$' + parseFloat(desdeVendedor.venta.montoAbonado).toFixed(2);
-                }
-            }
-            
-            const formData = {
-                cliente: {
-                    nombre: `${nombre.value} ${apellido.value}`,
-                    telefono: telefono.value.replace('-', ''),
-                    escuela: escuela.value === 'Otra' ? document.getElementById('otraEscuela').value : escuela.value,
-                    grupo: grupo ? grupo.value : '',
-                    comentario: comentario.value.trim() || "Sin comentarios"
-                },
-                paquete: paqueteNombre,
-                metodoPago: desdeVendedor ? desdeVendedor.venta.metodoPago : metodoPago.value,
-                tipoPago: tipoPagoValue, // Usar siempre minúsculas ('completo' o 'abono')
-                cantidadAbono: cantidadAbonoValue,
-                comentario: comentario.value.trim() || "Sin comentarios",
-                // NUEVO: Datos del vendedor si aplica
-                desdeVendedor: desdeVendedor ? true : false,
-                ventaInfo: desdeVendedor ? {
-                    idVendedor: desdeVendedor.venta.idVendedor,
-                    idColegio: desdeVendedor.venta.idColegio,
-                    nombreVendedor: desdeVendedor.venta.nombreVendedor,
-                    colegioNombre: desdeVendedor.venta.colegioNombre,
-                    metodoPago: desdeVendedor.venta.metodoPago,
-                    estadoPago: desdeVendedor.venta.estadoPago,
-                    montoAbonado: desdeVendedor.venta.montoAbonado
-                } : null,
-                productos: [
-                    {
-                        descripcion: paqueteNombre,
-                        base: precioBásico.toFixed(2),
-                        itbms: itbms.toFixed(2),
-                        total: totalConItbms.toFixed(2)
-                    }
-                ]
-            };
-
-            console.log('✓ FormData construida correctamente:', formData);
-            console.log('  - tipoPago:', formData.tipoPago);
-            console.log('  - cantidadAbono:', formData.cantidadAbono);
-            console.log('  - desdeVendedor:', formData.desdeVendedor);
-            if (formData.ventaInfo) {
-                console.log('  - ventaInfo.montoAbonado:', formData.ventaInfo.montoAbonado);
-            }
-            
-            // === 💾 Guardar datos de la factura en localStorage ===
-            localStorage.setItem('facturaData', JSON.stringify(formData));
-
-            // === 🔄 Redirigir automáticamente a factura.html ===
-            window.location.href = "factura.html";
+        if (!isValid) {
+            return;
         }
+        
+        // ========================================
+        // PREPARAR DATOS PARA GUARDAR
+        // ========================================
+        const ventaData = localStorage.getItem('ventaDesdeVendedor');
+        const desdeVendedor = ventaData ? JSON.parse(ventaData) : null;
+        
+        // Calcular precio con ITBMS
+        let precioBásico = 50.00;
+        let paqueteNombre = paquete.options[paquete.selectedIndex].text;
+        
+        if (desdeVendedor && desdeVendedor.venta.precio) {
+            precioBásico = parseFloat(desdeVendedor.venta.precio);
+            paqueteNombre = desdeVendedor.venta.nombreServicio;
+        } else {
+            const precioMatch = paqueteNombre.match(/\$(\d+\.?\d*)/);
+            if (precioMatch) {
+                precioBásico = parseFloat(precioMatch[1]);
+            }
+        }
+        
+        const itbms = precioBásico * 0.07;
+        const totalConItbms = precioBásico + itbms;
+        
+        const tipoPagoValue = tipoPago.value;
+        let cantidadAbonoValue = 'N/A';
+        
+        if (tipoPagoValue === 'abono') {
+            const abonoInput = cantidadAbonoInput.value.trim();
+            if (abonoInput) {
+                cantidadAbonoValue = abonoInput.includes('$') ? abonoInput : '$' + abonoInput;
+            } else if (desdeVendedor && desdeVendedor.venta.montoAbonado) {
+                cantidadAbonoValue = '$' + parseFloat(desdeVendedor.venta.montoAbonado).toFixed(2);
+            }
+        }
+        
+        const formData = {
+            cliente: {
+                nombre: `${nombre.value} ${apellido.value}`,
+                telefono: telefono.value.replace('-', ''),
+                escuela: escuela.value === 'Otra' ? document.getElementById('otraEscuela').value : escuela.value,
+                grupo: grupo ? grupo.value : '',
+                comentario: comentario.value.trim() || "Sin comentarios"
+            },
+            paquete: paqueteNombre,
+            metodoPago: desdeVendedor ? desdeVendedor.venta.metodoPago : metodoPago.value,
+            tipoPago: tipoPagoValue,
+            cantidadAbono: cantidadAbonoValue,
+            comentario: comentario.value.trim() || "Sin comentarios",
+            desdeVendedor: desdeVendedor ? true : false,
+            ventaInfo: desdeVendedor ? {
+                idVendedor: desdeVendedor.venta.idVendedor,
+                idColegio: desdeVendedor.venta.idColegio,
+                nombreVendedor: desdeVendedor.venta.nombreVendedor,
+                colegioNombre: desdeVendedor.venta.colegioNombre,
+                metodoPago: desdeVendedor.venta.metodoPago,
+                estadoPago: desdeVendedor.venta.estadoPago,
+                montoAbonado: desdeVendedor.venta.montoAbonado,
+                idServicio: desdeVendedor.venta.idServicio,
+                idPaquete: desdeVendedor.venta.idPaquete
+            } : null,
+            productos: [
+                {
+                    descripcion: paqueteNombre,
+                    base: precioBásico.toFixed(2),
+                    itbms: itbms.toFixed(2),
+                    total: totalConItbms.toFixed(2)
+                }
+            ]
+        };
+
+        console.log('✓ FormData construida:', formData);
+        
+        // ========================================
+        // GUARDAR EN BASE DE DATOS
+        // ========================================
+        // Mostrar modal de carga
+        mostrarModal('Guardando venta...', 'info');
+        
+        fetch('../php/guardar-venta.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error del servidor: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+            
+            if (data.success) {
+                // Agregar número de orden a los datos
+                formData.numeroOrden = data.numeroOrden;
+                formData.idPedido = data.idPedido;
+                
+                // Guardar datos para la factura
+                localStorage.setItem('facturaData', JSON.stringify(formData));
+                
+                // Limpiar datos del vendedor
+                localStorage.removeItem('ventaDesdeVendedor');
+                
+                mostrarModal('¡Venta guardada exitosamente!', 'success');
+                
+                // Redirigir a factura después de 1 segundo
+                setTimeout(() => {
+                    window.location.href = "factura.html";
+                }, 1000);
+            } else {
+                mostrarModal('Error al guardar: ' + (data.message || 'Error desconocido'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error al guardar venta:', error);
+            mostrarModal('Error de conexión. Verifica que XAMPP esté activo.', 'error');
+        });
     });
     
-    // 7. Configurar ocultar error al escribir
+    // Ocultar error al escribir
     document.querySelectorAll('input, select, textarea').forEach(element => {
         element.addEventListener('input', function () {
             hideError(this.id);
@@ -366,7 +369,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// === 🚨 Funciones de error ===
+// ========================================
+// FUNCIONES DE ERROR
+// ========================================
 function showError(fieldName) {
     const field = document.getElementById(fieldName);
     const error = document.getElementById(fieldName + 'Error');
@@ -381,9 +386,49 @@ function hideError(fieldName) {
     if (error) error.classList.remove('active');
 }
 
-// === ✏️ Ocultar error al escribir ===
-document.querySelectorAll('input, select, textarea').forEach(element => {
-    element.addEventListener('input', function () {
-        hideError(this.id);
-    });
-});
+// Función para mostrar notificaciones/modales
+function mostrarModal(mensaje, tipo = 'info') {
+    let modal = document.getElementById('notificacionRegistro');
+    
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'notificacionRegistro';
+        modal.className = 'notificacion-modal';
+        document.body.appendChild(modal);
+    }
+    
+    modal.className = 'notificacion-modal ' + tipo;
+    modal.textContent = mensaje;
+    modal.style.display = 'block';
+    modal.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        z-index: 9999;
+        display: block;
+        min-width: 250px;
+    `;
+    
+    // Definir colores según el tipo
+    const colores = {
+        'info': { bg: '#e3f2fd', color: '#1976d2', border: '2px solid #1976d2' },
+        'success': { bg: '#e8f5e9', color: '#388e3c', border: '2px solid #388e3c' },
+        'error': { bg: '#ffebee', color: '#d32f2f', border: '2px solid #d32f2f' },
+        'warning': { bg: '#fff3e0', color: '#f57c00', border: '2px solid #f57c00' }
+    };
+    
+    const estilos = colores[tipo] || colores['info'];
+    modal.style.backgroundColor = estilos.bg;
+    modal.style.color = estilos.color;
+    modal.style.border = estilos.border;
+    
+    // Auto-hide para success/error (no para info/loading)
+    if (tipo !== 'info') {
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 4000);
+    }
+}
