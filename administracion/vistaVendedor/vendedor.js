@@ -1,4 +1,16 @@
 // ========================================
+// FLUJO DE VENTA INTEGRADO CON REGISTRO
+// ========================================
+// NUEVO (21/12/2025):
+// El flujo ahora es:
+// 1. Vendedor registra venta básica (nombre cliente, servicio, precio)
+// 2. Datos se guardan en localStorage con clave 'ventaDesdeVendedor'
+// 3. Se redirige a registro.html para completar detalles
+// 4. En registro.html se cargan los datos previos y se pueden editar
+// 5. Al enviar el formulario se genera la factura
+// 6. La factura contiene info del vendedor, colegio y cliente completa
+
+// ========================================
 // FUNCIÓN AUXILIAR: Obtener fecha local
 // ========================================
 function obtenerFechaLocal() {
@@ -343,6 +355,7 @@ function guardarVenta(event) {
     const metodoPago = document.getElementById('metodoPago').value;
     const estadoPago = document.getElementById('estadoPago').value;
     const notas = document.getElementById('notasVenta').value;
+    const nombreServicio = selectedOption.textContent.split(' - ')[0];
     
     // NUEVO: Obtener monto abonado(11/12/25)
     let montoAbonado = null;
@@ -361,44 +374,55 @@ function guardarVenta(event) {
         }
     }
     
-    showLoadingModal();
-    
-    fetch('../../php/gest-ventas.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
+    // ========================================
+    // NUEVO: Guardar en localStorage y redirigir a registro.html
+    // ========================================
+    const ventaData = {
+        origen: 'vendedor',
+        cliente: {
+            nombre: nombreCliente,
+            apellido: '',
+            grupo: '',
+            telefono: '',
+            escuela: asignacionActual.NombreColegio,
+            comentario: notas || ''
         },
-        body: JSON.stringify({
-            action: 'registrar_venta',
-            idVendedor: vendedorData.id,
-            idColegio: asignacionActual.ID_Colegio,
-            nombreCliente: nombreCliente,
+        venta: {
             idServicio: esPaquete ? null : idServicio,
             idPaquete: esPaquete ? idServicio : null,
-            total: precio,
+            nombreServicio: nombreServicio,
+            esPaquete: esPaquete,
+            precio: precio,
             metodoPago: metodoPago,
             estadoPago: estadoPago,
-            montoAbonado: montoAbonado, // nuevo. monto abonado (11/12/25)
-            notas: notas
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
+            montoAbonado: montoAbonado,
+            idVendedor: vendedorData.id,
+            idColegio: asignacionActual.ID_Colegio,
+            nombreVendedor: vendedorData.nombre,
+            colegioNombre: asignacionActual.NombreColegio
+        },
+        productos: [
+            {
+                descripcion: nombreServicio,
+                base: precio.toFixed(2),
+                itbms: (precio * 0.07).toFixed(2),
+                total: (precio * 1.07).toFixed(2)
+            }
+        ]
+    };
+    
+    // Guardar en localStorage
+    localStorage.setItem('ventaDesdeVendedor', JSON.stringify(ventaData));
+    
+    console.log('✓ Venta guardada en localStorage:', ventaData);
+    console.log('✓ Redirigiendo a registro.html...');
+    
+    // Mostrar notificación y redirigir
+    showLoadingModal();
+    setTimeout(() => {
         hideLoadingModal();
-        
-        if (data.success) {
-            mostrarModal('¡Venta registrada correctamente!');
-            cerrarModalVenta();
-            cargarVentasDelDia();
-        } else {
-            mostrarModal('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        hideLoadingModal();
-        console.error('Error:', error);
-        mostrarModal('Error de conexión');
-    });
+        window.location.href = '../../RegistroCliente_Factura/registro.html';
+    }, 500);
 }
 
 // ========================================

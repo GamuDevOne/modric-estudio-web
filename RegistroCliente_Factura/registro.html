@@ -11,13 +11,17 @@
         <div class="header">
             <h1>Sistema de Facturación</h1>
             <p>Modric Estudio</p>
+            <!-- NUEVO: Indicador de origen -->
+            <div id="origenIndicador" style="display: none; margin-top: 10px; padding: 10px; background-color: #e8f5e9; border-radius: 5px; color: #2e7d32; font-size: 14px; font-weight: 500;">
+                📝 Completando venta del vendedor
+            </div>
         </div>
 
         <div class="form-container">
             <form id="facturaForm">
                 <!-- Información del Cliente -->
                 <div class="form-section">
-                    <h2>Información del Cliente</h2>
+                    <h2>Completar Información del Cliente</h2>
                     
                     <div class="row">
                         <div class="form-group">
@@ -83,9 +87,9 @@
                         <label for="paquete">Seleccione el paquete *</label>
                         <select id="paquete" name="paquete" required>
                             <option value="">Seleccione un paquete</option>
-                            <option value="basico">Paquete Básico - $50.00</option>
-                            <option value="estandar">Paquete Estándar - $100.00</option>
-                            <option value="premium">Paquete Premium - $200.00</option>
+                            <option value="basico">Paquete Básico - $10.00</option>
+                            <option value="estandar">Paquete Estándar - $15.00</option>
+                            <option value="premium">Paquete Premium - $20.00</option>
                         </select>
                         <span class="error" id="paqueteError">Por favor seleccione un paquete</span>
                     </div>

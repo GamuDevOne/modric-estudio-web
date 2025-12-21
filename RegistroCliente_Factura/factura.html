@@ -14,14 +14,12 @@
         </div>
         <div class="info-empresa">
           <p><strong>Borcelle</strong></p>
-          <p>Calle Cualquiera 123,<br />Cualquier Lugar, CP: 12345</p>
+          <p>Panamá,<br />La Chorrera</p>
           <p>Modricestudio@gmail.com</p>
-          <p>91-1234-567</p>
         </div>
         <div class="info-factura">
           <p><strong>FACTURA Nº:</strong> <span id="numeroFactura"></span></p>
           <p><strong>Fecha:</strong> <span id="fechaFactura"></span></p>
-          <p><strong>Vendedor:</strong> <span id="facturaVendedor"></span></p>
         </div>
       </header>
 
@@ -53,6 +51,12 @@
 
       <div class="total">
         <p><strong>Total:</strong> <span id="totalFactura"></span></p>
+        <!-- NUEVO: Sección de detalles de pago (abono) -->
+        <div id="detallesPago" style="display: none; margin-top: 15px; padding: 12px; background-color: #fff3e0; border-radius: 5px; border-left: 4px solid #ff9800;">
+          <p style="margin: 5px 0;"><strong>Detalles de Pago (Abono):</strong></p>
+          <p style="margin: 5px 0; color: #666;">Monto Abonado: <strong id="montoAbonado">$0.00</strong></p>
+          <p style="margin: 5px 0; color: #ff9800;"><strong>Saldo Pendiente: <span id="saldoPendiente">$0.00</span></strong></p>
+        </div>
       </div>
 
       <footer>

@@ -3,13 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-12-2025 a las 15:11:54
+-- Tiempo de generación: 21-12-2025 a las 21:37:15
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
--- SQL BACKUP PARA IMPORTAR EN PHPMYADMIN 
 
-CREATE DATABASE IF NOT EXISTS modricestudio00;
-USE modricestudio00;
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -91,21 +89,7 @@ CREATE TABLE `asignacionvendedor` (
 --
 
 INSERT INTO `asignacionvendedor` (`ID_Asignacion`, `ID_Vendedor`, `ID_Colegio`, `FechaAsignacion`, `Estado`, `FechaCreacion`) VALUES
-(2, 2, 2, '2025-11-28', 'Finalizado', '2025-11-27 23:17:55'),
-(3, 9, 2, '2025-11-28', 'Finalizado', '2025-11-27 23:26:43'),
-(5, 5, 2, '2025-11-29', 'Finalizado', '2025-11-29 12:07:36'),
-(12, 9, 5, '2025-12-01', 'Activo', '2025-11-30 19:48:46'),
-(13, 2, 5, '2025-12-01', 'Activo', '2025-11-30 19:48:49'),
-(14, 9, 5, '2025-11-30', 'Activo', '2025-11-30 19:49:25'),
-(15, 2, 5, '2025-11-30', 'Activo', '2025-11-30 19:49:28'),
-(16, 5, 2, '2025-12-01', 'Finalizado', '2025-11-30 20:20:02'),
-(35, 9, 8, '2025-12-06', 'Activo', '2025-12-06 20:50:00'),
-(36, 5, 8, '2025-12-06', 'Activo', '2025-12-06 20:50:22'),
-(38, 9, 8, '2025-12-11', 'Activo', '2025-12-11 22:40:50'),
-(39, 21, 8, '2025-12-11', 'Activo', '2025-12-11 22:41:00'),
-(40, 21, 5, '2025-12-12', 'Activo', '2025-12-12 02:20:37'),
-(41, 19, 5, '2025-12-12', 'Activo', '2025-12-12 02:20:45'),
-(42, 19, 8, '2025-12-18', 'Activo', '2025-12-18 08:46:24');
+(1, 61, 12, '2025-12-21', 'Activo', '2025-12-21 15:07:30');
 
 -- --------------------------------------------------------
 
@@ -122,14 +106,6 @@ CREATE TABLE `bloqueofecha` (
   `FechaCreacion` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `bloqueofecha`
---
-
-INSERT INTO `bloqueofecha` (`ID_Bloqueo`, `FechaInicio`, `FechaFin`, `Motivo`, `Estado`, `FechaCreacion`) VALUES
-(1, '2025-12-24', '2025-12-26', 'Navidad', 'Activo', '2025-12-06 17:38:20'),
-(2, '2025-12-31', '2026-01-01', 'Año Nuevo', 'Activo', '2025-12-06 17:38:20');
-
 -- --------------------------------------------------------
 
 --
@@ -144,15 +120,6 @@ CREATE TABLE `categoria` (
   `FechaFin` date NOT NULL,
   `Estado` varchar(20) DEFAULT 'Activa' CHECK (`Estado` in ('Activa','Inactiva'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `categoria`
---
-
-INSERT INTO `categoria` (`ID_Categoria`, `NombreCategoria`, `Descripcion`, `FechaInicio`, `FechaFin`, `Estado`) VALUES
-(1, 'Temporada de Bodas', 'Promoción especial para bodas', '2025-02-01', '2025-03-31', 'Activa'),
-(2, 'Graduaciones 2025', 'Sesiones de graduación con descuento', '2025-04-01', '2025-05-31', 'Activa'),
-(3, 'Navidad 2025', 'Sesiones familiares y temáticas', '2025-11-15', '2025-12-31', 'Inactiva');
 
 -- --------------------------------------------------------
 
@@ -190,9 +157,7 @@ CREATE TABLE `colegio` (
 --
 
 INSERT INTO `colegio` (`ID_Colegio`, `NombreColegio`, `Direccion`, `Telefono`, `FechaCreacion`, `Estado`, `Notas`) VALUES
-(2, 'Colegio Javier', 'Vía España, Ciudad de Panamá', NULL, '2025-11-22 14:55:41', 'Cerrado', NULL),
-(5, 'UTP', 'Sede central en la central', '64334531', '2025-11-30 19:48:35', 'Activo', 'Solo se atenderan a los estudiantes de tercer año'),
-(8, 'Instituto Nacional', 'Av. Balboa, Ciudad de Panamá', '6000-1111', '2025-12-05 19:50:18', 'Activo', NULL);
+(12, 'Lugar ejemplo', 'calle nose', '6543-9876', '2025-12-18 09:43:36', 'Activo', 'Comentario random');
 
 -- --------------------------------------------------------
 
@@ -219,15 +184,6 @@ CREATE TABLE `cotizacion` (
   `FechaConfirmacion` datetime DEFAULT NULL,
   `ID_Pedido` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `cotizacion`
---
-
-INSERT INTO `cotizacion` (`ID_Cotizacion`, `ID_Cliente`, `NombreCliente`, `CorreoCliente`, `TelefonoCliente`, `TipoSesion`, `DescripcionSesion`, `FechaSolicitada`, `HoraSolicitada`, `Estado`, `PrecioEstimado`, `NotasAdmin`, `Prioridad`, `FechaCreacion`, `FechaRespuesta`, `FechaConfirmacion`, `ID_Pedido`) VALUES
-(1, NULL, 'María González', 'maria@example.com', '6000-0001', 'Exterior', 'Necesito una sesión de fotos familiar en el parque. Somos 5 personas (2 adultos, 3 niños). Preferiblemente en la mañana con luz natural.', '2025-12-15', NULL, 'Pendiente', NULL, NULL, 0, '2025-12-06 17:38:20', NULL, NULL, NULL),
-(2, NULL, 'Carlos Ruiz', 'carlos@example.com', '6000-0002', 'Estudio', 'Sesión profesional para LinkedIn y redes sociales. Necesito 10-15 fotos editadas en alta resolución.', '2025-12-18', NULL, 'En_Revision', NULL, NULL, 0, '2025-12-06 17:38:20', NULL, NULL, NULL),
-(3, NULL, 'Ana Torres', 'ana@example.com', '6000-0003', 'Interior', 'Fotos de cumpleaños infantil en mi casa. Evento de 3 horas aproximadamente.', '2025-12-20', NULL, 'Aprobada', NULL, NULL, 0, '2025-12-06 17:38:20', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -290,15 +246,6 @@ CREATE TABLE `historialabonos` (
   `ID_RegistradoPor` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `historialabonos`
---
-
-INSERT INTO `historialabonos` (`ID_Abono`, `ID_Pedido`, `Monto`, `MetodoPago`, `Notas`, `FechaRegistro`, `ID_RegistradoPor`) VALUES
-(1, 13, 60.00, 'Efectivo', 'Abono inicial registrado por el vendedor', '2025-12-18 09:05:29', 19),
-(2, 14, 340.00, 'Yappy', 'Abono inicial registrado por el vendedor', '2025-12-18 09:06:29', 19),
-(3, 13, 90.00, 'Yappy', '', '2025-12-18 09:08:47', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -343,17 +290,6 @@ CREATE TABLE `paquete` (
   `ID_Servicio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `paquete`
---
-
-INSERT INTO `paquete` (`ID_Paquete`, `NombrePaquete`, `Contenido`, `Precio`, `ID_Servicio`) VALUES
-(1, 'Pack Graduación', 'Fotos + diplomas', 150.00, 1),
-(2, 'Pack Graduación Premium', '50 fotos digitales + 20 impresas + álbum', 450.00, 2),
-(3, 'Pack Graduación Básico', '30 fotos digitales + 10 impresas', 280.00, 2),
-(4, 'Pack Familiar Completo', '40 fotos + álbum familiar + cuadro 30x40', 380.00, 3),
-(5, 'Pack Retrato Profesional', '15 fotos editadas + 5 impresas', 200.00, 4);
-
 -- --------------------------------------------------------
 
 --
@@ -376,22 +312,6 @@ CREATE TABLE `pedido` (
   `Total` decimal(10,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `pedido`
---
-
-INSERT INTO `pedido` (`ID_Pedido`, `Fecha`, `Estado`, `Prioridad`, `FechaSesion`, `HoraSesion`, `ID_Usuario`, `NombreCliente`, `ID_Vendedor`, `ID_Servicio`, `ID_Paquete`, `ID_Colegio`, `Total`) VALUES
-(2, '2025-11-29 12:35:15', 'Completado', 0, NULL, NULL, 5, NULL, 5, NULL, 1, 2, 150.00),
-(3, '2025-11-29 12:39:49', 'Completado', 0, NULL, NULL, 5, NULL, 5, 1, NULL, 2, 500.00),
-(4, '2025-11-29 13:22:15', 'Completado', 0, NULL, NULL, 5, NULL, 5, NULL, 1, 2, 150.00),
-(5, '2025-11-29 14:53:44', 'Cancelado', 0, NULL, NULL, 5, 'Limon Dulce', 5, NULL, 1, 2, 150.00),
-(6, '2025-11-30 19:52:01', 'Completado', 0, NULL, NULL, 2, 'Ramona pilgrin', 2, NULL, 1, 5, 150.00),
-(9, '2025-12-11 23:09:33', 'Completado', 1, NULL, NULL, 9, 'Don cangrejo', 9, 1, NULL, 8, 500.00),
-(10, '2025-12-12 02:23:30', 'Cancelado', 1, NULL, NULL, 19, 'oldarei', 19, 2, NULL, 5, 350.00),
-(11, '2025-12-12 02:25:30', 'Cancelado', 2, NULL, NULL, 19, 'jigmaei', 19, NULL, 1, 5, 150.00),
-(13, '2025-12-18 09:05:29', 'Pendiente', 2, NULL, NULL, 19, 'cliente a', 19, NULL, 1, 8, 150.00),
-(14, '2025-12-18 09:06:29', 'Pendiente', 1, NULL, NULL, 19, 'cliente b', 19, NULL, 2, 8, 450.00);
-
 -- --------------------------------------------------------
 
 --
@@ -406,13 +326,6 @@ CREATE TABLE `producto` (
   `Precio` decimal(10,2) NOT NULL DEFAULT 0.00,
   `ID_Servicio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `producto`
---
-
-INSERT INTO `producto` (`ID_Producto`, `Nombre`, `Talla`, `Color`, `Precio`, `ID_Servicio`) VALUES
-(1, 'Camiseta básica', 'M', 'Negro', 12.50, 1);
 
 -- --------------------------------------------------------
 
@@ -434,11 +347,9 @@ CREATE TABLE `servicio` (
 --
 
 INSERT INTO `servicio` (`ID_Servicio`, `NombreServicio`, `Descripcion`, `Precio`, `Estado`, `Tipo`) VALUES
-(1, 'Fotografía de bodas', 'Servicio completo de fotografía', 500.00, 'Activo', 'Fotografía'),
-(2, 'Fotografía de Graduación', 'Sesión fotográfica completa para graduados', 350.00, 'Activo', 'Fotografía'),
-(3, 'Sesión Familiar', 'Fotografía familiar profesional', 250.00, 'Activo', 'Fotografía'),
-(4, 'Retrato Profesional', 'Sesión de retratos para CV y redes', 150.00, 'Activo', 'Fotografía'),
-(5, 'Evento Corporativo', 'Cobertura fotográfica de eventos', 600.00, 'Activo', 'Fotografía');
+(6, 'Pack Graduación Básico', 'Fotos + diploma', 10.00, 'Activo', 'Fotografia'),
+(7, 'Pack Graduación Estandar', 'Foto con diploma y dos familiares', 15.00, 'Activo', 'Fotografia'),
+(8, 'Pack Graduación Premuim', 'Foto con diploma más 4 familiares', 20.00, 'Activo', 'Fotografia');
 
 -- --------------------------------------------------------
 
@@ -467,21 +378,8 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`ID_Usuario`, `NombreCompleto`, `Correo`, `Usuario`, `Contrasena`, `TipoUsuario`, `Foto`, `GrupoGrado`, `LugarTrabajo`, `ContrasenaTemporal`, `FechaCreacionTemp`, `EsUsuarioTemporal`) VALUES
 (1, 'CEO Admin', 'ceo@modric.com', 'modric', 'password123', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
-(2, 'Luis Vendedor', 'vendedor@modric.com', NULL, 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(3, 'Ana Cliente', 'ana@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(5, 'Limon Vendedor', 'limonagrio@modric.com', NULL, 'password123', 'Vendedor', NULL, 'A/12', 'Escuela pedro pablo sanchez', NULL, NULL, 0),
-(7, 'Asucar Salada', '', NULL, 'password123', 'Cliente', NULL, NULL, NULL, 'temp8410', '2025-11-10 16:07:32', 1),
-(9, 'Delfin Morado', 'delfin12@modric.com', 'delfin vendedor', 'password123', 'Vendedor', NULL, 'Grupo E.Pedro', 'Pedro Pablo Sanchez', NULL, NULL, 0),
-(12, 'arroz conpollo(temporal)', 'arrozconpollo@cliente.com', 'arrozconpollo(temporal)455', 'password123', 'Cliente', NULL, NULL, NULL, 'temp9669', '2025-11-30 20:09:09', 1),
-(18, 'pepino demar', 'pepinodemar@modric.com', 'pepinodemar648', 'password123', 'Cliente', NULL, NULL, NULL, 'temp2750', '2025-11-30 20:13:33', 1),
-(19, 'Carlos Martínez', 'carlos@modric.com', 'cmartinez', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(21, 'Pedro Sánchez', 'pedro@modric.com', 'psanchez', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(24, 'Roberto Silva', 'roberto@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(25, 'Laura Martínez', 'laura@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(27, 'Carmen Ruiz', 'carmen@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(30, 'Andrés Castro', 'andres@cliente.com', NULL, 'password123', 'Cliente', NULL, NULL, NULL, NULL, NULL, 0),
-(47, 'Delfín Morado', 'delfin1@modric.com', 'delfinazul', 'password123', 'Vendedor', NULL, 'Grupo D', 'Colegio Abel Bravo', NULL, NULL, 0),
-(60, 'genji cliente', 'genticliente@modric.com', 'genjicliente696', 'password123', 'Cliente', NULL, NULL, NULL, 'temp2727', '2025-12-10 20:07:53', 1);
+(61, 'vendedor ejemplo', 'vendedorejemplo@modric.com', 'vendedor', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
+(62, 'cliente a', 'cliente@modric.com', 'clientea272', 'contraseña', 'Cliente', NULL, NULL, NULL, 'contraseña', '2025-12-18 09:56:59', 1);
 
 -- --------------------------------------------------------
 
@@ -499,21 +397,6 @@ CREATE TABLE `ventainfo` (
   `Notas` text DEFAULT NULL,
   `FechaRegistro` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `ventainfo`
---
-
-INSERT INTO `ventainfo` (`ID_VentaInfo`, `ID_Pedido`, `NombreCliente`, `MetodoPago`, `EstadoPago`, `MontoAbonado`, `Notas`, `FechaRegistro`) VALUES
-(1, 2, 'Emiliano perez', 'Yappy', 'Completo', NULL, 'el primer abono fue de 55', '2025-11-29 12:35:15'),
-(2, 3, 'Juan Ramires', 'Efectivo', 'Completo', NULL, 'Primer abono fue de 150\n\nMotivo cancelación: polquesi', '2025-11-29 12:39:49'),
-(3, 4, 'Layla gomez', 'Efectivo', 'Completo', NULL, 'Pidio informacion adicional', '2025-11-29 13:22:15'),
-(5, 6, 'Ramona pilgrin', 'Transferencia', 'Completo', NULL, 'Pidio info sobre el lugar\ntelefono: 65543421\n', '2025-11-30 19:52:01'),
-(6, 9, 'Don cangrejo', 'Transferencia', 'Completo', 275.00, 'La clienta pidio que la sesion fuera en el museo nacional (de dia)\n\nMotivo cancelación: ggjh', '2025-12-11 23:09:33'),
-(7, 10, 'oldarei', 'Yappy', 'Abono', 167.00, 'La sesion sera en el salon de conferencias de la sede principal', '2025-12-12 02:23:31'),
-(8, 11, 'jigmaei', 'Yappy', 'Abono', 90.00, 'La sesion será en el salon D1 edificio 3\n\nMotivo cancelación: No canceló', '2025-12-12 02:25:30'),
-(10, 13, 'cliente a', 'Efectivo', 'Completo', 150.00, 'menciono que terminará de cancelar la quincena que viene', '2025-12-18 09:05:29'),
-(11, 14, 'cliente b', 'Yappy', 'Abono', 340.00, 'Cancelara la cuota en dos quincenas', '2025-12-18 09:06:29');
 
 -- --------------------------------------------------------
 
@@ -700,19 +583,19 @@ ALTER TABLE `ventainfo`
 -- AUTO_INCREMENT de la tabla `albumcliente`
 --
 ALTER TABLE `albumcliente`
-  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `asignacionvendedor`
 --
 ALTER TABLE `asignacionvendedor`
-  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `bloqueofecha`
 --
 ALTER TABLE `bloqueofecha`
-  MODIFY `ID_Bloqueo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Bloqueo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `categoria`
@@ -730,13 +613,13 @@ ALTER TABLE `categoriapedido`
 -- AUTO_INCREMENT de la tabla `colegio`
 --
 ALTER TABLE `colegio`
-  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `cotizacion`
 --
 ALTER TABLE `cotizacion`
-  MODIFY `ID_Cotizacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID_Cotizacion` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detallepedido`
@@ -754,19 +637,19 @@ ALTER TABLE `factura`
 -- AUTO_INCREMENT de la tabla `fotoalbum`
 --
 ALTER TABLE `fotoalbum`
-  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `historialabonos`
 --
 ALTER TABLE `historialabonos`
-  MODIFY `ID_Abono` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID_Abono` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
-  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pago`
@@ -784,7 +667,7 @@ ALTER TABLE `paquete`
 -- AUTO_INCREMENT de la tabla `pedido`
 --
 ALTER TABLE `pedido`
-  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -796,19 +679,19 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT de la tabla `servicio`
 --
 ALTER TABLE `servicio`
-  MODIFY `ID_Servicio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID_Servicio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT de la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
-  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas

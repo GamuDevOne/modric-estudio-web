@@ -5,13 +5,13 @@ class EditorTextiles {
                 nombre: 'Suéter Personalizado',
                 activo: true,
                 precios: { xs: 0, s: 0, m: 0, l: 0, xl: 0 },
-                imagenes: ['', '', '']
+                imagenes: ['../../imagenes/SBN/IMG_0752.jpeg', '../../imagenes/SBN/IMG_0757.jpg', '../../imagenes/SBN/IMG_0758.jpeg']
             },
             abrigo: {
                 nombre: 'Abrigo Personalizado',
                 activo: true,
                 precios: { s: 0, m: 0, l: 0, xl: 0, xxl: 0 },
-                imagenes: ['', '', '']
+                imagenes: ['../../imagenes/SBN/_MG_0213.jpg', '../../imagenes/SBN/_MG_0334.jpg', '../../imagenes/SBN/_MG_0405.jpg']
             }
         };
         
