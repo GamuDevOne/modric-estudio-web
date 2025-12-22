@@ -197,10 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const detallesPago = document.getElementById('detallesPago');
       if (detallesPago) {
         detallesPago.style.display = 'block';
+        document.getElementById('pagoTotalPedido').textContent = '$' + total.toFixed(2);
         document.getElementById('montoAbonado').textContent = '$' + montoAbonado.toFixed(2);
         document.getElementById('saldoPendiente').textContent = '$' + saldoPendiente.toFixed(2);
         
         console.log('✅ Sección de abonos mostrada correctamente');
+        console.log('  - Total del pedido: $' + total.toFixed(2));
         console.log('  - Monto abonado: $' + montoAbonado.toFixed(2));
         console.log('  - Saldo pendiente: $' + saldoPendiente.toFixed(2));
       } else {

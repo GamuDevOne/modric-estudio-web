@@ -62,21 +62,42 @@ function cargarDatosDesdeVendedor() {
             let paqueteEncontrado = false;
             const nombreServicioLower = datos.venta.nombreServicio.toLowerCase();
             
-            for (let option of paqueteSelect.options) {
-                const textoOption = option.textContent.toLowerCase();
-                const valueOption = option.value.toLowerCase();
-                
-                if (textoOption.includes(nombreServicioLower) || 
-                    nombreServicioLower.includes(textoOption) ||
-                    nombreServicioLower.includes(valueOption) ||
-                    valueOption.includes(nombreServicioLower)) {
-                    paqueteSelect.value = option.value;
-                    paqueteEncontrado = true;
-                    break;
+            console.log('DEBUG: Buscando paquete:', datos.venta.nombreServicio);
+            
+            // Primero intentar búsqueda por palabra clave
+            const palabraClave = nombreServicioLower.includes('básico') || nombreServicioLower.includes('basico') ? 'basico' :
+                                 nombreServicioLower.includes('estándar') || nombreServicioLower.includes('estandar') ? 'estandar' :
+                                 nombreServicioLower.includes('premium') ? 'premium' : null;
+            
+            if (palabraClave) {
+                for (let option of paqueteSelect.options) {
+                    if (option.value === palabraClave) {
+                        paqueteSelect.value = option.value;
+                        paqueteEncontrado = true;
+                        console.log('DEBUG: Paquete encontrado por palabra clave:', palabraClave);
+                        break;
+                    }
+                }
+            }
+            
+            // Si no encontró por palabra clave, intentar búsqueda de texto
+            if (!paqueteEncontrado) {
+                for (let option of paqueteSelect.options) {
+                    const textoOption = option.textContent.toLowerCase();
+                    const valueOption = option.value.toLowerCase();
+                    
+                    if (textoOption.includes(nombreServicioLower) || 
+                        nombreServicioLower.includes(valueOption.replace('-', ' '))) {
+                        paqueteSelect.value = option.value;
+                        paqueteEncontrado = true;
+                        console.log('DEBUG: Paquete encontrado por texto:', option.value);
+                        break;
+                    }
                 }
             }
             
             if (!paqueteEncontrado) {
+                console.warn('DEBUG: Paquete no encontrado, creando opción personalizada');
                 const newValue = datos.venta.nombreServicio.toLowerCase().replace(/\s+/g, '-');
                 const newOption = document.createElement('option');
                 newOption.value = newValue;

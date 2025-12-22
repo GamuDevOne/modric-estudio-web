@@ -3,16 +3,26 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-12-2025 a las 21:37:15
+-- Tiempo de generación: 22-12-2025 a las 20:22:24
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
-
-
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `modricestudio00`
+--
+
+CREATE DATABASE IF NOT EXISTS `modricestudio00`;
+USE `modricestudio00`;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -84,13 +94,6 @@ CREATE TABLE `asignacionvendedor` (
   `FechaCreacion` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `asignacionvendedor`
---
-
-INSERT INTO `asignacionvendedor` (`ID_Asignacion`, `ID_Vendedor`, `ID_Colegio`, `FechaAsignacion`, `Estado`, `FechaCreacion`) VALUES
-(1, 61, 12, '2025-12-21', 'Activo', '2025-12-21 15:07:30');
-
 -- --------------------------------------------------------
 
 --
@@ -151,13 +154,6 @@ CREATE TABLE `colegio` (
   `Estado` varchar(20) NOT NULL DEFAULT 'Activo',
   `Notas` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `colegio`
---
-
-INSERT INTO `colegio` (`ID_Colegio`, `NombreColegio`, `Direccion`, `Telefono`, `FechaCreacion`, `Estado`, `Notas`) VALUES
-(12, 'Lugar ejemplo', 'calle nose', '6543-9876', '2025-12-18 09:43:36', 'Activo', 'Comentario random');
 
 -- --------------------------------------------------------
 
@@ -303,7 +299,7 @@ CREATE TABLE `pedido` (
   `Prioridad` int(11) DEFAULT 0,
   `FechaSesion` date DEFAULT NULL,
   `HoraSesion` time DEFAULT NULL,
-  `ID_Usuario` int(11) NOT NULL,
+  `ID_Usuario` int(11) DEFAULT NULL,
   `NombreCliente` varchar(150) DEFAULT NULL,
   `ID_Vendedor` int(11) NOT NULL,
   `ID_Servicio` int(11) DEFAULT NULL,
@@ -347,9 +343,9 @@ CREATE TABLE `servicio` (
 --
 
 INSERT INTO `servicio` (`ID_Servicio`, `NombreServicio`, `Descripcion`, `Precio`, `Estado`, `Tipo`) VALUES
-(6, 'Pack Graduación Básico', 'Fotos + diploma', 10.00, 'Activo', 'Fotografia'),
-(7, 'Pack Graduación Estandar', 'Foto con diploma y dos familiares', 15.00, 'Activo', 'Fotografia'),
-(8, 'Pack Graduación Premuim', 'Foto con diploma más 4 familiares', 20.00, 'Activo', 'Fotografia');
+(1, 'Pack Graduación Básico', 'Fotos + diploma', 10.00, 'Activo', 'Fotografia'),
+(2, 'Pack Graduación Estandar', 'Foto con diploma y dos familiares', 15.00, 'Activo', 'Fotografia'),
+(3, 'Pack Graduación Premuim', 'Foto con diploma más 4 familiares', 20.00, 'Activo', 'Fotografia');
 
 -- --------------------------------------------------------
 
@@ -377,9 +373,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`ID_Usuario`, `NombreCompleto`, `Correo`, `Usuario`, `Contrasena`, `TipoUsuario`, `Foto`, `GrupoGrado`, `LugarTrabajo`, `ContrasenaTemporal`, `FechaCreacionTemp`, `EsUsuarioTemporal`) VALUES
-(1, 'CEO Admin', 'ceo@modric.com', 'modric', 'password123', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
-(61, 'vendedor ejemplo', 'vendedorejemplo@modric.com', 'vendedor', 'password123', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0),
-(62, 'cliente a', 'cliente@modric.com', 'clientea272', 'contraseña', 'Cliente', NULL, NULL, NULL, 'contraseña', '2025-12-18 09:56:59', 1);
+(1, 'CEO admin', 'Modricestudio@gmail.com ', 'modric', 'admin', 'CEO', NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -589,7 +583,7 @@ ALTER TABLE `albumcliente`
 -- AUTO_INCREMENT de la tabla `asignacionvendedor`
 --
 ALTER TABLE `asignacionvendedor`
-  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `bloqueofecha`
@@ -613,7 +607,7 @@ ALTER TABLE `categoriapedido`
 -- AUTO_INCREMENT de la tabla `colegio`
 --
 ALTER TABLE `colegio`
-  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `cotizacion`
@@ -661,7 +655,7 @@ ALTER TABLE `pago`
 -- AUTO_INCREMENT de la tabla `paquete`
 --
 ALTER TABLE `paquete`
-  MODIFY `ID_Paquete` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID_Paquete` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pedido`
@@ -685,7 +679,7 @@ ALTER TABLE `servicio`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `ventainfo`
@@ -774,7 +768,7 @@ ALTER TABLE `paquete`
 -- Filtros para la tabla `pedido`
 --
 ALTER TABLE `pedido`
-  ADD CONSTRAINT `FK_Pedido_Cliente` FOREIGN KEY (`ID_Usuario`) REFERENCES `usuario` (`ID_Usuario`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Pedido_Cliente` FOREIGN KEY (`ID_Usuario`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_Pedido_Colegio` FOREIGN KEY (`ID_Colegio`) REFERENCES `colegio` (`ID_Colegio`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_Pedido_Paquete` FOREIGN KEY (`ID_Paquete`) REFERENCES `paquete` (`ID_Paquete`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_Pedido_Servicio` FOREIGN KEY (`ID_Servicio`) REFERENCES `servicio` (`ID_Servicio`) ON DELETE SET NULL ON UPDATE CASCADE,
