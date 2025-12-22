@@ -116,7 +116,10 @@ function checkSession() {
 // ========================================
 function logout() {
     localStorage.removeItem('userSession');
-    window.location.href = '/PaginaWebMS/index.html';
+    // Navega a la raíz del servidor y luego a la carpeta actual + index.html
+    const pathParts = window.location.pathname.split('/').filter(p => p !== '');
+    const projectFolder = pathParts[0]; // Primera carpeta después de localhost
+    window.location.href = `/${projectFolder}/index.html`;
 }
 
 // ========================================
