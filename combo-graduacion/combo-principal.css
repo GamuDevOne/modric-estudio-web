@@ -9,7 +9,7 @@ body {
     gap: 40px;
     flex-wrap: wrap;
     padding: 50px 0;
-    padding-top: 110px; /* compensa el header fijo (ajustar si es necesario) */
+    padding-top: 50px; /* Reducido - el separador ya tiene su propio padding */
 }
 
 .producto-card {
@@ -63,6 +63,7 @@ body {
 .btn-agregar:hover {
     background: #333;
 }
+
 .footer {
     background-color: #2f2f2f;
     color: white;
@@ -71,11 +72,12 @@ body {
     margin-top: 40px;
     font-size: 18px;
 }
+
 /* ========================================
-   SEPARADOR DE GALERÍA
+   SEPARADOR DE GALERÍA - AJUSTADO
 ======================================== */
 .gallery-separator {
-    padding: 80px 50px;
+    padding: 150px 50px 80px; /* Aumentado padding superior */
     display: flex;
     align-items: center;
     gap: 30px;
@@ -98,10 +100,23 @@ body {
     white-space: nowrap;
 }
 
-/* RESPONSIVE */
+/* ========================================
+   RESPONSIVE
+======================================== */
 @media (max-width: 768px) {
+    .productos-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 20px;
+    }
+
+    .producto-card {
+        width: 90%;
+        max-width: 350px;
+    }
+
     .gallery-separator {
-        padding: 40px 20px;
+        padding: 100px 20px 60px; /* Ajustado para móvil */
         gap: 15px;
     }
     
@@ -112,8 +127,16 @@ body {
 }
 
 @media (max-width: 480px) {
+    .gallery-separator {
+        padding: 90px 15px 50px; /* Más compacto en móviles pequeños */
+    }
+    
     .separator-title {
         font-size: 18px;
         letter-spacing: 1px;
+    }
+
+    .productos-container {
+        padding: 20px 15px;
     }
 }

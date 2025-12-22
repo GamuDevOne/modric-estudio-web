@@ -366,47 +366,115 @@ function mostrarModalDetallePedido(pedido) {
 
 // MARCAR PEDIDO COMO COMPLETADO
 function marcarCompletado(idPedido) {
-    accionPendiente = 'marcar_completado';
-    datosAccion = { idPedido: idPedido };
+    // Obtener detalle del pedido para verificar saldo pendiente
+    showLoadingModal('Validando...');
     
-    const modal = document.getElementById('modalConfirmacion');
-    const title = document.getElementById('confirmTitle');
-    const message = document.getElementById('confirmMessage');
-    const inputContainer = document.getElementById('confirmInputContainer');
-    const confirmBtn = document.getElementById('confirmBtn');
-    
-    title.textContent = 'Marcar como Completado';
-    message.textContent = `¿Deseas marcar el pedido #${idPedido} como completado?`;
-    inputContainer.style.display = 'none';
-    confirmBtn.textContent = 'Confirmar';
-    confirmBtn.style.background = '#2e7d32';
-    
-    modal.classList.add('active');
-    document.body.classList.add('modal-open');
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'obtener_detalle_pedido',
+            idPedido: idPedido
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success && data.pedido) {
+            const saldoPendiente = parseFloat(data.pedido.SaldoPendiente);
+            
+            // Validación: Verificar que no haya saldo pendiente
+            if (saldoPendiente > 0) {
+                mostrarModal('No se puede marcar como completado. El pedido tiene un saldo pendiente de $' + saldoPendiente.toFixed(2), 'error');
+                return;
+            }
+            
+            // Si no tiene saldo pendiente, proceder
+            accionPendiente = 'marcar_completado';
+            datosAccion = { idPedido: idPedido };
+            
+            const modal = document.getElementById('modalConfirmacion');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const inputContainer = document.getElementById('confirmInputContainer');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            title.textContent = 'Marcar como Completado';
+            message.textContent = `¿Deseas marcar el pedido #${idPedido} como completado?`;
+            inputContainer.style.display = 'none';
+            confirmBtn.textContent = 'Confirmar';
+            confirmBtn.style.background = '#2e7d32';
+            
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        } else {
+            mostrarModal('Error: No se pudo cargar el pedido', 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión', 'error');
+    });
 }
 
 // CANCELAR PEDIDO
 function cancelarPedido(idPedido) {
-    accionPendiente = 'cancelar_pedido';
-    datosAccion = { idPedido: idPedido };
+    // Obtener detalle del pedido para verificar saldo pendiente
+    showLoadingModal('Validando...');
     
-    const modal = document.getElementById('modalConfirmacion');
-    const title = document.getElementById('confirmTitle');
-    const message = document.getElementById('confirmMessage');
-    const inputContainer = document.getElementById('confirmInputContainer');
-    const confirmBtn = document.getElementById('confirmBtn');
-    
-    title.textContent = 'Cancelar Pedido';
-    message.textContent = `¿Deseas cancelar el pedido #${idPedido}?`;
-    inputContainer.style.display = 'block';
-    confirmBtn.textContent = 'Cancelar Pedido';
-    confirmBtn.style.background = '#c62828';
-    
-    // Limpiar textarea
-    document.getElementById('confirmInput').value = '';
-    
-    modal.classList.add('active');
-    document.body.classList.add('modal-open');
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'obtener_detalle_pedido',
+            idPedido: idPedido
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        if (data.success && data.pedido) {
+            const saldoPendiente = parseFloat(data.pedido.SaldoPendiente);
+            
+            // Validación: Verificar que no haya saldo pendiente
+            if (saldoPendiente > 0) {
+                mostrarModal('No se puede cancelar. El pedido tiene un saldo pendiente de $' + saldoPendiente.toFixed(2), 'error');
+                return;
+            }
+            
+            // Si no tiene saldo pendiente, proceder
+            accionPendiente = 'cancelar_pedido';
+            datosAccion = { idPedido: idPedido };
+            
+            const modal = document.getElementById('modalConfirmacion');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const inputContainer = document.getElementById('confirmInputContainer');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            title.textContent = 'Cancelar Pedido';
+            message.textContent = `¿Deseas cancelar el pedido #${idPedido}?`;
+            inputContainer.style.display = 'block';
+            confirmBtn.textContent = 'Cancelar Pedido';
+            confirmBtn.style.background = '#c62828';
+            
+            // Limpiar textarea
+            document.getElementById('confirmInput').value = '';
+            
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        } else {
+            mostrarModal('Error: No se pudo cargar el pedido', 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión', 'error');
+    });
 }
 
 // CERRAR MODAL DE CONFIRMACIÓN
@@ -1009,4 +1077,6 @@ window.addEventListener('click', function(event) {
         cerrarModalNuevoAbono();
     }
 });
+
+
 
