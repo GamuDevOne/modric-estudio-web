@@ -695,7 +695,7 @@ function cerrarModalNuevoAbono() {
 }
 
 // ========================================
-// REGISTRAR NUEVO ABONO - VERSION CORREGIDA
+// REGISTRAR NUEVO ABONO 
 // ========================================
 function registrarNuevoAbono(event) {
     event.preventDefault();
@@ -739,6 +739,53 @@ function registrarNuevoAbono(event) {
         mostrarModal('Selecciona un método de pago', 'warning');
         return;
     }
+    
+    // ENVIAR ABONO AL SERVIDOR
+    cerrarModalNuevoAbono();
+    showLoadingModal('Registrando abono...');
+    
+    fetch('../../php/gest-abonos.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'registrar_nuevo_abono',
+            idPedido: idPedido,
+            monto: monto,
+            metodo: metodo,
+            notas: notas,
+            idUsuario: user.id
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoadingModal();
+        
+        console.log('Respuesta del servidor:', data);
+        
+        if (data.success) {
+            const mensaje = data.completado 
+                ? '¡Pago completado! El pedido ha sido pagado en su totalidad.' 
+                : `Abono registrado correctamente. Saldo restante: $${data.saldoRestante.toFixed(2)}`;
+            
+            mostrarModal(mensaje, 'success');
+            
+            // Actualizar saldo pendiente actual
+            saldoPendienteActual = data.saldoRestante || 0;
+            
+            // Recargar detalle del pedido
+            verDetallePedido(idPedido);
+            
+            // Recargar dashboard completo
+            loadDashboardData();
+        } else {
+            mostrarModal('Error: ' + (data.message || 'No se pudo registrar el abono'), 'error');
+        }
+    })
+    .catch(err => {
+        hideLoadingModal();
+        console.error('Error:', err);
+        mostrarModal('Error de conexión al registrar abono', 'error');
+    });
 }
 // ========================================
 // FUNCIONES DE REPORTES

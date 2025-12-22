@@ -223,6 +223,7 @@ function getGraficos($pdo) {
 function getPedidos($pdo) {
     $pedidos = [];
     
+    // ÚLTIMOS 10 PEDIDOS (sin filtrar)
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
@@ -243,6 +244,15 @@ function getPedidos($pdo) {
     ");
     $pedidos['ultimos'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // ==========================================
+    // PEDIDOS PENDIENTES - CONSULTA CORREGIDA
+    // ==========================================
+    // MOSTRAR: Todos los pedidos que NO estén Completados ni Cancelados
+    // Esto incluye:
+    // - Estado = 'Pendiente' con cualquier EstadoPago (Pendiente/Abono/Completo)
+    // - Estado = 'En_Proceso' con cualquier EstadoPago
+    // - Cualquier otro estado que no sea Completado o Cancelado
+    // ==========================================
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
@@ -251,15 +261,13 @@ function getPedidos($pdo) {
             p.Estado,
             DATEDIFF(CURDATE(), p.Fecha) as DiasPendiente,
             v.NombreCompleto as Vendedor,
-            COALESCE(vi.EstadoPago, 'Pendiente') as EstadoPago
+            COALESCE(vi.EstadoPago, 'Pendiente') as EstadoPago,
+            COALESCE(vi.MontoAbonado, 0) as MontoAbonado
         FROM Pedido p
         INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
         LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
         LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-        WHERE (
-            (p.Estado = 'Pendiente' OR vi.EstadoPago = 'Abono')
-            AND p.Estado != 'Cancelado'
-        )
+        WHERE p.Estado NOT IN ('Completado', 'Cancelado')
         ORDER BY p.Fecha ASC
     ");
     $pedidos['pendientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);

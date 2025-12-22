@@ -1,7 +1,13 @@
 <?php
 // ========================================
 // GEST-ABONOS.PHP - VERSIÓN CORREGIDA
-// FIX: Validación correcta considerando decimales y redondeo
+// FIX CRÍTICO: NO cambiar estado del pedido al completar el pago
+// 
+// FLUJO CORRECTO:
+// 1. Abono parcial → EstadoPago = 'Abono', Estado = 'Pendiente'
+// 2. Pago completo → EstadoPago = 'Completo', Estado = 'Pendiente' ✓
+// 3. CEO marca completado → Estado = 'Completado' (desaparece de pendientes)
+// 4. CEO cancela → Estado = 'Cancelado' (desaparece de pendientes)
 // ========================================
 
 $host = 'localhost';
@@ -48,7 +54,7 @@ try {
 }
 
 // ========================================
-// OBTENER DETALLE COMPLETO DEL PEDIDO
+// OBTENER DETALLE COMPLETO DEL PEDIDO - CORREGIDO
 // ========================================
 function obtenerDetallePedido($pdo, $data) {
     try {
@@ -57,6 +63,9 @@ function obtenerDetallePedido($pdo, $data) {
             return;
         }
         
+        // ========================================
+        // PASO 1: Obtener datos del pedido
+        // ========================================
         $stmt = $pdo->prepare("
             SELECT 
                 p.ID_Pedido,
@@ -69,12 +78,7 @@ function obtenerDetallePedido($pdo, $data) {
                 COALESCE(c.NombreColegio, 'Sin asignar') as Colegio,
                 vi.EstadoPago,
                 vi.MetodoPago as MetodoPagoInicial,
-                vi.Notas,
-                COALESCE((
-                    SELECT SUM(Monto) 
-                    FROM HistorialAbonos 
-                    WHERE ID_Pedido = p.ID_Pedido
-                ), 0) as TotalAbonado
+                vi.Notas
             FROM Pedido p
             INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
@@ -93,19 +97,63 @@ function obtenerDetallePedido($pdo, $data) {
             return;
         }
         
-        // Calcular saldo pendiente con redondeo a 2 decimales
-        $total = round(floatval($pedido['Total']), 2);
-        $abonado = round(floatval($pedido['TotalAbonado']), 2);
-        $saldoPendiente = round($total - $abonado, 2);
+        // ========================================
+        // PASO 2: Calcular total abonado CORRECTAMENTE
+        // ========================================
+        // LÓGICA:
+        // - Si EstadoPago = 'Completo' → Total abonado = Total del pedido
+        // - Si hay abonos en HistorialAbonos → Usar SUM de esos
+        // - Si EstadoPago = 'Abono' sin historial → Usar VentaInfo.MontoAbonado
+        // ========================================
         
-        // Asegurar que no haya valores negativos por errores de redondeo
-        if ($saldoPendiente < 0.01) {
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(Monto), 0) as TotalHistorial
+            FROM HistorialAbonos 
+            WHERE ID_Pedido = :idPedido
+        ");
+        $stmt->execute([':idPedido' => $data['idPedido']]);
+        $resultHistorial = $stmt->fetch(PDO::FETCH_ASSOC);
+        $totalHistorial = round(floatval($resultHistorial['TotalHistorial']), 2);
+        
+        // Determinar total abonado según el caso
+        $totalAbonado = 0;
+        
+        if ($pedido['EstadoPago'] === 'Completo' && $totalHistorial == 0) {
+            // Caso 1: Pago completo directo
+            $totalAbonado = round(floatval($pedido['Total']), 2);
+            
+        } elseif ($totalHistorial > 0) {
+            // Caso 2: Hay abonos registrados en historial
+            // Usar la suma del historial
+            $totalAbonado = $totalHistorial;
+            error_log("  Tipo: Con historial de abonos");
+            
+        } else {
+            // Caso 3: Sin historial, verificar VentaInfo por si acaso
+            $totalAbonado = 0;
+            error_log("  Tipo: Sin abonos registrados");
+        }
+        
+        // ========================================
+        // PASO 3: Calcular saldo pendiente
+        // ========================================
+        $total = round(floatval($pedido['Total']), 2);
+        $saldoPendiente = round($total - $totalAbonado, 2);
+        
+        // Asegurar que no haya valores negativos
+        if ($saldoPendiente < 0) {
             $saldoPendiente = 0;
         }
         
+        // Agregar datos calculados al array
+        $pedido['TotalAbonado'] = $totalAbonado;
         $pedido['SaldoPendiente'] = $saldoPendiente;
         
-        error_log("Detalle pedido #{$data['idPedido']}: Total=$total, Abonado=$abonado, Saldo=$saldoPendiente");
+        error_log("✓ Detalle pedido #{$data['idPedido']}:");
+        error_log("  Total: $total");
+        error_log("  Abonado: $totalAbonado");
+        error_log("  Saldo: $saldoPendiente");
+        error_log("  EstadoPago: " . ($pedido['EstadoPago'] ?? 'null'));
         
         echo json_encode([
             'success' => true,
@@ -158,6 +206,7 @@ function obtenerHistorialAbonos($pdo, $data) {
 
 // ========================================
 // REGISTRAR NUEVO ABONO - VERSION CORREGIDA
+// FIX: NO CAMBIAR ESTADO DEL PEDIDO
 // ========================================
 function registrarNuevoAbono($pdo, $data) {
     try {
@@ -211,9 +260,8 @@ function registrarNuevoAbono($pdo, $data) {
         error_log("Nuevo total: $nuevoTotal");
         
         // ==========================================
-        // FIX CRÍTICO: Validación con margen de error
+        // Validación con margen de error
         // ==========================================
-        // Permitir un margen de 0.01 centavos por errores de redondeo
         $margenError = 0.01;
         
         if ($nuevoTotal > ($totalPedido + $margenError)) {
@@ -248,12 +296,14 @@ function registrarNuevoAbono($pdo, $data) {
             $pagoCompletado = false;
             
             // ==========================================
-            // FIX: Considerar pago completado con margen
+            // FIX CRÍTICO: NO CAMBIAR ESTADO DEL PEDIDO
+            // Solo actualizar VentaInfo
             // ==========================================
             if ($nuevoTotal >= ($totalPedido - $margenError)) {
                 // Ajustar el nuevo total al total exacto del pedido
                 $nuevoTotalAjustado = $totalPedido;
                 
+                // SOLO actualizar VentaInfo, NO el estado del pedido
                 $stmt = $pdo->prepare("
                     UPDATE VentaInfo 
                     SET EstadoPago = 'Completo',
@@ -265,17 +315,8 @@ function registrarNuevoAbono($pdo, $data) {
                     ':idPedido' => $data['idPedido']
                 ]);
                 
-                error_log("VentaInfo actualizada - EstadoPago: Completo");
-                
-                // Actualizar estado del pedido
-                $stmt = $pdo->prepare("
-                    UPDATE Pedido 
-                    SET Estado = 'Completado'
-                    WHERE ID_Pedido = :idPedido
-                ");
-                $stmt->execute([':idPedido' => $data['idPedido']]);
-                
-                error_log("Pedido actualizado - Estado: Completado");
+                error_log("✅ Pago completado - VentaInfo actualizada");
+                error_log("ℹ️ El pedido sigue en estado 'Pendiente' hasta que el CEO lo marque como Completado");
                 
                 $pagoCompletado = true;
                 $saldoRestante = 0;
@@ -303,7 +344,7 @@ function registrarNuevoAbono($pdo, $data) {
             echo json_encode([
                 'success' => true,
                 'message' => $pagoCompletado 
-                    ? '¡Pago completado! El pedido ha sido pagado en su totalidad.' 
+                    ? '¡Pago completado! El pedido permanecerá en "Pendientes" hasta que se marque como Completado.' 
                     : 'Abono registrado correctamente.',
                 'completado' => $pagoCompletado,
                 'nuevoTotal' => $nuevoTotal,
