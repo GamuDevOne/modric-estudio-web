@@ -182,7 +182,7 @@ function cambiarContrasenaUsuarioTemporal($pdo, $data) {
 }
 
 // ========================================
-// ELIMINAR USUARIO TEMPORAL
+// ELIMINAR USUARIO TEMPORAL (FUNCIÓN ACTUALIZADA)
 // ========================================
 function eliminarUsuarioTemporal($pdo, $data) {
     try {
@@ -191,7 +191,7 @@ function eliminarUsuarioTemporal($pdo, $data) {
             return;
         }
         
-        // Verificar si tiene álbumes activos
+        // Verificar si tiene álbumes ACTIVOS (Cerrados o Vencidos están OK)
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as total 
             FROM AlbumCliente 
@@ -204,12 +204,32 @@ function eliminarUsuarioTemporal($pdo, $data) {
         if ($result['total'] > 0) {
             echo json_encode([
                 'success' => false,
-                'message' => 'No se puede eliminar: el usuario tiene ' . $result['total'] . ' álbum(es) activo(s)'
+                'message' => 'No se puede eliminar: el usuario tiene ' . $result['total'] . ' álbum(es) activo(s). Espera a que caduquen o ciérralos manualmente.'
             ]);
             return;
         }
         
-        // Eliminar usuario
+        // Los usuarios temporales son SOLO para álbumes
+        // Los pedidos asociados permanecen en el historial con el nombre del cliente
+        // NO eliminamos los pedidos, solo desvinculamos el usuario
+        
+        // Paso 1: Desvincular pedidos (cambiar FK a NULL o mantener referencia por nombre)
+        $stmt = $pdo->prepare("
+            UPDATE Pedido 
+            SET ID_Usuario = NULL 
+            WHERE ID_Usuario = :id
+        ");
+        $stmt->execute([':id' => $data['id']]);
+        
+        // Paso 2: Eliminar álbumes cerrados/vencidos del usuario
+        $stmt = $pdo->prepare("
+            DELETE FROM AlbumCliente 
+            WHERE ID_Cliente = :id 
+            AND Estado IN ('Cerrado', 'Vencido')
+        ");
+        $stmt->execute([':id' => $data['id']]);
+        
+        // Paso 3: Eliminar usuario temporal
         $stmt = $pdo->prepare("
             DELETE FROM Usuario 
             WHERE ID_Usuario = :id 
@@ -220,12 +240,12 @@ function eliminarUsuarioTemporal($pdo, $data) {
         if ($stmt->rowCount() > 0) {
             echo json_encode([
                 'success' => true,
-                'message' => 'Usuario temporal eliminado correctamente'
+                'message' => 'Usuario temporal eliminado correctamente. Los pedidos asociados se mantienen en el historial.'
             ]);
         } else {
             echo json_encode([
                 'success' => false,
-                'message' => 'Usuario no encontrado'
+                'message' => 'Usuario no encontrado o no es temporal'
             ]);
         }
         
@@ -235,21 +255,62 @@ function eliminarUsuarioTemporal($pdo, $data) {
 }
 
 // ========================================
-// LIMPIAR USUARIOS VENCIDOS (SIN ÁLBUMES ACTIVOS)
+// LIMPIAR USUARIOS VENCIDOS (FUNCIÓN ACTUALIZADA)
 // ========================================
 function limpiarUsuariosVencidos($pdo) {
     try {
-        // Eliminar usuarios temporales sin álbumes activos y con más de 60 días
+        $pdo->beginTransaction();
+        
+        // Encontrar usuarios temporales sin álbumes activos
         $stmt = $pdo->prepare("
-            DELETE u FROM Usuario u
+            SELECT DISTINCT u.ID_Usuario 
+            FROM Usuario u
             LEFT JOIN AlbumCliente a ON u.ID_Usuario = a.ID_Cliente AND a.Estado = 'Activo'
             WHERE u.EsUsuarioTemporal = 1
             AND a.ID_Album IS NULL
             AND DATEDIFF(CURDATE(), u.FechaCreacionTemp) > 60
         ");
-        
         $stmt->execute();
+        $usuarios = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        if (empty($usuarios)) {
+            $pdo->rollBack();
+            echo json_encode([
+                'success' => true,
+                'message' => 'No hay usuarios temporales para eliminar',
+                'eliminados' => 0
+            ]);
+            return;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($usuarios), '?'));
+        
+        // Desvincular pedidos
+        $stmt = $pdo->prepare("
+            UPDATE Pedido 
+            SET ID_Usuario = NULL 
+            WHERE ID_Usuario IN ($placeholders)
+        ");
+        $stmt->execute($usuarios);
+        
+        // Eliminar álbumes cerrados/vencidos
+        $stmt = $pdo->prepare("
+            DELETE FROM AlbumCliente 
+            WHERE ID_Cliente IN ($placeholders)
+            AND Estado IN ('Cerrado', 'Vencido')
+        ");
+        $stmt->execute($usuarios);
+        
+        // Eliminar usuarios temporales
+        $stmt = $pdo->prepare("
+            DELETE FROM Usuario 
+            WHERE ID_Usuario IN ($placeholders)
+            AND EsUsuarioTemporal = 1
+        ");
+        $stmt->execute($usuarios);
+        
         $eliminados = $stmt->rowCount();
+        $pdo->commit();
         
         echo json_encode([
             'success' => true,
@@ -260,6 +321,7 @@ function limpiarUsuariosVencidos($pdo) {
         ]);
         
     } catch (PDOException $e) {
+        $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
