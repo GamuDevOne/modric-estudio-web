@@ -33,13 +33,13 @@ Este documento explica paso a paso cómo instalar, configurar y dejar funcionand
 El proyecto debe colocarse dentro de:
 
 ```
-C:\xampp\htdocs\PaginaWebMS\     ("PaginaWebMS" o el nombre de la raiz que tenga)
+C:\xampp\htdocs\    
 ```
 
 Estructura principal:
 
 ```
-PaginaWebMS/
+PaginaWebMS(el nombre del archivo del proyect)/
 └── php/
     ├── composer.json       
     ├── composer.lock
@@ -83,7 +83,7 @@ Abrir CMD y ejecutar:
 composer --version
 ```
 
-Si muestra la versión, Composer está correctamente instalado.
+Si muestra la versión, Composer está correctamente instalado y puede continuar.
 
 ---
 
@@ -96,7 +96,7 @@ Si muestra la versión, Composer está correctamente instalado.
 cd C:\xampp\htdocs\nombreDeLaCarpetaRaiz\php
 ```
 
-3. Ejecutar (estando en la ubicacion anterior):
+3. Ejecutar (estando en la ubicacion del archivo):
 
 ```bash
 composer install
@@ -150,7 +150,7 @@ CREATE DATABASE IF NOT EXISTS modricestudio00;
 
 ## 8. Configuración de conexión a la BD
 
-Verificar en el archivo de conexión:
+Verificar en el archivo de conexión (si está trabajando en local):
 
 ```php
 $host = "localhost";
@@ -158,6 +158,7 @@ $user = "root";
 $password = "";
 $database = "modricestudio00";  (espesifico, por si pasa algo con la direccion)
 ```
+
 
 ---
 

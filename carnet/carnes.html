@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carnés | Modric Estudio</title>
-
-  <!-- Enlaces a tus hojas de estilo -->
-   <link rel="stylesheet" href="../css/global-styles.css">
+  <link rel="stylesheet" href="../css/global-styles.css">
   <link rel="stylesheet" href="carnet-styles.css">
 </head>
 
@@ -33,7 +31,7 @@
             <li><a href="../index.html">INICIO</a></li>
             <li><a href="../index.html#sobre-nosotros">SOBRE NOSOTROS</a></li>
             <li><a href="../index.html#fotografias">FOTOGRAFÍAS</a></li>
-            <li><a href="../carnet/carnes.html">CARNÉS</a></li>
+            <li><a href="carnes.html" class="active">CARNÉS</a></li>
             <li><a href="../textiles/text-activado.html">TEXTIL</a></li>
             <li class="dropdown">
                 <a href="javascript:void(0)" class="dropdown-toggle">MÁS</a>
@@ -45,10 +43,13 @@
         </ul>
     </nav>
 
-    <!-- 4. BOTÓN LOGIN -->
+    <!-- 4. BOTÓN LOGIN -  CORREGIDO CON ICONO SVG -->
     <div class="login-btn">
         <button onclick="toggleLoginMenu()" class="login-icon-btn" title="Abrir menú de inicio de sesión">
-            <!-- SVG icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
         </button>
         <div id="loginMenu" class="login-menu">
             <a href="../login/login.html">Iniciar Sesión</a>
@@ -105,10 +106,9 @@
     </div>
   </section>
 
-  
   <!-- FOOTER -->
   <footer class="footer">
-    <p class="copyright">©2025 - Modric Estudio</p>
+    <p class="copyright">- Modric Estudio -</p>
   </footer>
 
   <script src="../js/global-script.js"></script>

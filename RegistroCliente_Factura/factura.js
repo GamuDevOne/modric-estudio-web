@@ -1,8 +1,84 @@
 // ========================================
 // FACTURA.JS - VERSIÓN CORREGIDA
 // FIX: Detección correcta de abonos y visualización
+// NUEVO: Función para regresar según tipo de usuario
 // ========================================
 
+// ========================================
+// FUNCIÓN: REGRESAR AL PANEL SEGÚN USUARIO
+// ========================================
+function regresarAPanel() {
+  const facturaData = JSON.parse(localStorage.getItem("facturaData"));
+  
+  // Determinar si viene desde vendedor
+  const desdeVendedor = facturaData && facturaData.desdeVendedor === true;
+  
+  console.log('🔙 Función regresarAPanel() ejecutada');
+  console.log('  - desdeVendedor:', desdeVendedor);
+  
+  // Limpiar datos de factura
+  localStorage.removeItem('facturaData');
+  
+  if (desdeVendedor) {
+    // Regresar a vista de vendedor y recargar
+    console.log('✓ Regresando a vista de vendedor...');
+    window.location.href = '../administracion/vistaVendedor/vendedor.html';
+  } else {
+    // Verificar sesión para determinar destino
+    const userSession = localStorage.getItem('userSession');
+    
+    if (userSession) {
+      try {
+        const user = JSON.parse(userSession);
+        
+        if (user.tipo === 'CEO') {
+          console.log('✓ Regresando a panel de administración (CEO)...');
+          window.location.href = '../administracion/administracion.html';
+        } else if (user.tipo === 'Vendedor') {
+          console.log('✓ Regresando a vista de vendedor...');
+          window.location.href = '../administracion/vistaVendedor/vendedor.html';
+        } else {
+          // Cliente u otro tipo
+          console.log('✓ Regresando al inicio...');
+          window.location.href = '../index.html';
+        }
+      } catch (e) {
+        console.error('Error al parsear sesión:', e);
+        window.location.href = '../index.html';
+      }
+    } else {
+      // Sin sesión, regresar al inicio
+      console.log('⚠️ Sin sesión, regresando al inicio...');
+      window.location.href = '../index.html';
+    }
+  }
+}
+
+// ========================================
+// MODAL PERSONALIZADO
+// ========================================
+function mostrarNotificacion(mensaje, tipo = 'success') {
+  let modal = document.getElementById('notificacionFactura');
+  
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'notificacionFactura';
+    modal.className = 'notificacion-factura';
+    document.body.appendChild(modal);
+  }
+  
+  modal.className = 'notificacion-factura ' + tipo;
+  modal.textContent = mensaje;
+  modal.style.display = 'block';
+  
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 3000);
+}
+
+// ========================================
+// CARGAR DATOS DE FACTURA
+// ========================================
 document.addEventListener("DOMContentLoaded", () => {
   const datosFactura = JSON.parse(localStorage.getItem("facturaData"));
 
@@ -131,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error('❌ Elemento #detallesPago no encontrado en el DOM');
       }
     } else {
-      console.log('ℹ️ No se muestra sección de abonos');
+      console.log('! No se muestra sección de abonos');
       if (!esAbono) {
         console.log('  → Razón: No es un abono (tipoPago=' + tipoPago + ')');
       } else if (montoAbonado <= 0) {
@@ -146,28 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("fechaFactura").textContent = formatoFecha;
   }
 });
-
-// ========================================
-// MODAL PERSONALIZADO
-// ========================================
-function mostrarNotificacion(mensaje, tipo = 'success') {
-  let modal = document.getElementById('notificacionFactura');
-  
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'notificacionFactura';
-    modal.className = 'notificacion-factura';
-    document.body.appendChild(modal);
-  }
-  
-  modal.className = 'notificacion-factura ' + tipo;
-  modal.textContent = mensaje;
-  modal.style.display = 'block';
-  
-  setTimeout(() => {
-    modal.style.display = 'none';
-  }, 3000);
-}
 
 // ========================================
 // GENERAR PDF

@@ -103,9 +103,117 @@
       #detallesPago.pago-completo h3::before {
         content: "✅";
       }
+
+      /* ==== NUEVO: BOTÓN REGRESAR FIJO (ESQUINA SUPERIOR IZQUIERDA) ==== */
+      .btn-regresar-fixed {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #757575;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-regresar-fixed:hover {
+        background-color: #616161;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+
+      .btn-regresar-fixed:active {
+        transform: translateY(0);
+      }
+
+      /* ==== BOTONES DE ACCIÓN ==== */
+      .acciones-factura {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 25px;
+      }
+
+      .btn-pdf {
+        display: inline-block;
+        background-color: #004aad;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-pdf:hover {
+        background-color: #002f70;
+        transform: scale(1.05);
+      }
+
+      .btn-whatsapp {
+        display: inline-block;
+        background-color: #25d366;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-whatsapp:hover {
+        background-color: #1ca650;
+        transform: scale(1.05);
+      }
+
+      /* ==== RESPONSIVE ==== */
+      @media (max-width: 768px) {
+        body {
+          padding: 20px 15px;
+        }
+
+        .btn-regresar-fixed {
+          top: 10px;
+          left: 10px;
+          padding: 10px 18px;
+          font-size: 14px;
+        }
+
+        .contenedor-factura {
+          margin-top: 60px; /* Espacio para el botón fijo */
+        }
+
+        .acciones-factura {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn-pdf,
+        .btn-whatsapp {
+          width: 100%;
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- NUEVO: Botón Regresar en esquina superior izquierda -->
+    <button id="btnRegresar" class="btn-regresar-fixed" onclick="regresarAPanel()">
+      ← Regresar
+    </button>
+
     <div class="contenedor-factura">
       <header>
         <div class="logo">
