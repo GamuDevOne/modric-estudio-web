@@ -72,7 +72,7 @@ function mostrarUsuariosTemporales(usuarios) {
             <td>#${usuario.ID_Usuario}</td>
             <td>${usuario.NombreCompleto}</td>
             <td>${usuario.Usuario || 'N/A'}</td>
-            <td><span class="badge-album">${usuario.AlbumesAsociados}</span></td>
+            <td><span class="badge-album">${usuario.AlbumesActivos}</span></td>
             <td><span class="${claseDias}">${usuario.DiasDesdeCreacion} días</span></td>
             <td>
                 <div class="action-buttons">
@@ -107,7 +107,7 @@ function mostrarUsuariosTemporales(usuarios) {
         
         if (btnDelete) {
             btnDelete.addEventListener('click', () => 
-                eliminarUsuarioTemporal(usuario.ID_Usuario, usuario.NombreCompleto, usuario.AlbumesAsociados)
+                eliminarUsuarioTemporal(usuario.ID_Usuario, usuario.NombreCompleto, usuario.AlbumesActivos)
             );
         }
     });

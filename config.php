@@ -17,7 +17,7 @@ define('JWT_SECRET', 'tu-clave-super-secreta-cambiar-en-produccion-' . md5(__DIR
 
 // Configuración de la aplicación
 define('APP_ENV', 'development'); // 'production' en servidor real
-define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
+define('MAX_FILE_SIZE', 25 * 1024 * 1024); // 25MB
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('LOG_DIR', __DIR__ . '/php/logs/');
 

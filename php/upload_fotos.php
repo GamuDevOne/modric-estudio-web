@@ -15,7 +15,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // Configuración de subida
 define('UPLOAD_DIR', '../uploads/clientes/');
-define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
+define('MAX_FILE_SIZE', 25 * 1024 * 1024); // 25MB
 define('ALLOWED_TYPES', ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']);
 
 try {

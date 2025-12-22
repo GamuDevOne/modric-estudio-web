@@ -188,3 +188,7 @@
 [2025-12-22 17:13:28] PEDIDO_COMPLETADO - IP: 127.0.0.1 - Detalles: {"id_pedido":8,"usuario":"CEO Admin"}
 [2025-12-22 17:13:28] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-22 17:13:31] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
+[2025-12-22 18:15:54] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-22 18:17:53] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-22 18:18:02] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-22 18:20:29] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_all_pedidos"}
