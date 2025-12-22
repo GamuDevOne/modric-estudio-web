@@ -228,40 +228,18 @@ function cambiarContrasenaUsuarioTemporal(event) {
 // ELIMINAR USUARIO TEMPORAL
 // ========================================
 function eliminarUsuarioTemporal(id, nombre, albumesAsociados) {
-    tempUserIdEliminar = id;
-    
-    document.getElementById('tempUserNombreEliminar').textContent = nombre;
-    
-    const advertencia = document.getElementById('advertenciaAlbumes');
-    if (parseInt(albumesAsociados) > 0) {
-        advertencia.textContent = `⚠️ Este usuario tiene ${albumesAsociados} álbum(es) asociado(s). Solo se puede eliminar si no tiene álbumes activos.`;
-        advertencia.style.display = 'block';
-    } else {
-        advertencia.style.display = 'none';
-    }
-    
-    document.getElementById('modalEliminarTemporal').classList.add('active');
-    document.body.classList.add('modal-open');
-}
-
-function closeModalEliminarTemporal() {
-    document.getElementById('modalEliminarTemporal').classList.remove('active');
-    document.body.classList.remove('modal-open');
-    tempUserIdEliminar = null;
-}
-
-function confirmarEliminarTemporal() {
-    if (!tempUserIdEliminar) {
-        mostrarModal('Error: No se pudo obtener el ID del usuario', 'error');
+    if (albumesAsociados > 0) {
+        mostrarModal('No se puede eliminar: el usuario tiene ' + albumesAsociados + ' álbum(es) activo(s)', 'warning');
         return;
     }
     
-    const idAEliminar = tempUserIdEliminar;
-    closeModalEliminarTemporal();
+    if (!confirm('¿Estás seguro de que deseas eliminar al usuario temporal "' + nombre + '"?')) {
+        return;
+    }
     
-    setTimeout(() => {
-        showLoadingModal();
-    }, 100);
+    tempUserIdEliminar = id;
+    
+    showLoadingModal();
     
     fetch('../../php/gest-usuarios-temporales.php', {
         method: 'POST',
@@ -270,30 +248,27 @@ function confirmarEliminarTemporal() {
         },
         body: JSON.stringify({
             action: 'eliminar_usuario_temporal',
-            id: parseInt(idAEliminar)
+            id: id
         })
     })
     .then(response => response.json())
     .then(data => {
-        hideLoadingModal(); // ← SIEMPRE cerrar loading antes del setTimeout
+        hideLoadingModal();
         
-        setTimeout(() => {
-            if (data.success) {
-                mostrarModal('Usuario temporal eliminado correctamente', 'success');
-                cargarUsuariosTemporales();
-            } else {
-                mostrarModal('Error: ' + data.message, 'error');
-            }
-        }, 200);
+        if (data.success) {
+            mostrarModal('Usuario temporal eliminado correctamente', 'success');
+            cargarUsuariosTemporales();
+        } else {
+            mostrarModal('Error: ' + data.message, 'error');
+        }
     })
     .catch(error => {
-        hideLoadingModal(); // ← Asegurar que se cierre en caso de error
+        hideLoadingModal();
         console.error('Error:', error);
-        setTimeout(() => {
-            mostrarModal('Error de conexión', 'error');
-        }, 200);
+        mostrarModal('Error de conexión', 'error');
     });
 }
+
 
 // ========================================
 // LIMPIAR USUARIOS VENCIDOS

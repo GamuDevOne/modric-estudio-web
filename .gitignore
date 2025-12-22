@@ -7,3 +7,4 @@ logs/
 php/logs/
 *.log
 contacto_errors.log
+uploads/

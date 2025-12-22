@@ -121,7 +121,10 @@ function crearAlbumCard(album) {
     const card = document.createElement('div');
     card.className = 'album-card';
     
-    const diasRestantes = album.DiasRestantes > 0 ? album.DiasRestantes : 0;
+    // FIX: Asegurar que diasRestantes sea >= 0
+    const diasRestantes = Math.max(0, parseInt(album.DiasRestantes) || 0);
+    
+    // Si diasRestantes es 0 o negativo, marcar como vencido
     const estaVencido = album.Estado === 'Vencido' || diasRestantes === 0;
     const estaProximoAVencer = diasRestantes > 0 && diasRestantes <= 7;
     

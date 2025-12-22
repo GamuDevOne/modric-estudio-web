@@ -1,8 +1,9 @@
 <?php
 // ========================================
 // GUARDAR VENTA COMPLETA EN BASE DE DATOS
+// FIX: NO crear usuarios temporales aquí
+// Los usuarios temporales SOLO se crean desde documentos.php
 // ========================================
-// Este archivo se llama desde registro.html ANTES de redirigir a factura.html
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -47,69 +48,19 @@ try {
     
     try {
         // ========================================
-        // PASO 1: CREAR O BUSCAR USUARIO CLIENTE
+        // PASO 1: NO CREAR USUARIO TEMPORAL
+        // Usar ID del CEO (1) como usuario por defecto
         // ========================================
+        $idCliente = 1; // CEO por defecto
+        
         $nombreCompleto = $input['cliente']['nombre'];
         $correo = isset($input['cliente']['correo']) ? $input['cliente']['correo'] : null;
         $telefono = isset($input['cliente']['telefono']) ? $input['cliente']['telefono'] : null;
         $escuela = isset($input['cliente']['escuela']) ? $input['cliente']['escuela'] : null;
         $grupo = isset($input['cliente']['grupo']) ? $input['cliente']['grupo'] : null;
         
-        // Buscar si el cliente ya existe (por correo o teléfono)
-        $idCliente = null;
-        
-        if ($correo) {
-            $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo AND TipoUsuario = 'Cliente' LIMIT 1");
-            $stmt->execute([':correo' => $correo]);
-            $clienteExistente = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($clienteExistente) {
-                $idCliente = $clienteExistente['ID_Usuario'];
-            }
-        }
-        
-        // Si no existe, crear nuevo cliente temporal
-        if (!$idCliente) {
-            // Generar usuario único basado en nombre + timestamp
-            $usuarioBase = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $nombreCompleto)[0]));
-            $usuario = $usuarioBase . substr(time(), -3);
-            $contrasenaTemporal = bin2hex(random_bytes(4)); // 8 caracteres aleatorios
-            
-            $stmt = $pdo->prepare("
-                INSERT INTO Usuario (
-                    NombreCompleto, 
-                    Correo, 
-                    Usuario, 
-                    Contrasena, 
-                    TipoUsuario, 
-                    GrupoGrado,
-                    ContrasenaTemporal,
-                    FechaCreacionTemp,
-                    EsUsuarioTemporal
-                ) VALUES (
-                    :nombre, 
-                    :correo, 
-                    :usuario, 
-                    :contrasena, 
-                    'Cliente', 
-                    :grupo,
-                    :contrasenaTemporal,
-                    NOW(),
-                    1
-                )
-            ");
-            
-            $stmt->execute([
-                ':nombre' => $nombreCompleto,
-                ':correo' => $correo,
-                ':usuario' => $usuario,
-                ':contrasena' => $contrasenaTemporal,
-                ':grupo' => $grupo,
-                ':contrasenaTemporal' => $contrasenaTemporal
-            ]);
-            
-            $idCliente = $pdo->lastInsertId();
-            error_log("Nuevo cliente creado con ID: $idCliente");
-        }
+        error_log("✓ Cliente: $nombreCompleto (asignado a ID_Usuario: $idCliente - CEO)");
+        error_log("NO se creó usuario temporal - se creará cuando el CEO genere el álbum");
         
         // ========================================
         // PASO 2: OBTENER IDs DE SERVICIO/PAQUETE
@@ -219,7 +170,7 @@ try {
         
         $notas = $input['comentario'] ?? '';
         
-        // Agregar info de escuela y grupo a las notas
+        // Agregar info de cliente a las notas (para referencia futura)
         if ($escuela) {
             $notas .= "\nEscuela: " . $escuela;
         }
@@ -228,6 +179,9 @@ try {
         }
         if ($telefono) {
             $notas .= "\nTeléfono: " . $telefono;
+        }
+        if ($correo) {
+            $notas .= "\nCorreo: " . $correo;
         }
         
         $stmt = $pdo->prepare("

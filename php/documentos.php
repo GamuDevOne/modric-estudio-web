@@ -137,7 +137,7 @@ function obtenerAlbums($pdo) {
                 u.NombreCompleto as Cliente,
                 u.ID_Usuario as ID_Cliente,
                 COUNT(f.ID_Foto) as TotalFotos,
-                DATEDIFF(a.FechaCaducidad, NOW()) as DiasRestantes
+                CAST(TIMESTAMPDIFF(DAY, NOW(), a.FechaCaducidad) AS SIGNED) as DiasRestantes
             FROM AlbumCliente a
             INNER JOIN Usuario u ON a.ID_Cliente = u.ID_Usuario
             LEFT JOIN FotoAlbum f ON a.ID_Album = f.ID_Album
@@ -156,6 +156,7 @@ function obtenerAlbums($pdo) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
+
 
 // ========================================
 // OBTENER ÁLBUMES DE UN CLIENTE ESPECÍFICO
@@ -176,7 +177,7 @@ function obtenerAlbumsCliente($pdo, $data) {
                 a.FechaCaducidad,
                 a.Estado,
                 COUNT(f.ID_Foto) as TotalFotos,
-                DATEDIFF(a.FechaCaducidad, NOW()) as DiasRestantes
+                CAST(TIMESTAMPDIFF(DAY, NOW(), a.FechaCaducidad) AS SIGNED) as DiasRestantes
             FROM AlbumCliente a
             LEFT JOIN FotoAlbum f ON a.ID_Album = f.ID_Album
             WHERE a.ID_Cliente = :idCliente
