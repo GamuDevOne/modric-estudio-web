@@ -405,8 +405,8 @@ function guardarVenta(event) {
             {
                 descripcion: nombreServicio,
                 base: precio.toFixed(2),
-                itbms: (precio * 0.07).toFixed(2),
-                total: (precio * 1.07).toFixed(2)
+                itbms: '0.00',                    // Sin ITBMS
+                total: precio.toFixed(2)
             }
         ]
     };
