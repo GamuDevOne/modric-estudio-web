@@ -1293,3 +1293,30 @@ body.modal-open {
         padding: 8px;
     }
 }
+
+/* ========================================
+   FIX: BOTONES MODALES SIEMPRE VISIBLES
+======================================== */
+.modal-footer button {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+#modalEliminar .btn-danger,
+#modalEliminarTemporal .btn-danger {
+    background-color: #c62828 !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Debug: Forzar visibilidad absoluta */
+.modal.active .modal-footer .btn-danger {
+    display: inline-block !important;
+}

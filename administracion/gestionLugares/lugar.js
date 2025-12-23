@@ -268,47 +268,46 @@ function crearColegioCard(colegio) {
         
         <div class="colegio-footer">
             <span class="colegio-estado ${estadoClass}">${colegio.Estado}</span>
-            <div class="colegio-actions">
-                ${colegio.Estado === 'Activo' ? `
-                    <button class="btn-icon" title="Asignar vendedores" onclick="openModalAsignar(${colegio.ID_Colegio}, '${nombreEscapado}')">
+                <div class="colegio-actions">
+                    ${colegio.Estado === 'Activo' ? `
+                        <button class="btn-icon" title="Asignar vendedores" onclick="openModalAsignar(${colegio.ID_Colegio}, '${nombreEscapado}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                        </button>
+                        
+                        <button class="btn-icon" title="Editar colegio" onclick="editarColegio(${colegio.ID_Colegio})">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        
+                        <button class="btn-icon" title="Cerrar colegio" onclick="cerrarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </button>
+                    ` : ''}
+                    
+                    <button class="btn-icon" title="Ver estadísticas" onclick="verEstadisticas(${colegio.ID_Colegio}, '${nombreEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                         </svg>
                     </button>
                     
-                    <button class="btn-icon" title="Editar colegio" onclick="editarColegio(${colegio.ID_Colegio})">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </button>
-                    
-                    <button class="btn-icon" title="Cerrar colegio" onclick="cerrarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                    </button>
-                ` : ''}
-                
-                <button class="btn-icon" title="Ver estadísticas" onclick="verEstadisticas(${colegio.ID_Colegio}, '${nombreEscapado}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
-                </button>
-                
-                ${colegio.TotalVentas == 0 ? `
-                    <button class="btn-icon" title="Eliminar colegio" onclick="eliminarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
+                    !-- ✅ SIEMPRE MOSTRAR BOTÓN ELIMINAR -->
+                    <button class="btn-icon btn-delete" title="Eliminar lugar" onclick="eliminarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         </svg>
                     </button>
-                ` : ''}
-            </div>
+                </div>
         </div>
     `;
     

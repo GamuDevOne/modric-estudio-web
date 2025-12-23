@@ -908,3 +908,27 @@ body.modal-open {
         font-size: 13px;
     }
 }
+
+/* ========================================
+   FIX: BOTÓN ELIMINAR SIEMPRE VISIBLE
+======================================== */
+.btn-icon.btn-delete {
+    color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.btn-icon.btn-delete:hover {
+    background-color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.btn-icon.btn-delete:hover svg {
+    stroke: #fff;
+}
+
+/* Asegurar visibilidad de botones en modales */
+.modal-footer .btn-danger {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

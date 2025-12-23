@@ -226,17 +226,33 @@ let confirmarEliminacionForzadaVendedor = false;
 
 function eliminarVendedor(id, nombre) {
     vendedorIdEliminar = id;
-    confirmarEliminacionForzadaVendedor = false; // Reset
+    confirmarEliminacionForzadaVendedor = false;
+    
+    console.log('🔍 DEBUG: Abriendo modal eliminar vendedor ID:', id); // DEBUG
     
     document.getElementById('vendedorNombre').textContent = nombre;
-    document.getElementById('advertenciaVentasVendedor').style.display = 'none'; // Ocultar por defecto
+    document.getElementById('advertenciaVentasVendedor').style.display = 'none';
     
-    // Resetear texto del botón
+    // ✅ FORZAR VISIBILIDAD DEL BOTÓN
     const btnEliminar = document.querySelector('#modalEliminar .btn-danger');
-    btnEliminar.textContent = 'Eliminar';
-    btnEliminar.style.backgroundColor = '#c62828';
+    console.log('🔍 DEBUG: Botón eliminar encontrado:', btnEliminar); // DEBUG
     
-    document.getElementById('modalEliminar').classList.add('active');
+    if (btnEliminar) {
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.style.backgroundColor = '#c62828';
+        btnEliminar.style.display = 'inline-block';
+        btnEliminar.style.visibility = 'visible';
+        btnEliminar.style.opacity = '1';
+        console.log('✅ DEBUG: Botón configurado como visible'); // DEBUG
+    } else {
+        console.error('❌ DEBUG: No se encontró el botón .btn-danger en #modalEliminar'); // DEBUG
+    }
+    
+    const modal = document.getElementById('modalEliminar');
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+    
+    console.log('✅ DEBUG: Modal activado'); // DEBUG
 }
 
 function confirmarEliminar() {
