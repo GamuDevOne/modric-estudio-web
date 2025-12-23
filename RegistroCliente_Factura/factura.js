@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fila.innerHTML = `
           <td>${p.descripcion}</td>
           <td>$${parseFloat(p.base).toFixed(2)}</td>
-          <td>$${parseFloat(p.itbms).toFixed(2)}</td>
           <td>$${parseFloat(p.total).toFixed(2)}</td>
         `;
         tabla.appendChild(fila);
@@ -284,7 +283,7 @@ function generarPDF() {
       if (data.exito) {
         mostrarNotificacion("✓ Factura PDF descargada correctamente", "success");
         
-        // Detectar la ruta base dinámicamente (funciona en localhost y Hostinger)
+         // Detectar la ruta base dinámicamente (funciona en localhost y Hostinger)
         const pathParts = window.location.pathname.split('/').filter(p => p !== '');
         let rutaBase = '';
         

@@ -79,13 +79,13 @@ function obtenerDetallePedido($pdo, $data) {
                 vi.EstadoPago,
                 vi.MetodoPago as MetodoPagoInicial,
                 vi.Notas
-            FROM Pedido p
-            INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-            LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
-            LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
-            LEFT JOIN Colegio c ON p.ID_Colegio = c.ID_Colegio
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            FROM pedido p
+            INNER JOIN usuario u ON p.ID_Usuario = u.ID_Usuario
+            LEFT JOIN usuario v ON p.ID_Vendedor = v.ID_Usuario
+            LEFT JOIN servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN paquete pk ON p.ID_Paquete = pk.ID_Paquete
+            LEFT JOIN colegio c ON p.ID_Colegio = c.ID_Colegio
+            LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
             WHERE p.ID_Pedido = :idPedido
         ");
         
@@ -108,7 +108,7 @@ function obtenerDetallePedido($pdo, $data) {
         
         $stmt = $pdo->prepare("
             SELECT COALESCE(SUM(Monto), 0) as TotalHistorial
-            FROM HistorialAbonos 
+            FROM historialabonos 
             WHERE ID_Pedido = :idPedido
         ");
         $stmt->execute([':idPedido' => $data['idPedido']]);
@@ -184,8 +184,8 @@ function obtenerHistorialAbonos($pdo, $data) {
                 ha.Notas,
                 ha.FechaRegistro,
                 u.NombreCompleto as RegistradoPor
-            FROM HistorialAbonos ha
-            LEFT JOIN Usuario u ON ha.ID_RegistradoPor = u.ID_Usuario
+            FROM historialabonos ha
+            LEFT JOIN usuario u ON ha.ID_RegistradoPor = u.ID_Usuario
             WHERE ha.ID_Pedido = :idPedido
             ORDER BY ha.FechaRegistro ASC
         ");
@@ -234,10 +234,10 @@ function registrarNuevoAbono($pdo, $data) {
                 p.Total,
                 COALESCE((
                     SELECT SUM(Monto) 
-                    FROM HistorialAbonos 
+                    FROM historialabonos 
                     WHERE ID_Pedido = p.ID_Pedido
                 ), 0) as TotalAbonado
-            FROM Pedido p
+            FROM pedido p
             WHERE p.ID_Pedido = :idPedido
         ");
         $stmt->execute([':idPedido' => $data['idPedido']]);
@@ -279,7 +279,7 @@ function registrarNuevoAbono($pdo, $data) {
         try {
             // Registrar nuevo abono
             $stmt = $pdo->prepare("
-                INSERT INTO HistorialAbonos (ID_Pedido, Monto, MetodoPago, Notas, ID_RegistradoPor)
+                INSERT INTO historialabonos (ID_Pedido, Monto, MetodoPago, Notas, ID_RegistradoPor)
                 VALUES (:idPedido, :monto, :metodo, :notas, :idUsuario)
             ");
             
@@ -305,7 +305,7 @@ function registrarNuevoAbono($pdo, $data) {
                 
                 // SOLO actualizar VentaInfo, NO el estado del pedido
                 $stmt = $pdo->prepare("
-                    UPDATE VentaInfo 
+                    UPDATE ventainfo 
                     SET EstadoPago = 'Completo',
                         MontoAbonado = :nuevoTotal
                     WHERE ID_Pedido = :idPedido
@@ -323,7 +323,7 @@ function registrarNuevoAbono($pdo, $data) {
             } else {
                 // Actualizar monto abonado
                 $stmt = $pdo->prepare("
-                    UPDATE VentaInfo 
+                    UPDATE ventainfo 
                     SET MontoAbonado = :nuevoTotal
                     WHERE ID_Pedido = :idPedido
                 ");

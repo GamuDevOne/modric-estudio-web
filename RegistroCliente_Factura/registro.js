@@ -281,8 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        const itbms = precioBásico * 0.07;
-        const totalConItbms = precioBásico + itbms;
+        const itbms = 0;
+        const totalConItbms = precioBásico;
         
         const tipoPagoValue = tipoPago.value;
         let cantidadAbonoValue = 'N/A';
@@ -325,8 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     descripcion: paqueteNombre,
                     base: precioBásico.toFixed(2),
-                    itbms: itbms.toFixed(2),
-                    total: totalConItbms.toFixed(2)
+                    itbms: '0.00',
+                    total: precioBásico.toFixed(2)
                 }
             ]
         };

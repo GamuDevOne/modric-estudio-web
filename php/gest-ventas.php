@@ -124,7 +124,7 @@ function registrarVenta($pdo, $data) {
             
             // Insertar pedido
             $stmt = $pdo->prepare("
-                INSERT INTO Pedido (
+                INSERT INTO pedido (
                     ID_Usuario,
                     ID_Vendedor,
                     ID_Colegio,
@@ -169,7 +169,7 @@ function registrarVenta($pdo, $data) {
             }
             
             $stmt = $pdo->prepare("
-                INSERT INTO VentaInfo (
+                INSERT INTO ventainfo (
                     ID_Pedido,
                     NombreCliente,
                     MetodoPago,
@@ -200,7 +200,7 @@ function registrarVenta($pdo, $data) {
             // ========================================
             if ($data['estadoPago'] === 'Abono' && $montoAbonado > 0) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO HistorialAbonos (
+                    INSERT INTO historialabonos (
                         ID_Pedido,
                         Monto,
                         MetodoPago,
@@ -266,9 +266,9 @@ function obtenerVentasVendedorHoy($pdo, $data) {
                 vi.Notas,
                 COALESCE(s.NombreServicio, pk.NombrePaquete) as Servicio
             FROM pedido p
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
-            LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
+            LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
+            LEFT JOIN servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN paquete pk ON p.ID_Paquete = pk.ID_Paquete
             WHERE p.ID_Vendedor = :idVendedor
             AND DATE(p.Fecha) = CURDATE()
             ORDER BY p.Fecha DESC

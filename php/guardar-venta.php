@@ -76,7 +76,7 @@ try {
             
             // Calcular precio con ITBMS
             $precioBase = isset($input['productos'][0]['base']) ? floatval($input['productos'][0]['base']) : 0;
-            $precioTotal = $precioBase * 1.07; // Base + 7% ITBMS
+            $precioTotal = $precioBase;
         } else {
             // Viene del formulario directo, buscar el servicio/paquete
             $paqueteSeleccionado = $input['paquete'];
@@ -88,7 +88,7 @@ try {
             
             if ($servicio) {
                 $idServicio = $servicio['ID_Servicio'];
-                $precioTotal = floatval($servicio['Precio']) * 1.07;
+                $precioTotal = floatval($servicio['Precio']);
             } else {
                 // Buscar como paquete
                 $stmt = $pdo->prepare("SELECT ID_Paquete, Precio FROM paquete WHERE NombrePaquete LIKE :nombre LIMIT 1");
@@ -97,7 +97,7 @@ try {
                 
                 if ($paquete) {
                     $idPaquete = $paquete['ID_Paquete'];
-                    $precioTotal = floatval($paquete['Precio']) * 1.07;
+                    $precioTotal = floatval($paquete['Precio']);
                 } else {
                     // Si no se encuentra, usar precio de productos
                     $precioTotal = isset($input['productos'][0]['total']) ? floatval($input['productos'][0]['total']) : 0;
@@ -117,7 +117,7 @@ try {
         }
         
         $stmt = $pdo->prepare("
-            INSERT INTO Pedido (
+            INSERT INTO pedido (
                 Fecha,
                 Estado,
                 Prioridad,
@@ -185,7 +185,7 @@ try {
         }
         
         $stmt = $pdo->prepare("
-            INSERT INTO VentaInfo (
+            INSERT INTO ventainfo (
                 ID_Pedido,
                 NombreCliente,
                 MetodoPago,
@@ -220,7 +220,7 @@ try {
         // ========================================
         if ($estadoPago === 'Abono' && $montoAbonado > 0) {
             $stmt = $pdo->prepare("
-                INSERT INTO HistorialAbonos (
+                INSERT INTO historialabonos (
                     ID_Pedido,
                     Monto,
                     MetodoPago,

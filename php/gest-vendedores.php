@@ -248,7 +248,7 @@ function updateVendedor($pdo, $data) {
         if (!empty($data['contrasena'])) {
             // Actualizar con contraseña nueva
             $stmt = $pdo->prepare("
-                UPDATE Usuario SET
+                UPDATE usuario SET
                     NombreCompleto = :nombreCompleto,
                     Usuario = :usuario,
                     Correo = :correo,
@@ -266,7 +266,7 @@ function updateVendedor($pdo, $data) {
         } else {
             // Actualizar sin cambiar contraseña
             $stmt = $pdo->prepare("
-                UPDATE Usuario SET
+                UPDATE usuario SET
                     NombreCompleto = :nombreCompleto,
                     Usuario = :usuario,
                     Correo = :correo
@@ -361,7 +361,7 @@ function getVendedorStats($pdo, $data) {
         $stmt = $pdo->prepare("
             SELECT c.NombreColegio 
             FROM asignacionvendedor av
-            INNER JOIN Colegio c ON av.ID_Colegio = c.ID_Colegio
+            INNER JOIN colegio c ON av.ID_Colegio = c.ID_Colegio
             WHERE av.ID_Vendedor = :id 
             AND av.FechaAsignacion = CURDATE()
             AND av.Estado = 'Activo'
@@ -380,8 +380,8 @@ function getVendedorStats($pdo, $data) {
                     ELSE p.Total
                 END
             ), 0) as totalVentas
-            FROM Pedido p
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            FROM pedido p
+            LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
             WHERE p.ID_Vendedor = :id 
             AND p.Estado != 'Cancelado'
         ");
@@ -391,7 +391,7 @@ function getVendedorStats($pdo, $data) {
         // Pedidos activos
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as pedidosActivos
-            FROM Pedido
+            FROM pedido
             WHERE ID_Vendedor = :id 
             AND Estado NOT IN ('Completado', 'Cancelado')
         ");
@@ -404,9 +404,9 @@ function getVendedorStats($pdo, $data) {
                 p.ID_Pedido,
                 p.Fecha,
                 COALESCE(vi.NombreCliente, u.NombreCompleto) as Cliente
-            FROM Pedido p
-            INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            FROM pedido p
+            INNER JOIN usuario u ON p.ID_Usuario = u.ID_Usuario
+            LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
             WHERE p.ID_Vendedor = :id
             ORDER BY p.Fecha DESC
             LIMIT 1
@@ -425,7 +425,7 @@ function getVendedorStats($pdo, $data) {
             SELECT 
                 Estado,
                 COUNT(*) as cantidad
-            FROM Pedido
+            FROM pedido
             WHERE ID_Vendedor = :id
             GROUP BY Estado
         ");

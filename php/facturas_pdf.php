@@ -293,7 +293,7 @@ try {
                 :numeroOrden,
                 NOW(),
                 'PDF',
-                (SELECT ID_Pedido FROM Pedido WHERE ID_Pedido = :idPedido LIMIT 1)
+                (SELECT ID_Pedido FROM pedido WHERE ID_Pedido = :idPedido LIMIT 1)
             )
         ");
 
