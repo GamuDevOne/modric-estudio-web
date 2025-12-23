@@ -1,9 +1,9 @@
 <?php
 // Configuración de la base de datos
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 // Headers para permitir CORS y JSON
 header('Content-Type: application/json');
@@ -74,7 +74,7 @@ function getAllVendedores($pdo) {
                 u.NombreCompleto,
                 u.Usuario,
                 u.Correo
-            FROM Usuario u
+            FROM usuario u
             WHERE u.TipoUsuario = 'Vendedor'
             ORDER BY u.NombreCompleto ASC
         ");
@@ -125,7 +125,7 @@ function createVendedor($pdo, $data) {
         }
         
         // Verificar si el correo ya existe
-        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo");
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM usuario WHERE Correo = :correo");
         $stmt->execute([':correo' => $data['correo']]);
         if ($stmt->fetch()) {
             echo json_encode([
@@ -136,7 +136,7 @@ function createVendedor($pdo, $data) {
         }
         
         $stmt = $pdo->prepare("
-            INSERT INTO Usuario (
+            INSERT INTO usuario (
                 NombreCompleto, 
                 Usuario,
                 Correo, 
@@ -203,7 +203,7 @@ function updateVendedor($pdo, $data) {
         }
         
         // Verificar que el vendedor existe
-        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
         $stmt->execute([':id' => $data['id']]);
         if (!$stmt->fetch()) {
             echo json_encode([
@@ -214,7 +214,7 @@ function updateVendedor($pdo, $data) {
         }
         
         // Verificar si el correo ya existe (excepto el actual)
-        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Correo = :correo AND ID_Usuario != :id");
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM usuario WHERE Correo = :correo AND ID_Usuario != :id");
         $stmt->execute([':correo' => $data['correo'], ':id' => $data['id']]);
         if ($stmt->fetch()) {
             echo json_encode([
@@ -227,7 +227,7 @@ function updateVendedor($pdo, $data) {
         // Verificar si el usuario ya existe (excepto el actual)
         $stmt = $pdo->prepare("
             SELECT ID_Usuario 
-            FROM Usuario 
+            FROM usuario 
             WHERE Usuario = :usuario 
             AND ID_Usuario != :id
         ");
@@ -308,7 +308,7 @@ function deleteVendedor($pdo, $data) {
         }
         
         // Verificar si el vendedor tiene pedidos asociados
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM Pedido WHERE ID_Vendedor = :id");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM pedido WHERE ID_Vendedor = :id");
         $stmt->execute([':id' => $data['id']]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -321,7 +321,7 @@ function deleteVendedor($pdo, $data) {
         }
         
         // Eliminar vendedor
-        $stmt = $pdo->prepare("DELETE FROM Usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
+        $stmt = $pdo->prepare("DELETE FROM usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
         $stmt->execute([':id' => $data['id']]);
         
         if ($stmt->rowCount() > 0) {
@@ -360,7 +360,7 @@ function getVendedorStats($pdo, $data) {
         // Obtener asignación ACTUAL (del día de HOY)
         $stmt = $pdo->prepare("
             SELECT c.NombreColegio 
-            FROM AsignacionVendedor av
+            FROM asignacionvendedor av
             INNER JOIN Colegio c ON av.ID_Colegio = c.ID_Colegio
             WHERE av.ID_Vendedor = :id 
             AND av.FechaAsignacion = CURDATE()

@@ -3,9 +3,9 @@
 
 // Configuración de la base de datos
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 // Headers para permitir CORS
 header('Content-Type: application/json');
@@ -36,7 +36,7 @@ try {
     // Verificar que el álbum existe y está activo
     $stmt = $pdo->prepare("
         SELECT a.ID_Album, a.ID_Cliente, a.Estado, u.ID_Usuario
-        FROM AlbumCliente a
+        FROM albumcliente a
         INNER JOIN Usuario u ON a.ID_Cliente = u.ID_Usuario
         WHERE a.ID_Album = :idAlbum
     ");

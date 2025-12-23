@@ -1,16 +1,32 @@
 <?php
 // ========================================
-// LOGIN SIMPLE - TEXTO PLANO
+// LOGIN SIMPLE - CONEXIÓN DIRECTA
 // ========================================
-require_once '../config.php';
 
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// Iniciar sesión
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 session_start();
 
 try {
-    $pdo = getDBConnection();
+    // CONEXIÓN DIRECTA A BD (sin config.php)
+    $pdo = new PDO(
+        "mysql:host=localhost;dbname=u951150559_modricestudio;charset=utf8mb4",
+        "u951150559_modric",
+        "|Fi|b~qQw7",
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]
+    );
 
     $input = json_decode(file_get_contents('php://input'), true);
 
@@ -29,7 +45,7 @@ try {
     // Buscar usuario
     $stmt = $pdo->prepare("
         SELECT ID_Usuario, NombreCompleto, Correo, Usuario, TipoUsuario, Foto, Contrasena
-        FROM Usuario
+        FROM usuario
         WHERE Usuario = ? OR Correo = ?
     ");
 
@@ -47,7 +63,7 @@ try {
     // ========================================
     // VERIFICACIÓN DE CONTRASEÑA (TEXTO PLANO)
     // ========================================
-    $contrasenaDB = $user['Contrasena'];
+    $contrasenaDB = trim($user['Contrasena']);
 
     if ($contrasenaDB === $contrasena) {
         // Login exitoso
@@ -80,6 +96,7 @@ try {
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,
-        'message' => 'Error en la autenticación'
+        'message' => 'Error en la autenticación',
+        'debug' => $e->getMessage()
     ]);
 }

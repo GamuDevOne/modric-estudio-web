@@ -8,9 +8,9 @@
 
 // Configuración de Base de Datos
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'ModricEstudio00');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u951150559_modricestudio');
+define('DB_USER', 'u951150559_modric');
+define('DB_PASS', '|Fi|b~qQw7');
 
 // Clave secreta para JWT (CAMBIAR ESTO en producción)
 define('JWT_SECRET', 'tu-clave-super-secreta-cambiar-en-produccion-' . md5(__DIR__));
@@ -146,7 +146,7 @@ function verificarRateLimit($accion, $limite = 50, $tiempo = 200) {
 // ========================================
 function configurarHeadersSeguridad() {
     // CORS - se debe ajustar segun el dominio (de momento taremos en localhost)
-    $allowedOrigins = ['http://localhost', 'http://127.0.0.1'];
+    $allowedOrigins = ['http://localhost', 'http://127.0.0.1', 'https://modricestudio.com', 'http://modricestudio.com'];
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     
     if (in_array($origin, $allowedOrigins) || APP_ENV === 'development') {

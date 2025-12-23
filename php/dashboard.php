@@ -78,8 +78,8 @@ function getEstadisticas($pdo) {
                     ELSE p.Total
                 END
             ), 0) as ventasMes
-        FROM Pedido p
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         WHERE YEAR(p.Fecha) = YEAR(CURDATE()) 
         AND MONTH(p.Fecha) = MONTH(CURDATE())
         AND p.Estado != 'Cancelado'
@@ -94,8 +94,8 @@ function getEstadisticas($pdo) {
                     ELSE p.Total
                 END
             ), 0) as ventasMesAnterior
-        FROM Pedido p
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         WHERE YEAR(p.Fecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
         AND MONTH(p.Fecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
         AND p.Estado != 'Cancelado'
@@ -110,15 +110,15 @@ function getEstadisticas($pdo) {
     
     $stmt = $pdo->query("
         SELECT COUNT(*) as pedidosActivos
-        FROM Pedido
+        FROM pedido
         WHERE Estado NOT IN ('Cancelado', 'Completado')
     ");
     $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
 
     $stmt = $pdo->query("
         SELECT COUNT(DISTINCT p.ID_Pedido) as pedidosPendientes
-        FROM Pedido p
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         WHERE p.Estado NOT IN ('Cancelado', 'Completado')
         AND (
             vi.EstadoPago IS NULL 
@@ -130,14 +130,14 @@ function getEstadisticas($pdo) {
     
     $stmt = $pdo->query("
         SELECT COUNT(*) as totalClientes
-        FROM Usuario
+        FROM usuario
         WHERE TipoUsuario = 'Cliente'
     ");
     $stats['totalClientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['totalClientes'];
     
     $stmt = $pdo->query("
         SELECT COUNT(*) as clientesNuevos
-        FROM Usuario
+        FROM usuario
         WHERE TipoUsuario = 'Cliente'
         AND YEAR(CURDATE()) = YEAR(CURDATE())
         AND MONTH(CURDATE()) = MONTH(CURDATE())
@@ -152,8 +152,8 @@ function getEstadisticas($pdo) {
                     ELSE p.Total
                 END
             ), 0) as ingresosTotales
-        FROM Pedido p
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         WHERE p.Estado != 'Cancelado'
     ");
     $stats['ingresosTotales'] = $stmt->fetch(PDO::FETCH_ASSOC)['ingresosTotales'];
@@ -169,7 +169,7 @@ function getGraficos($pdo) {
             DATE_FORMAT(Fecha, '%Y-%m') as mes,
             DATE_FORMAT(Fecha, '%b %Y') as mesTexto,
             COALESCE(SUM(Total), 0) as total
-        FROM Pedido
+        FROM pedido
         WHERE Fecha >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
         AND Estado != 'Cancelado'
         GROUP BY DATE_FORMAT(Fecha, '%Y-%m')
@@ -194,9 +194,9 @@ function getGraficos($pdo) {
         SELECT 
             COALESCE(s.NombreServicio, pk.NombrePaquete, 'Sin especificar') as Servicio,
             COUNT(p.ID_Pedido) as cantidad
-        FROM Pedido p
-        LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-        LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
+        FROM pedido p
+        LEFT JOIN servicio s ON p.ID_Servicio = s.ID_Servicio
+        LEFT JOIN paquete pk ON p.ID_Paquete = pk.ID_Paquete
         WHERE p.Estado != 'Cancelado'
         GROUP BY COALESCE(s.ID_Servicio, pk.ID_Paquete, 0)
         ORDER BY cantidad DESC
@@ -233,12 +233,12 @@ function getPedidos($pdo) {
             p.Total,
             p.Estado,
             v.NombreCompleto as Vendedor
-        FROM Pedido p
-        INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
-        LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-        LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        INNER JOIN usuario u ON p.ID_Usuario = u.ID_Usuario
+        LEFT JOIN usuario v ON p.ID_Vendedor = v.ID_Usuario
+        LEFT JOIN servicio s ON p.ID_Servicio = s.ID_Servicio
+        LEFT JOIN paquete pk ON p.ID_Paquete = pk.ID_Paquete
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         ORDER BY p.Fecha DESC
         LIMIT 10
     ");
@@ -263,10 +263,10 @@ function getPedidos($pdo) {
             v.NombreCompleto as Vendedor,
             COALESCE(vi.EstadoPago, 'Pendiente') as EstadoPago,
             COALESCE(vi.MontoAbonado, 0) as MontoAbonado
-        FROM Pedido p
-        INNER JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-        LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
-        LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+        FROM pedido p
+        INNER JOIN usuario u ON p.ID_Usuario = u.ID_Usuario
+        LEFT JOIN usuario v ON p.ID_Vendedor = v.ID_Usuario
+        LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
         WHERE p.Estado NOT IN ('Completado', 'Cancelado')
         ORDER BY p.Fecha ASC
     ");
@@ -288,10 +288,10 @@ function marcarCompletado($pdo, $data, $user) {
             'usuario' => $user['nombre']
         ]);
         
-        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Completado' WHERE ID_Pedido = ?");
+        $stmt = $pdo->prepare("UPDATE pedido SET Estado = 'Completado' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
-        $stmt = $pdo->prepare("UPDATE VentaInfo SET EstadoPago = 'Completo' WHERE ID_Pedido = ?");
+        $stmt = $pdo->prepare("UPDATE ventainfo SET EstadoPago = 'Completo' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
         echo json_encode([
@@ -322,12 +322,12 @@ function cancelarPedido($pdo, $data, $user) {
             'motivo' => $motivo
         ]);
         
-        $stmt = $pdo->prepare("UPDATE Pedido SET Estado = 'Cancelado' WHERE ID_Pedido = ?");
+        $stmt = $pdo->prepare("UPDATE pedido SET Estado = 'Cancelado' WHERE ID_Pedido = ?");
         $stmt->execute([$idPedido]);
         
         if (!empty($motivo)) {
             $stmt = $pdo->prepare("
-                UPDATE VentaInfo 
+                UPDATE ventainfo 
                 SET Notas = CONCAT(COALESCE(Notas, ''), '\n\nMotivo cancelación: ', ?)
                 WHERE ID_Pedido = ?
             ");
@@ -357,11 +357,11 @@ function getAllPedidos($pdo) {
                 p.Fecha,
                 p.Total,
                 p.Estado
-            FROM Pedido p
-            LEFT JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
-            LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
-            LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete
-            LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
+            FROM pedido p
+            LEFT JOIN usuario u ON p.ID_Usuario = u.ID_Usuario
+            LEFT JOIN servicio s ON p.ID_Servicio = s.ID_Servicio
+            LEFT JOIN paquete pk ON p.ID_Paquete = pk.ID_Paquete
+            LEFT JOIN ventainfo vi ON p.ID_Pedido = vi.ID_Pedido
             ORDER BY p.Fecha DESC
             LIMIT 100
         ");

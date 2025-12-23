@@ -3,9 +3,9 @@
 // API REST para el sistema de cotizaciones
 
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');

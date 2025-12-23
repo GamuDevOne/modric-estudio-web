@@ -3,9 +3,9 @@
 // Gestión de usuarios temporales creados para álbumes
 
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -106,7 +106,7 @@ function obtenerContrasenaActual($pdo, $data) {
         
         $stmt = $pdo->prepare("
             SELECT ContrasenaTemporal, Contrasena 
-            FROM Usuario 
+            FROM usuario 
             WHERE ID_Usuario = :id 
             AND EsUsuarioTemporal = 1
         ");
@@ -147,7 +147,7 @@ function cambiarContrasenaUsuarioTemporal($pdo, $data) {
         
         $stmt = $pdo->prepare("
             SELECT ID_Usuario 
-            FROM Usuario 
+            FROM usuario 
             WHERE ID_Usuario = :id 
             AND EsUsuarioTemporal = 1
         ");
@@ -198,7 +198,7 @@ function eliminarUsuarioTemporal($pdo, $data) {
                 COUNT(CASE WHEN Estado = 'Cerrado' THEN 1 END) as cerrados,
                 COUNT(CASE WHEN Estado = 'Vencido' THEN 1 END) as vencidos,
                 COUNT(*) as total
-            FROM AlbumCliente 
+            FROM albumcliente 
             WHERE ID_Cliente = :id
         ");
         $stmt->execute([':id' => $data['id']]);
@@ -226,7 +226,7 @@ function eliminarUsuarioTemporal($pdo, $data) {
             
             // Eliminar álbumes cerrados/vencidos
             $stmt = $pdo->prepare("
-                DELETE FROM AlbumCliente 
+                DELETE FROM albumcliente 
                 WHERE ID_Cliente = :id 
                 AND Estado IN ('Cerrado', 'Vencido')
             ");
@@ -235,7 +235,7 @@ function eliminarUsuarioTemporal($pdo, $data) {
             
             // Eliminar usuario temporal
             $stmt = $pdo->prepare("
-                DELETE FROM Usuario 
+                DELETE FROM usuario 
                 WHERE ID_Usuario = :id 
                 AND EsUsuarioTemporal = 1
             ");

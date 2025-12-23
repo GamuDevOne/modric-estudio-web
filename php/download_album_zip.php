@@ -3,9 +3,9 @@
 
 // Configuración de la base de datos
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

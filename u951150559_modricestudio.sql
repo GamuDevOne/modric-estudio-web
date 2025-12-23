@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 22-12-2025 a las 20:22:24
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 23-12-2025 a las 09:21:57
+-- Versión del servidor: 11.8.3-MariaDB-log
+-- Versión de PHP: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,50 +18,8 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `modricestudio00`
+-- Base de datos: `u951150559_modricestudio`
 --
-
-CREATE DATABASE IF NOT EXISTS `modricestudio00`;
-USE `modricestudio00`;
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `modricestudio00`
---
-
-DELIMITER $$
---
--- Procedimientos
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `AsignarPrioridadAutomatica` (IN `p_idPedido` INT)   BEGIN
-    DECLARE v_precio DECIMAL(10,2);
-    DECLARE v_prioridad INT;
-    
-    -- Obtener el precio del pedido
-    SELECT Total INTO v_precio
-    FROM Pedido
-    WHERE ID_Pedido = p_idPedido;
-    
-    -- Asignar prioridad según el precio
-    IF v_precio >= 300 THEN
-        SET v_prioridad = 1; -- Alta
-    ELSE
-        SET v_prioridad = 2; -- Baja
-    END IF;
-    
-    -- Actualizar el pedido
-    UPDATE Pedido
-    SET Prioridad = v_prioridad
-    WHERE ID_Pedido = p_idPedido;
-    
-    SELECT v_prioridad as PrioridadAsignada;
-END$$
-
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -155,6 +113,13 @@ CREATE TABLE `colegio` (
   `Notas` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `colegio`
+--
+
+INSERT INTO `colegio` (`ID_Colegio`, `NombreColegio`, `Direccion`, `Telefono`, `FechaCreacion`, `Estado`, `Notas`) VALUES
+(14, 'ejemplo', 'ejemplo', '66889809', '2025-12-23 08:00:54', 'Activo', 'ejemplo');
+
 -- --------------------------------------------------------
 
 --
@@ -242,6 +207,17 @@ CREATE TABLE `historialabonos` (
   `ID_RegistradoPor` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `historialabonos`
+--
+
+INSERT INTO `historialabonos` (`ID_Abono`, `ID_Pedido`, `Monto`, `MetodoPago`, `Notas`, `FechaRegistro`, `ID_RegistradoPor`) VALUES
+(1, 1, 5.00, 'Efectivo', 'Abono inicial al registrar venta', '2025-12-23 08:58:11', 4),
+(2, 2, 9.00, 'Yappy', 'Abono inicial al registrar venta', '2025-12-23 09:08:20', 4),
+(3, 2, 7.00, 'Efectivo', '', '2025-12-23 09:10:02', 1),
+(4, 2, 0.05, 'Efectivo', '', '2025-12-23 09:10:29', 1),
+(5, 1, 5.70, 'Yappy', '', '2025-12-23 09:13:00', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -308,6 +284,14 @@ CREATE TABLE `pedido` (
   `Total` decimal(10,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `pedido`
+--
+
+INSERT INTO `pedido` (`ID_Pedido`, `Fecha`, `Estado`, `Prioridad`, `FechaSesion`, `HoraSesion`, `ID_Usuario`, `NombreCliente`, `ID_Vendedor`, `ID_Servicio`, `ID_Paquete`, `ID_Colegio`, `Total`) VALUES
+(1, '2025-12-23 08:58:11', 'Cancelado', 0, NULL, NULL, 1, 'cliente prueba a', 4, 1, NULL, 14, 10.70),
+(2, '2025-12-23 09:08:20', 'Completado', 0, NULL, NULL, 1, 'prueba 2 aa', 4, 2, NULL, 14, 16.05);
+
 -- --------------------------------------------------------
 
 --
@@ -373,7 +357,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`ID_Usuario`, `NombreCompleto`, `Correo`, `Usuario`, `Contrasena`, `TipoUsuario`, `Foto`, `GrupoGrado`, `LugarTrabajo`, `ContrasenaTemporal`, `FechaCreacionTemp`, `EsUsuarioTemporal`) VALUES
-(1, 'CEO admin', 'Modricestudio@gmail.com ', 'modric', 'admin', 'CEO', NULL, NULL, NULL, NULL, NULL, 0);
+(1, 'CEO admin', 'Modricestudio@gmail.com ', 'modric', 'admin', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
+(4, 'vendedor ejemplo', 'vendedor@gmail.com', 'vend', 'vendedor', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -392,26 +377,13 @@ CREATE TABLE `ventainfo` (
   `FechaRegistro` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Estructura Stand-in para la vista `v_fechasocupadas`
--- (Véase abajo para la vista actual)
+-- Volcado de datos para la tabla `ventainfo`
 --
-CREATE TABLE `v_fechasocupadas` (
-`Fecha` date
-,`Estado` varchar(11)
-,`CantidadSesiones` bigint(21)
-);
 
--- --------------------------------------------------------
-
---
--- Estructura para la vista `v_fechasocupadas`
---
-DROP TABLE IF EXISTS `v_fechasocupadas`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_fechasocupadas`  AS SELECT `pedido`.`FechaSesion` AS `Fecha`, 'Confirmada' AS `Estado`, count(0) AS `CantidadSesiones` FROM `pedido` WHERE `pedido`.`FechaSesion` is not null AND `pedido`.`Estado` in ('Confirmado','En_Proceso') GROUP BY `pedido`.`FechaSesion`union all select `cotizacion`.`FechaSolicitada` AS `Fecha`,case when `cotizacion`.`Estado` = 'Aprobada' then 'Confirmada' when `cotizacion`.`Estado` = 'Pendiente' then 'Pendiente' when `cotizacion`.`Estado` = 'En_Revision' then 'En_Revision' else 'Disponible' end AS `Estado`,count(0) AS `CantidadSesiones` from `cotizacion` where `cotizacion`.`FechaSolicitada` >= curdate() group by `cotizacion`.`FechaSolicitada`,`cotizacion`.`Estado`  ;
+INSERT INTO `ventainfo` (`ID_VentaInfo`, `ID_Pedido`, `NombreCliente`, `MetodoPago`, `EstadoPago`, `MontoAbonado`, `Notas`, `FechaRegistro`) VALUES
+(1, 1, 'cliente prueba a', 'Efectivo', 'Completo', 10.70, 'prueba\nEscuela: ejemplo\nGrupo: 9 c\nTeléfono: 65435544', '2025-12-23 08:58:11'),
+(2, 2, 'prueba 2 aa', 'Yappy', 'Completo', 16.05, 'prueba 2\nEscuela: ejemplo\nGrupo: 12 g\nTeléfono: 62289510', '2025-12-23 09:08:20');
 
 --
 -- Índices para tablas volcadas
@@ -577,13 +549,13 @@ ALTER TABLE `ventainfo`
 -- AUTO_INCREMENT de la tabla `albumcliente`
 --
 ALTER TABLE `albumcliente`
-  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `asignacionvendedor`
 --
 ALTER TABLE `asignacionvendedor`
-  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `bloqueofecha`
@@ -607,7 +579,7 @@ ALTER TABLE `categoriapedido`
 -- AUTO_INCREMENT de la tabla `colegio`
 --
 ALTER TABLE `colegio`
-  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `ID_Colegio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `cotizacion`
@@ -625,25 +597,25 @@ ALTER TABLE `detallepedido`
 -- AUTO_INCREMENT de la tabla `factura`
 --
 ALTER TABLE `factura`
-  MODIFY `ID_Factura` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Factura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `fotoalbum`
 --
 ALTER TABLE `fotoalbum`
-  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `historialabonos`
 --
 ALTER TABLE `historialabonos`
-  MODIFY `ID_Abono` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Abono` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
-  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `pago`
@@ -661,7 +633,7 @@ ALTER TABLE `paquete`
 -- AUTO_INCREMENT de la tabla `pedido`
 --
 ALTER TABLE `pedido`
-  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -679,13 +651,13 @@ ALTER TABLE `servicio`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
-  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
@@ -790,7 +762,7 @@ DELIMITER $$
 --
 -- Eventos
 --
-CREATE DEFINER=`root`@`localhost` EVENT `CerrarAlbumsVencidos` ON SCHEDULE EVERY 1 DAY STARTS '2025-11-10 14:28:34' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+CREATE DEFINER=`u951150559_modric`@`127.0.0.1` EVENT `CerrarAlbumsVencidos` ON SCHEDULE EVERY 1 DAY STARTS '2025-11-10 14:28:34' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
     UPDATE AlbumCliente 
     SET Estado = 'Vencido'
     WHERE FechaCaducidad < NOW() 

@@ -1,9 +1,9 @@
 <?php
 // reportes.php
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -76,7 +76,7 @@ function generarReporteVentas($pdo, $data) {
                 (p.Total - COALESCE(vi.MontoAbonado, 0)) as SaldoPendiente,
                 p.Estado as EstadoPedido,
                 p.Prioridad
-            FROM Pedido p
+            FROM pedido p
             LEFT JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
             LEFT JOIN Colegio c ON p.ID_Colegio = c.ID_Colegio
@@ -177,10 +177,10 @@ function generarReporteAbonos($pdo, $data) {
                  WHERE ID_Pedido = p.ID_Pedido 
                  AND FechaRegistro <= ha.FechaRegistro) as AcumuladoHasta,
                 (p.Total - (SELECT SUM(Monto) 
-                            FROM HistorialAbonos 
+                            FROM historialabonos 
                             WHERE ID_Pedido = p.ID_Pedido 
                             AND FechaRegistro <= ha.FechaRegistro)) as SaldoRestante
-            FROM HistorialAbonos ha
+            FROM historialabonos ha
             INNER JOIN Pedido p ON ha.ID_Pedido = p.ID_Pedido
             LEFT JOIN Usuario u ON p.ID_Usuario = u.ID_Usuario
             LEFT JOIN Usuario v ON p.ID_Vendedor = v.ID_Usuario
@@ -260,7 +260,7 @@ function generarReporteDocumentos($pdo, $data) {
                 COUNT(DISTINCT CASE WHEN f.Descargada = 1 THEN f.ID_Foto END) as FotosDescargadas,
                 COUNT(DISTINCT ld.ID_Log) as TotalDescargas,
                 DATEDIFF(a.FechaCaducidad, NOW()) as DiasRestantes
-            FROM AlbumCliente a
+            FROM albumcliente a
             INNER JOIN Usuario u ON a.ID_Cliente = u.ID_Usuario
             LEFT JOIN FotoAlbum f ON a.ID_Album = f.ID_Album
             LEFT JOIN LogDescarga ld ON f.ID_Foto = ld.ID_Foto

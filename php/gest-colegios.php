@@ -2,9 +2,9 @@
 // php/gest-colegios.php
 
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -84,7 +84,7 @@ function obtenerColegios($pdo) {
                 c.FechaCreacion,
                 c.Estado,
                 c.Notas,
-                (SELECT COUNT(*) FROM AsignacionVendedor av 
+                (SELECT COUNT(*) FROM asignacionvendedor av 
                  WHERE av.ID_Colegio = c.ID_Colegio 
                  AND av.FechaAsignacion = CURDATE()
                  AND av.Estado = 'Activo') as VendedoresHoy,
@@ -231,7 +231,7 @@ function eliminarColegio($pdo, $data) {
         error_log("eliminarColegio - Verificando ventas para ID: $idColegio");
         
         // Verificar si tiene pedidos asociados
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM Pedido WHERE ID_Colegio = :id");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM pedido WHERE ID_Colegio = :id");
         $stmt->execute([':id' => $idColegio]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -286,7 +286,7 @@ function obtenerVendedoresDisponibles($pdo) {
     try {
         $stmt = $pdo->query("
             SELECT ID_Usuario, NombreCompleto, Correo
-            FROM Usuario
+            FROM usuario
             WHERE TipoUsuario = 'Vendedor'
             ORDER BY NombreCompleto ASC
         ");
@@ -325,7 +325,7 @@ function obtenerAsignaciones($pdo, $data) {
                 AND p.ID_Colegio = av.ID_Colegio
                 AND DATE(p.Fecha) = av.FechaAsignacion
                 AND p.Estado != 'Cancelado') as VentasDelDia,
-                (SELECT COALESCE(SUM(p.Total), 0) FROM Pedido p 
+                (SELECT COALESCE(SUM(p.Total), 0) FROM pedido p 
                  WHERE p.ID_Vendedor = av.ID_Vendedor 
                  AND p.ID_Colegio = av.ID_Colegio
                  AND DATE(p.Fecha) = av.FechaAsignacion) as TotalVendido
@@ -495,7 +495,7 @@ function obtenerEstadisticasColegio($pdo, $data) {
                 u.NombreCompleto,
                 COUNT(p.ID_Pedido) as ventas,
                 COALESCE(SUM(p.Total), 0) as monto
-            FROM Pedido p
+            FROM pedido p
             INNER JOIN Usuario u ON p.ID_Vendedor = u.ID_Usuario
             WHERE p.ID_Colegio = :id AND p.Estado != 'Cancelado'
             GROUP BY p.ID_Vendedor

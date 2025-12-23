@@ -17,9 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Configuración de la base de datos
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
@@ -82,7 +82,7 @@ try {
             $paqueteSeleccionado = $input['paquete'];
             
             // Intentar buscar como servicio primero
-            $stmt = $pdo->prepare("SELECT ID_Servicio, Precio FROM Servicio WHERE NombreServicio LIKE :nombre LIMIT 1");
+            $stmt = $pdo->prepare("SELECT ID_Servicio, Precio FROM servicio WHERE NombreServicio LIKE :nombre LIMIT 1");
             $stmt->execute([':nombre' => '%' . $paqueteSeleccionado . '%']);
             $servicio = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -91,7 +91,7 @@ try {
                 $precioTotal = floatval($servicio['Precio']) * 1.07;
             } else {
                 // Buscar como paquete
-                $stmt = $pdo->prepare("SELECT ID_Paquete, Precio FROM Paquete WHERE NombrePaquete LIKE :nombre LIMIT 1");
+                $stmt = $pdo->prepare("SELECT ID_Paquete, Precio FROM paquete WHERE NombrePaquete LIKE :nombre LIMIT 1");
                 $stmt->execute([':nombre' => '%' . $paqueteSeleccionado . '%']);
                 $paquete = $stmt->fetch(PDO::FETCH_ASSOC);
                 

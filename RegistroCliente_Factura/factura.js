@@ -284,7 +284,18 @@ function generarPDF() {
       if (data.exito) {
         mostrarNotificacion("✓ Factura PDF descargada correctamente", "success");
         
-        const urlCompleta = window.location.origin + "/PaginaWebMS/" + data.url;
+        // Detectar la ruta base dinámicamente (funciona en localhost y Hostinger)
+        const pathParts = window.location.pathname.split('/').filter(p => p !== '');
+        let rutaBase = '';
+        
+        // Si la primera carpeta es "PaginaWebMS" (localhost), incluirla. Si no (Hostinger), usar raíz
+        if (pathParts.length > 0 && pathParts[0] === 'PaginaWebMS') {
+            rutaBase = '/PaginaWebMS/';
+        } else {
+            rutaBase = '/';
+        }
+        
+        const urlCompleta = window.location.origin + rutaBase + data.url;
         const link = document.createElement("a");
         link.href = urlCompleta;
         link.download = `Factura_${factura.numero}.pdf`;

@@ -3,9 +3,9 @@
 
 // Configuración de la base de datos
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 // Headers para permitir CORS y JSON
 header('Content-Type: application/json');
@@ -273,7 +273,7 @@ function eliminarAlbum($pdo, $data) {
         }
         
         // Obtener fotos para eliminar archivos físicos
-        $stmt = $pdo->prepare("SELECT RutaArchivo FROM FotoAlbum WHERE ID_Album = :idAlbum");
+        $stmt = $pdo->prepare("SELECT RutaArchivo FROM fotoalbum WHERE ID_Album = :idAlbum");
         $stmt->execute([':idAlbum' => $data['idAlbum']]);
         $fotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -285,7 +285,7 @@ function eliminarAlbum($pdo, $data) {
         }
         
         // Eliminar álbum (las fotos se eliminan en cascada)
-        $stmt = $pdo->prepare("DELETE FROM AlbumCliente WHERE ID_Album = :idAlbum");
+        $stmt = $pdo->prepare("DELETE FROM albumcliente WHERE ID_Album = :idAlbum");
         $stmt->execute([':idAlbum' => $data['idAlbum']]);
         
         echo json_encode([
@@ -317,7 +317,7 @@ function obtenerFotosAlbum($pdo, $data) {
                 FechaSubida,
                 Descargada,
                 FechaDescarga
-            FROM FotoAlbum
+            FROM fotoalbum
             WHERE ID_Album = :idAlbum
             ORDER BY FechaSubida DESC
         ");
@@ -390,7 +390,7 @@ function crearClienteTemporal($pdo, $data) {
         $usuarioTemporal = $nombreLimpio . rand(100, 999);
         
         // Verificar que el usuario no exista
-        $stmt = $pdo->prepare("SELECT ID_Usuario FROM Usuario WHERE Usuario = :usuario");
+        $stmt = $pdo->prepare("SELECT ID_Usuario FROM usuario WHERE Usuario = :usuario");
         $stmt->execute([':usuario' => $usuarioTemporal]);
         
         while ($stmt->fetch()) {
@@ -458,7 +458,7 @@ function obtenerClientes($pdo) {
                 Correo,
                 EsUsuarioTemporal,
                 FechaCreacionTemp
-            FROM Usuario
+            FROM usuario
             WHERE TipoUsuario = 'Cliente'
             ORDER BY EsUsuarioTemporal DESC, NombreCompleto ASC
         ");
@@ -501,7 +501,7 @@ function eliminarFoto($pdo, $data) {
         }
         
         // Eliminar registro de BD (los logs se eliminan en cascada)
-        $stmt = $pdo->prepare("DELETE FROM FotoAlbum WHERE ID_Foto = :idFoto");
+        $stmt = $pdo->prepare("DELETE FROM fotoalbum WHERE ID_Foto = :idFoto");
         $stmt->execute([':idFoto' => $data['idFoto']]);
         
         echo json_encode([

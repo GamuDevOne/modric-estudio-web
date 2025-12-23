@@ -2,9 +2,9 @@
 // php/gest-ventas.php
 
 $host = 'localhost';
-$dbname = 'ModricEstudio00';
-$username = 'root';
-$password = '';
+$dbname = 'u951150559_modricestudio';
+$username = 'u951150559_modric';
+$password = '|Fi|b~qQw7';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -51,7 +51,7 @@ function obtenerServicios($pdo) {
     try {
         $stmt = $pdo->query("
             SELECT ID_Servicio, NombreServicio, Precio
-            FROM Servicio
+            FROM servicio
             WHERE Estado = 'Activo'
             ORDER BY NombreServicio ASC
         ");
@@ -72,7 +72,7 @@ function obtenerPaquetes($pdo) {
     try {
         $stmt = $pdo->query("
             SELECT ID_Paquete, NombrePaquete, Precio
-            FROM Paquete
+            FROM paquete
             ORDER BY NombrePaquete ASC
         ");
         
@@ -265,7 +265,7 @@ function obtenerVentasVendedorHoy($pdo, $data) {
                 vi.MontoAbonado,
                 vi.Notas,
                 COALESCE(s.NombreServicio, pk.NombrePaquete) as Servicio
-            FROM Pedido p
+            FROM pedido p
             LEFT JOIN VentaInfo vi ON p.ID_Pedido = vi.ID_Pedido
             LEFT JOIN Servicio s ON p.ID_Servicio = s.ID_Servicio
             LEFT JOIN Paquete pk ON p.ID_Paquete = pk.ID_Paquete

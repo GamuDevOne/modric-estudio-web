@@ -116,10 +116,8 @@ function checkSession() {
 // ========================================
 function logout() {
     localStorage.removeItem('userSession');
-    // Navega a la raíz del servidor y luego a la carpeta actual + index.html
-    const pathParts = window.location.pathname.split('/').filter(p => p !== '');
-    const projectFolder = pathParts[0]; // Primera carpeta después de localhost
-    window.location.href = `/${projectFolder}/index.html`;
+    // Redirige a la raíz del sitio (funciona en localhost y Hostinger)
+    window.location.href = '/index.html';
 }
 
 // ========================================

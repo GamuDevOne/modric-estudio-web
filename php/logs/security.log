@@ -211,3 +211,6 @@
 [2025-12-22 20:01:15] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-22 20:09:17] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
 [2025-12-22 20:10:25] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO Admin","action":"get_dashboard_data"}
+[2025-12-23 02:00:52] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
+[2025-12-23 02:16:43] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
+[2025-12-23 02:23:19] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
