@@ -213,7 +213,7 @@
         </div>
     </div>
 
-    <!-- MODAL: CONFIRMAR ELIMINAR LUGAR -->
+        <!-- MODAL: CONFIRMAR ELIMINAR LUGAR -->
     <div id="modalEliminarLugar" class="modal">
         <div class="modal-content modal-small">
             <div class="modal-header">
@@ -222,6 +222,10 @@
             </div>
             <div class="modal-body">
                 <p>¿Deseas eliminar el lugar "<strong id="nombreLugarEliminar"></strong>"?</p>
+                
+                <!-- Advertencia sobre ventas (se muestra dinámicamente) -->
+                <p id="advertenciaVentas" style="display: none;"></p>
+                
                 <p class="warning-text" style="margin-top: 15px; font-size: 14px;">
                     ⚠️ Esta acción no se puede deshacer.
                 </p>

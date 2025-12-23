@@ -2,7 +2,6 @@
 // VARIABLES GLOBALES
 // ========================================
 let vendedoresData = [];
-let vendedorIdEliminar = null;
 let modoEdicion = false;
 
 // ========================================
@@ -220,11 +219,23 @@ function guardarVendedor(event) {
 }
 
 // ========================================
-// ELIMINAR VENDEDOR
+// ELIMINAR VENDEDOR - CON CONFIRMACIÓN EN DOS PASOS
 // ========================================
+let vendedorIdEliminar = null;
+let confirmarEliminacionForzadaVendedor = false;
+
 function eliminarVendedor(id, nombre) {
     vendedorIdEliminar = id;
+    confirmarEliminacionForzadaVendedor = false; // Reset
+    
     document.getElementById('vendedorNombre').textContent = nombre;
+    document.getElementById('advertenciaVentasVendedor').style.display = 'none'; // Ocultar por defecto
+    
+    // Resetear texto del botón
+    const btnEliminar = document.querySelector('#modalEliminar .btn-danger');
+    btnEliminar.textContent = 'Eliminar';
+    btnEliminar.style.backgroundColor = '#c62828';
+    
     document.getElementById('modalEliminar').classList.add('active');
 }
 
@@ -237,6 +248,7 @@ function confirmarEliminar() {
     
     // Guardar el ID ANTES de cerrar el modal
     const idAEliminar = vendedorIdEliminar;
+    const forzar = confirmarEliminacionForzadaVendedor;
     
     // ✅ CERRAR MODAL PRIMERO
     closeModalEliminar();
@@ -245,7 +257,7 @@ function confirmarEliminar() {
         showLoadingModal();
     }, 100);
     
-    console.log('Eliminando vendedor con ID:', idAEliminar); // DEBUG
+    console.log('Eliminando vendedor con ID:', idAEliminar, 'Forzar:', forzar);
     
     fetch('../../php/gest-vendedores.php', {
         method: 'POST',
@@ -254,18 +266,53 @@ function confirmarEliminar() {
         },
         body: JSON.stringify({
             action: 'delete',
-            id: parseInt(idAEliminar) // ✅ Asegurar que sea número
+            id: parseInt(idAEliminar),
+            forzarEliminacion: forzar
         })
     })
     .then(response => response.json())
     .then(data => {
         hideLoadingModal();
         
-        console.log('Respuesta del servidor:', data); // DEBUG
+        console.log('Respuesta del servidor:', data);
         
+        // ==========================================
+        // CASO 1: Requiere confirmación (tiene ventas)
+        // ==========================================
+        if (data.requiereConfirmacion) {
+            // Restaurar ID para segunda confirmación
+            vendedorIdEliminar = idAEliminar;
+            confirmarEliminacionForzadaVendedor = true;
+            
+            // Actualizar modal con advertencia
+            const advertencia = document.getElementById('advertenciaVentasVendedor');
+            advertencia.textContent = `⚠️ Advertencia: Este vendedor tiene ${data.totalVentas} venta(s) asociada(s). Al eliminar el vendedor, también se eliminarán todas las ventas, abonos, facturas y datos relacionados. Esta acción NO SE PUEDE DESHACER.`;
+            advertencia.style.display = 'block';
+            advertencia.style.color = '#d32f2f';
+            advertencia.style.backgroundColor = '#ffebee';
+            advertencia.style.padding = '15px';
+            advertencia.style.borderRadius = '5px';
+            advertencia.style.marginTop = '15px';
+            advertencia.style.fontWeight = 'bold';
+            
+            // Cambiar texto del botón
+            const btnEliminar = document.querySelector('#modalEliminar .btn-danger');
+            btnEliminar.textContent = 'Sí, eliminar TODO';
+            btnEliminar.style.backgroundColor = '#b71c1c';
+            
+            // Reabrir modal
+            document.getElementById('modalEliminar').classList.add('active');
+            document.body.classList.add('modal-open');
+            
+            return;
+        }
+        
+        // ==========================================
+        // CASO 2: Eliminación exitosa
+        // ==========================================
         setTimeout(() => {
             if (data.success) {
-                mostrarModal('Vendedor eliminado correctamente', 'success');
+                mostrarModal(data.message || 'Vendedor eliminado correctamente', 'success');
                 cargarVendedores();
             } else {
                 mostrarModal('Error: ' + data.message, 'error');
@@ -279,6 +326,13 @@ function confirmarEliminar() {
             mostrarModal('Error de conexión. Intenta nuevamente.', 'error');
         }, 200);
     });
+}
+
+function closeModalEliminar() {
+    document.getElementById('modalEliminar').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    vendedorIdEliminar = null;
+    confirmarEliminacionForzadaVendedor = false;
 }
 
 // ========================================
@@ -347,10 +401,6 @@ function closeModal() {
     document.getElementById('passwordHelp').classList.remove('show');
 }
 
-function closeModalEliminar() {
-    document.getElementById('modalEliminar').classList.remove('active');
-    vendedorIdEliminar = null;
-}
 
 function closeModalEstadisticas() {
     document.getElementById('modalEstadisticas').classList.remove('active');

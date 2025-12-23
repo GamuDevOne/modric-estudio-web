@@ -168,7 +168,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIRMAR ELIMINACIÓN VENDEDOR -->
+        <!-- MODAL CONFIRMAR ELIMINACIÓN VENDEDOR -->
     <div id="modalEliminar" class="modal">
         <div class="modal-content modal-small">
             <div class="modal-header">
@@ -177,6 +177,10 @@
             </div>
             <div class="modal-body">
                 <p>¿Estás seguro de que deseas eliminar a <strong id="vendedorNombre"></strong>?</p>
+                
+                <!-- Advertencia sobre ventas (se muestra dinámicamente) -->
+                <p id="advertenciaVentasVendedor" style="display: none;"></p>
+                
                 <p class="warning-text">Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">

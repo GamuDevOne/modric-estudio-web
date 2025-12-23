@@ -256,7 +256,7 @@ function generarPDF() {
     clienteCorreo: document.getElementById("clienteCorreo").textContent,
     metodoPago: facturaData.metodoPago,
     paquete: facturaData.paquete,
-    total: totalFactura.toFixed(2),
+    total: totalFactura.toFixed(2), // posible problema
     comentario: facturaData.comentario || "Sin comentarios",
     // NUEVO: Enviar info de abono al PDF
     tipoPago: tipoPago,

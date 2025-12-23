@@ -5,7 +5,7 @@ let vendedoresDisponibles = [];
 let colegioActualId = null;
 let fechaActual = null; // Cambio: Inicializar en null
 let lugarIdCerrar = null;
-let lugarIdEliminar = null;
+
 
 // ========================================
 // FUNCIÓN AUXILIAR: Obtener fecha local en formato YYYY-MM-DD
@@ -537,19 +537,29 @@ function confirmarCerrarLugar() {
     });
 }
 
+// ========================================
+// ELIMINAR COLEGIO - VERSIÓN CON CONFIRMACIÓN EN DOS PASOS
+// ========================================
+
+// Variables globales para eliminación
+let lugarIdEliminar = null;
+let confirmarEliminacionForzada = false;
+
 function eliminarColegio(id, nombre) {
-    // FIx CONVERTIR A NÚMERO PARA ASEGURAR TIPO CORRECTO(11/12/25)
+    // Convertir a número para asegurar tipo correcto
     lugarIdEliminar = parseInt(id);
+    confirmarEliminacionForzada = false; // Reset
     
     console.log('Eliminar colegio - ID recibido:', id, 'Tipo:', typeof id);
     console.log('Eliminar colegio - ID guardado:', lugarIdEliminar, 'Tipo:', typeof lugarIdEliminar);
     
     if (!lugarIdEliminar || isNaN(lugarIdEliminar)) {
-        mostrarModal('Error: ID de lugar inválido');
+        mostrarModal('Error: ID de lugar inválido', 'error');
         return;
     }
     
     document.getElementById('nombreLugarEliminar').textContent = nombre;
+    document.getElementById('advertenciaVentas').style.display = 'none'; // Ocultar por defecto
     document.getElementById('modalEliminarLugar').classList.add('active');
     document.body.classList.add('modal-open');
 }
@@ -558,21 +568,23 @@ function closeModalEliminarLugar() {
     document.getElementById('modalEliminarLugar').classList.remove('active');
     document.body.classList.remove('modal-open');
     lugarIdEliminar = null;
+    confirmarEliminacionForzada = false;
 }
 
 function confirmarEliminarLugar() {
-    // FIX CRÍTICO: GUARDAR ID ANTES DE CERRAR MODAL(11/12/25)
+    // FIX CRÍTICO: GUARDAR ID ANTES DE CERRAR MODAL
     const idAUsar = lugarIdEliminar;
     
     // VALIDACIÓN CON LA VARIABLE LOCAL
     if (!idAUsar || isNaN(idAUsar)) {
         console.error('Error: ID inválido', idAUsar);
-        mostrarModal('Error: No se pudo identificar el lugar a eliminar');
+        mostrarModal('Error: No se pudo identificar el lugar a eliminar', 'error');
         closeModalEliminarLugar();
         return;
     }
     
     console.log('Confirmando eliminar colegio - ID a usar:', idAUsar);
+    console.log('Forzar eliminación:', confirmarEliminacionForzada);
     
     // AHORA SÍ CERRAMOS EL MODAL
     closeModalEliminarLugar();
@@ -586,7 +598,8 @@ function confirmarEliminarLugar() {
         },
         body: JSON.stringify({
             action: 'eliminar_colegio',
-            idColegio: idAUsar
+            idColegio: idAUsar,
+            forzarEliminacion: confirmarEliminacionForzada
         })
     })
     .then(response => response.json())
@@ -595,17 +608,51 @@ function confirmarEliminarLugar() {
         
         console.log('Respuesta eliminar colegio:', data);
         
+        // ==========================================
+        // CASO 1: Requiere confirmación (tiene ventas)
+        // ==========================================
+        if (data.requiereConfirmacion) {
+            // Restaurar ID para segunda confirmación
+            lugarIdEliminar = idAUsar;
+            confirmarEliminacionForzada = true; // Marcar para forzar en próximo intento
+            
+            // Actualizar modal con advertencia
+            const advertencia = document.getElementById('advertenciaVentas');
+            advertencia.textContent = `⚠️ Advertencia: Este lugar tiene ${data.totalVentas} venta(s) asociada(s). Al eliminar el lugar, también se eliminarán todas las ventas, abonos, facturas y datos relacionados. Esta acción NO SE PUEDE DESHACER.`;
+            advertencia.style.display = 'block';
+            advertencia.style.color = '#d32f2f';
+            advertencia.style.backgroundColor = '#ffebee';
+            advertencia.style.padding = '15px';
+            advertencia.style.borderRadius = '5px';
+            advertencia.style.marginTop = '15px';
+            advertencia.style.fontWeight = 'bold';
+            
+            // Cambiar texto del botón de confirmación
+            const btnEliminar = document.querySelector('#modalEliminarLugar .btn-danger');
+            btnEliminar.textContent = 'Sí, eliminar TODO';
+            btnEliminar.style.backgroundColor = '#b71c1c';
+            
+            // Reabrir modal
+            document.getElementById('modalEliminarLugar').classList.add('active');
+            document.body.classList.add('modal-open');
+            
+            return;
+        }
+        
+        // ==========================================
+        // CASO 2: Eliminación exitosa
+        // ==========================================
         if (data.success) {
-            mostrarModal('Lugar eliminado correctamente');
-            cargarColegios();
+            mostrarModal(data.message || 'Lugar eliminado correctamente', 'success');
+            cargarColegios(); // Recargar lista
         } else {
-            mostrarModal('Error: ' + data.message);
+            mostrarModal('Error: ' + data.message, 'error');
         }
     })
     .catch(error => {
         hideLoadingModal();
         console.error('Error:', error);
-        mostrarModal('Error de conexión');
+        mostrarModal('Error de conexión', 'error');
     });
 }
 
@@ -789,5 +836,6 @@ window.onclick = function(event) {
     }
     if (event.target === document.getElementById('modalEliminarLugar')) {
         lugarIdEliminar = null;
+        confirmarEliminacionForzada = false;
     }
 };

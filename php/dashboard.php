@@ -1,12 +1,11 @@
 <?php
 // ========================================
-// DASHBOARD - SOLO CEO MEJORA DE SEGURIDAD HECHA(12/15/25)
+// DASHBOARD - FIX: EXCLUIR PEDIDOS CANCELADOS DE ESTADÍSTICAS
 // ========================================
 require_once '../config.php';
 
 header('Content-Type: application/json');
 
-//AUTORIZACIÓN: Solo CEO puede acceder
 $user = verificarSesion(['CEO']);
 
 try {
@@ -65,11 +64,14 @@ try {
 }
 
 // ========================================
-// FUNCIONES 
+// ESTADÍSTICAS - FIX: EXCLUIR CANCELADOS
 // ========================================
 function getEstadisticas($pdo) {
     $stats = [];
     
+    // ==========================================
+    // FIX 1: Ventas del mes (EXCLUIR CANCELADOS)
+    // ==========================================
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -86,6 +88,9 @@ function getEstadisticas($pdo) {
     ");
     $stats['ventasMes'] = $stmt->fetch(PDO::FETCH_ASSOC)['ventasMes'];
     
+    // ==========================================
+    // FIX 2: Ventas mes anterior (EXCLUIR CANCELADOS)
+    // ==========================================
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -108,6 +113,7 @@ function getEstadisticas($pdo) {
         $stats['cambioVentas'] = 0;
     }
     
+    // Pedidos activos (sin cambios)
     $stmt = $pdo->query("
         SELECT COUNT(*) as pedidosActivos
         FROM pedido
@@ -115,6 +121,7 @@ function getEstadisticas($pdo) {
     ");
     $stats['pedidosActivos'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosActivos'];
 
+    // Pedidos pendientes (sin cambios)
     $stmt = $pdo->query("
         SELECT COUNT(DISTINCT p.ID_Pedido) as pedidosPendientes
         FROM pedido p
@@ -128,6 +135,7 @@ function getEstadisticas($pdo) {
     ");
     $stats['pedidosPendientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['pedidosPendientes'];
     
+    // Total clientes (sin cambios)
     $stmt = $pdo->query("
         SELECT COUNT(*) as totalClientes
         FROM usuario
@@ -135,6 +143,7 @@ function getEstadisticas($pdo) {
     ");
     $stats['totalClientes'] = $stmt->fetch(PDO::FETCH_ASSOC)['totalClientes'];
     
+    // Clientes nuevos (sin cambios)
     $stmt = $pdo->query("
         SELECT COUNT(*) as clientesNuevos
         FROM usuario
@@ -144,6 +153,9 @@ function getEstadisticas($pdo) {
     ");
     $stats['clientesNuevos'] = $stmt->fetch(PDO::FETCH_ASSOC)['clientesNuevos'];
     
+    // ==========================================
+    // FIX 3: Ingresos totales (EXCLUIR CANCELADOS)
+    // ==========================================
     $stmt = $pdo->query("
         SELECT 
             COALESCE(SUM(
@@ -161,9 +173,13 @@ function getEstadisticas($pdo) {
     return $stats;
 }
 
+// ==========================================
+// GRÁFICOS - FIX: EXCLUIR CANCELADOS
+// ==========================================
 function getGraficos($pdo) {
     $graficos = [];
     
+    // Gráfico ventas mensuales
     $stmt = $pdo->query("
         SELECT 
             DATE_FORMAT(Fecha, '%Y-%m') as mes,
@@ -190,6 +206,7 @@ function getGraficos($pdo) {
         ];
     }
     
+    // Gráfico servicios más vendidos
     $stmt = $pdo->query("
         SELECT 
             COALESCE(s.NombreServicio, pk.NombrePaquete, 'Sin especificar') as Servicio,
@@ -223,7 +240,7 @@ function getGraficos($pdo) {
 function getPedidos($pdo) {
     $pedidos = [];
     
-    // ÚLTIMOS 10 PEDIDOS (sin filtrar)
+    // Últimos 10 pedidos (sin filtrar)
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,
@@ -244,15 +261,7 @@ function getPedidos($pdo) {
     ");
     $pedidos['ultimos'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // ==========================================
-    // PEDIDOS PENDIENTES - CONSULTA CORREGIDA
-    // ==========================================
-    // MOSTRAR: Todos los pedidos que NO estén Completados ni Cancelados
-    // Esto incluye:
-    // - Estado = 'Pendiente' con cualquier EstadoPago (Pendiente/Abono/Completo)
-    // - Estado = 'En_Proceso' con cualquier EstadoPago
-    // - Cualquier otro estado que no sea Completado o Cancelado
-    // ==========================================
+    // Pedidos pendientes (excluir cancelados)
     $stmt = $pdo->query("
         SELECT 
             p.ID_Pedido,

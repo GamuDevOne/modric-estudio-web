@@ -210,7 +210,8 @@ function cerrarColegio($pdo, $data) {
 }
 
 // ========================================
-// ELIMINAR COLEGIO
+// ELIMINAR COLEGIO - VERSIÓN CON ELIMINACIÓN EN CASCADA
+// Permite eliminar colegio junto con todas sus ventas y datos relacionados
 // ========================================
 function eliminarColegio($pdo, $data) {
     try {
@@ -228,51 +229,117 @@ function eliminarColegio($pdo, $data) {
             return;
         }
         
-        error_log("eliminarColegio - Verificando ventas para ID: $idColegio");
+        // Verificar si el parámetro forzarEliminacion está presente
+        $forzarEliminacion = isset($data['forzarEliminacion']) && $data['forzarEliminacion'] === true;
         
-        // Verificar si tiene pedidos asociados
+        error_log("eliminarColegio - Procesando ID: $idColegio, forzar: " . ($forzarEliminacion ? 'SI' : 'NO'));
+        
+        // Contar ventas asociadas
         $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM pedido WHERE ID_Colegio = :id");
         $stmt->execute([':id' => $idColegio]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $totalVentas = $result['total'];
         
-        if ($result['total'] > 0) {
-            error_log("eliminarColegio - Advertencia: Colegio $idColegio tiene {$result['total']} ventas");
+        // Si tiene ventas y NO se fuerza eliminación, pedir confirmación
+        if ($totalVentas > 0 && !$forzarEliminacion) {
+            error_log("eliminarColegio - Colegio tiene $totalVentas ventas, solicitando confirmación");
             echo json_encode([
-                'success' => false, 
-                'message' => 'No se puede eliminar: el colegio tiene ' . $result['total'] . ' venta(s) asociada(s). Primero debes cerrar o reasignar esas ventas.'
+                'success' => false,
+                'requiereConfirmacion' => true,
+                'totalVentas' => $totalVentas,
+                'message' => "El lugar tiene $totalVentas venta(s) asociada(s). ¿Deseas eliminar el lugar junto con todas sus ventas? Esta acción no se puede deshacer."
             ]);
             return;
         }
         
-        // Iniciar transacción para eliminar todolo relacionado
+        // ==========================================
+        // ELIMINACIÓN EN CASCADA
+        // ==========================================
         $pdo->beginTransaction();
         
         try {
-            // Eliminar asignaciones de vendedores
-            $stmt = $pdo->prepare("DELETE FROM AsignacionVendedor WHERE ID_Colegio = :id");
+            // Obtener IDs de pedidos del colegio
+            $stmt = $pdo->prepare("SELECT ID_Pedido FROM pedido WHERE ID_Colegio = :id");
             $stmt->execute([':id' => $idColegio]);
+            $pedidos = $stmt->fetchAll(PDO::FETCH_COLUMN);
             
-            // Eliminar el colegio
-            $stmt = $pdo->prepare("DELETE FROM Colegio WHERE ID_Colegio = :id");
+            if (!empty($pedidos)) {
+                $placeholders = str_repeat('?,', count($pedidos) - 1) . '?';
+                
+                // 1. Eliminar historial de abonos
+                $stmt = $pdo->prepare("DELETE FROM historialabonos WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminados abonos de " . count($pedidos) . " pedidos");
+                
+                // 2. Eliminar ventainfo
+                $stmt = $pdo->prepare("DELETE FROM ventainfo WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminada información de ventas");
+                
+                // 3. Eliminar facturas
+                $stmt = $pdo->prepare("DELETE FROM factura WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminadas facturas");
+                
+                // 4. Eliminar detalles de pedido
+                $stmt = $pdo->prepare("DELETE FROM detallepedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminados detalles de pedidos");
+                
+                // 5. Eliminar pagos
+                $stmt = $pdo->prepare("DELETE FROM pago WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminados pagos");
+                
+                // 6. Eliminar categorías de pedido
+                $stmt = $pdo->prepare("DELETE FROM categoriapedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminadas categorías");
+                
+                // 7. Actualizar cotizaciones (SET NULL en lugar de eliminar)
+                $stmt = $pdo->prepare("UPDATE cotizacion SET ID_Pedido = NULL WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Desvinculadas cotizaciones");
+                
+                // 8. Eliminar pedidos
+                $stmt = $pdo->prepare("DELETE FROM pedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                error_log("  ✓ Eliminados $totalVentas pedidos");
+            }
+            
+            // 9. Eliminar asignaciones de vendedores
+            $stmt = $pdo->prepare("DELETE FROM asignacionvendedor WHERE ID_Colegio = :id");
+            $stmt->execute([':id' => $idColegio]);
+            error_log("  ✓ Eliminadas asignaciones de vendedores");
+            
+            // 10. Eliminar el colegio
+            $stmt = $pdo->prepare("DELETE FROM colegio WHERE ID_Colegio = :id");
             $stmt->execute([':id' => $idColegio]);
             
             if ($stmt->rowCount() === 0) {
-                throw new Exception('Colegio no encontrado');
+                throw new Exception('Lugar no encontrado');
             }
             
             $pdo->commit();
             
-            error_log("eliminarColegio - Éxito: Colegio $idColegio eliminado");
-            echo json_encode(['success' => true, 'message' => 'Colegio eliminado correctamente']);
+            error_log("✅ eliminarColegio - ÉXITO: Colegio $idColegio eliminado junto con $totalVentas ventas");
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => $totalVentas > 0 
+                    ? "Lugar eliminado correctamente junto con $totalVentas venta(s) asociada(s)"
+                    : 'Lugar eliminado correctamente'
+            ]);
             
         } catch (Exception $e) {
             $pdo->rollBack();
+            error_log("❌ Error en transacción: " . $e->getMessage());
             throw $e;
         }
         
     } catch (PDOException $e) {
         error_log("eliminarColegio - Error PDO: " . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Error de base de datos: ' . $e->getMessage()]);
     } catch (Exception $e) {
         error_log("eliminarColegio - Error: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);

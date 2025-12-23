@@ -295,45 +295,119 @@ function updateVendedor($pdo, $data) {
 }
 
 // ========================================
-// FUNCIÓN: ELIMINAR VENDEDOR
+// FUNCIÓN: ELIMINAR VENDEDOR - CON ELIMINACIÓN EN CASCADA
+// Permite eliminar vendedor junto con todas sus ventas y datos
 // ========================================
 function deleteVendedor($pdo, $data) {
     try {
         if (empty($data['id'])) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID de vendedor es requerido'
-            ]);
+            echo json_encode(['success' => false, 'message' => 'ID de vendedor es requerido']);
+            return;
+        }
+        
+        $idVendedor = intval($data['id']);
+        $forzarEliminacion = isset($data['forzarEliminacion']) && $data['forzarEliminacion'] === true;
+        
+        // Verificar si el vendedor existe
+        $stmt = $pdo->prepare("SELECT NombreCompleto FROM usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
+        $stmt->execute([':id' => $idVendedor]);
+        $vendedor = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$vendedor) {
+            echo json_encode(['success' => false, 'message' => 'Vendedor no encontrado']);
             return;
         }
         
         // Verificar si el vendedor tiene pedidos asociados
         $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM pedido WHERE ID_Vendedor = :id");
-        $stmt->execute([':id' => $data['id']]);
+        $stmt->execute([':id' => $idVendedor]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $totalVentas = $result['total'];
         
-        if ($result['total'] > 0) {
+        // Si tiene ventas y NO se fuerza eliminación, pedir confirmación
+        if ($totalVentas > 0 && !$forzarEliminacion) {
             echo json_encode([
                 'success' => false,
-                'message' => 'No se puede eliminar el vendedor porque tiene pedidos asociados'
+                'requiereConfirmacion' => true,
+                'totalVentas' => $totalVentas,
+                'message' => "El vendedor tiene $totalVentas venta(s) asociada(s). ¿Deseas eliminar el vendedor junto con todas sus ventas? Esta acción no se puede deshacer."
             ]);
             return;
         }
         
-        // Eliminar vendedor
-        $stmt = $pdo->prepare("DELETE FROM usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
-        $stmt->execute([':id' => $data['id']]);
+        // ==========================================
+        // ELIMINACIÓN EN CASCADA
+        // ==========================================
+        $pdo->beginTransaction();
         
-        if ($stmt->rowCount() > 0) {
+        try {
+            // Obtener IDs de pedidos del vendedor
+            $stmt = $pdo->prepare("SELECT ID_Pedido FROM pedido WHERE ID_Vendedor = :id");
+            $stmt->execute([':id' => $idVendedor]);
+            $pedidos = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            if (!empty($pedidos)) {
+                $placeholders = str_repeat('?,', count($pedidos) - 1) . '?';
+                
+                // 1. Eliminar historial de abonos
+                $stmt = $pdo->prepare("DELETE FROM historialabonos WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 2. Eliminar ventainfo
+                $stmt = $pdo->prepare("DELETE FROM ventainfo WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 3. Eliminar facturas
+                $stmt = $pdo->prepare("DELETE FROM factura WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 4. Eliminar detalles de pedido
+                $stmt = $pdo->prepare("DELETE FROM detallepedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 5. Eliminar pagos
+                $stmt = $pdo->prepare("DELETE FROM pago WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 6. Eliminar categorías de pedido
+                $stmt = $pdo->prepare("DELETE FROM categoriapedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 7. Actualizar cotizaciones (SET NULL)
+                $stmt = $pdo->prepare("UPDATE cotizacion SET ID_Pedido = NULL WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                // 8. Eliminar pedidos
+                $stmt = $pdo->prepare("DELETE FROM pedido WHERE ID_Pedido IN ($placeholders)");
+                $stmt->execute($pedidos);
+                
+                error_log("✓ Eliminados $totalVentas pedidos del vendedor");
+            }
+            
+            // 9. Eliminar asignaciones del vendedor
+            $stmt = $pdo->prepare("DELETE FROM asignacionvendedor WHERE ID_Vendedor = :id");
+            $stmt->execute([':id' => $idVendedor]);
+            
+            // 10. Eliminar el vendedor
+            $stmt = $pdo->prepare("DELETE FROM usuario WHERE ID_Usuario = :id AND TipoUsuario = 'Vendedor'");
+            $stmt->execute([':id' => $idVendedor]);
+            
+            if ($stmt->rowCount() === 0) {
+                throw new Exception('No se pudo eliminar el vendedor');
+            }
+            
+            $pdo->commit();
+            
             echo json_encode([
                 'success' => true,
-                'message' => 'Vendedor eliminado correctamente'
+                'message' => $totalVentas > 0 
+                    ? "Vendedor eliminado correctamente junto con $totalVentas venta(s) asociada(s)"
+                    : 'Vendedor eliminado correctamente'
             ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Vendedor no encontrado'
-            ]);
+            
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
         }
         
     } catch (PDOException $e) {

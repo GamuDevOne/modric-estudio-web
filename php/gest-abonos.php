@@ -10,7 +10,6 @@
 // 4. CEO cancela → Estado = 'Cancelado' (desaparece de pendientes)
 // ========================================
 
-
 $host = 'localhost';
 $dbname = 'u951150559_modricestudio';
 $username = 'u951150559_modric';

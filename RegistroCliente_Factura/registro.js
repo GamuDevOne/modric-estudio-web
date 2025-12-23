@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const ventaData = localStorage.getItem('ventaDesdeVendedor');
         const desdeVendedor = ventaData ? JSON.parse(ventaData) : null;
         
-        // Calcular precio con ITBMS
+        // Calcular precio SIN ITBMS
         let precioBásico = 50.00;
         let paqueteNombre = paquete.options[paquete.selectedIndex].text;
         
@@ -281,7 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        const itbms = 0;
         const totalConItbms = precioBásico;
         
         const tipoPagoValue = tipoPago.value;
