@@ -1,5 +1,5 @@
 // ========================================
-// MANEJO DE LOGIN - VERSIÓN CON USUARIO O CORREO
+// MANEJO DE LOGIN
 // ========================================
 
 function handleLoginSubmit(event) {

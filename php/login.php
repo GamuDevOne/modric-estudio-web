@@ -1,37 +1,29 @@
 <?php
 // ========================================
-// LOGIN SIMPLE - CONEXIÓN DIRECTA
+// LOGIN - USA CONFIG.PHP CON AUTO-DETECCIÓN
+// FIX: Corregido error SQLSTATE[HY093]
 // ========================================
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+// Incluir configuración (detecta automáticamente local/producción)
+require_once __DIR__ . '/../config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+header('Content-Type: application/json');
+
+// Iniciar sesión si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-session_start();
-
 try {
-    // CONEXIÓN DIRECTA A BD (sin config.php)
-    $pdo = new PDO(
-        "mysql:host=localhost;dbname=u951150559_modricestudio;charset=utf8mb4",
-        "u951150559_modric",
-        "|Fi|b~qQw7",
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
-        ]
-    );
-
+    // Log del entorno
+    error_log("=== LOGIN - Entorno: " . APP_ENV . " ===");
+    
+    // Obtener datos del POST
     $input = json_decode(file_get_contents('php://input'), true);
 
     // Validación de entrada
     if (!isset($input['usuarioCorreo']) || !isset($input['contrasena'])) {
+        logSeguridad('LOGIN_FAILED', ['reason' => 'Missing credentials']);
         echo json_encode([
             'success' => false,
             'message' => 'Usuario/Correo y contraseña son requeridos'
@@ -40,19 +32,47 @@ try {
     }
 
     $usuarioCorreo = trim($input['usuarioCorreo']);
-    $contrasena = trim($input['contrasena']);
+    $contrasena = $input['contrasena'];
 
-    // Buscar usuario
+    error_log("Buscando usuario: $usuarioCorreo");
+
+    // Obtener conexión usando config.php
+    $pdo = getDBConnection();
+
+    // ========================================
+    // FIX: Buscar usuario con parámetros correctos
+    // ========================================
     $stmt = $pdo->prepare("
-        SELECT ID_Usuario, NombreCompleto, Correo, Usuario, TipoUsuario, Foto, Contrasena
+        SELECT 
+            ID_Usuario, 
+            NombreCompleto, 
+            Correo, 
+            Usuario, 
+            TipoUsuario, 
+            Foto, 
+            Contrasena
         FROM usuario
-        WHERE Usuario = ? OR Correo = ?
+        WHERE LOWER(TRIM(Usuario)) = LOWER(:usuario)
+           OR LOWER(TRIM(Correo)) = LOWER(:correo)
+        LIMIT 1
     ");
 
-    $stmt->execute([$usuarioCorreo, $usuarioCorreo]);
+    // Pasar ambos parámetros con el mismo valor
+    $stmt->execute([
+        ':usuario' => $usuarioCorreo,
+        ':correo' => $usuarioCorreo
+    ]);
+    
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
+        logSeguridad('LOGIN_FAILED', [
+            'usuarioCorreo' => $usuarioCorreo,
+            'reason' => 'User not found'
+        ]);
+        
+        error_log("Usuario no encontrado: $usuarioCorreo");
+        
         echo json_encode([
             'success' => false,
             'message' => 'Usuario/Correo o contraseña incorrectos'
@@ -60,17 +80,26 @@ try {
         exit();
     }
 
-    // ========================================
-    // VERIFICACIÓN DE CONTRASEÑA (TEXTO PLANO)
-    // ========================================
-    $contrasenaDB = trim($user['Contrasena']);
+    error_log("Usuario encontrado: {$user['NombreCompleto']} (ID: {$user['ID_Usuario']})");
 
+    // ========================================
+    // VERIFICACIÓN DE CONTRASEÑA
+    // ========================================
+    $contrasenaDB = $user['Contrasena'];
+    
     if ($contrasenaDB === $contrasena) {
         // Login exitoso
         $_SESSION['user_id'] = $user['ID_Usuario'];
         $_SESSION['user_nombre'] = $user['NombreCompleto'];
         $_SESSION['user_tipo'] = $user['TipoUsuario'];
         $_SESSION['user_correo'] = $user['Correo'];
+
+        logSeguridad('LOGIN_SUCCESS', [
+            'usuario' => $user['NombreCompleto'],
+            'tipo' => $user['TipoUsuario']
+        ]);
+
+        error_log("Login exitoso para: {$user['NombreCompleto']}");
 
         echo json_encode([
             'success' => true,
@@ -88,15 +117,25 @@ try {
     }
 
     // Contraseña incorrecta
+    logSeguridad('LOGIN_FAILED', [
+        'usuarioCorreo' => $usuarioCorreo,
+        'reason' => 'Invalid password'
+    ]);
+
+    error_log("Contraseña incorrecta para: $usuarioCorreo");
+
     echo json_encode([
         'success' => false,
         'message' => 'Usuario/Correo o contraseña incorrectos'
     ]);
 
 } catch (Exception $e) {
+    logSeguridad('LOGIN_ERROR', ['error' => $e->getMessage()]);
+    error_log("Error en login: " . $e->getMessage());
+    
     echo json_encode([
         'success' => false,
         'message' => 'Error en la autenticación',
-        'debug' => $e->getMessage()
+        'debug' => APP_ENV === 'development' ? $e->getMessage() : null
     ]);
 }

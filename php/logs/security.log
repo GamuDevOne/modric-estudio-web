@@ -214,3 +214,4 @@
 [2025-12-23 02:00:52] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
 [2025-12-23 02:16:43] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
 [2025-12-23 02:23:19] DASHBOARD_ACCESS - IP: 127.0.0.1 - Detalles: {"usuario":"CEO admin","action":"get_dashboard_data"}
+[2025-12-26 21:02:25] DB_CONNECTION_ERROR - IP: 127.0.0.1 - Detalles: {"error":"SQLSTATE[HY000] [1045] Access denied for user 'u951150559_modric'@'localhost' (using password: YES)"}

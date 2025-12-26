@@ -1,30 +1,63 @@
 <?php
 // ========================================
-// CONFIGURACIÓN GLOBAL DE LA SEGURIDAD
-// se mantendra al mismo nivel de index principall
-// no se usará de momento 
+// CONFIGURACIÓN GLOBAL - AUTO-DETECCIÓN
+// Detecta automáticamente si está en local o producción
 // ========================================
 
+// ========================================
+// DETECTAR ENTORNO
+// ========================================
+function detectarEntorno() {
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $esLocal = (
+        strpos($host, 'localhost') !== false ||
+        strpos($host, '127.0.0.1') !== false ||
+        strpos($host, '::1') !== false ||
+        strpos($host, '.local') !== false
+    );
+    
+    return $esLocal ? 'local' : 'production';
+}
 
-// Configuración de Base de Datos
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u951150559_modricestudio');
-define('DB_USER', 'u951150559_modric');
-define('DB_PASS', '|Fi|b~qQw7');
+$entorno = detectarEntorno();
 
-// Clave secreta para JWT (CAMBIAR ESTO en producción)
-define('JWT_SECRET', 'tu-clave-super-secreta-cambiar-en-produccion-' . md5(__DIR__));
+// ========================================
+// CONFIGURACIÓN SEGÚN ENTORNO
+// ========================================
+if ($entorno === 'local') {
+    // ========================================
+    // CONFIGURACIÓN LOCAL (XAMPP)
+    // ========================================
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'u951150559_modricestudio');  // Tu BD local
+    define('DB_USER', 'root');                       // Usuario XAMPP por defecto
+    define('DB_PASS', '');                           // Sin contraseña en XAMPP
+    define('APP_ENV', 'development');
+    
+    error_log("🟢 Entorno detectado: LOCAL (XAMPP)");
+    
+} else {
+    // ========================================
+    // CONFIGURACIÓN PRODUCCIÓN (HOSTINGER)
+    // ========================================
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'u951150559_modricestudio');
+    define('DB_USER', 'u951150559_modric');
+    define('DB_PASS', '|Fi|b~qQw7');
+    define('APP_ENV', 'production');
+    
+    error_log("🔴 Entorno detectado: PRODUCCIÓN (Hostinger)");
+}
 
-// Configuración de la aplicación
-define('APP_ENV', 'development'); // 'production' en servidor real
+// Configuración común
+define('JWT_SECRET', 'tu-clave-super-secreta-' . md5(__DIR__));
 define('MAX_FILE_SIZE', 25 * 1024 * 1024); // 25MB
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
-define('LOG_DIR', __DIR__ . '/php/logs/');
-
+define('LOG_DIR', __DIR__ . '/logs/');
 
 // Crear directorios si no existen
 if (!file_exists(LOG_DIR)) {
-    mkdir(LOG_DIR, 0755, true);
+    @mkdir(LOG_DIR, 0755, true);
 }
 
 // ========================================
@@ -35,8 +68,14 @@ function getDBConnection() {
     
     if ($pdo === null) {
         try {
+            $dsn = sprintf(
+                "mysql:host=%s;dbname=%s;charset=utf8mb4",
+                DB_HOST,
+                DB_NAME
+            );
+            
             $pdo = new PDO(
-                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+                $dsn,
                 DB_USER,
                 DB_PASS,
                 [
@@ -45,10 +84,26 @@ function getDBConnection() {
                     PDO::ATTR_EMULATE_PREPARES => false
                 ]
             );
+            
+            error_log("Conexión a BD exitosa (" . APP_ENV . ")");
+            
         } catch (PDOException $e) {
             logSeguridad('DB_CONNECTION_ERROR', ['error' => $e->getMessage()]);
+            
+            // En desarrollo, mostrar más info
+            if (APP_ENV === 'development') {
+                error_log("Error de conexión: " . $e->getMessage());
+                error_log("   Host: " . DB_HOST);
+                error_log("   DB: " . DB_NAME);
+                error_log("   User: " . DB_USER);
+            }
+            
             http_response_code(500);
-            die(json_encode(['error' => 'Error de conexión a la base de datos']));
+            die(json_encode([
+                'success' => false,
+                'message' => 'Error de conexión a la base de datos',
+                'debug' => APP_ENV === 'development' ? $e->getMessage() : null
+            ]));
         }
     }
     
@@ -59,6 +114,7 @@ function getDBConnection() {
 // FUNCIÓN: LOGGING DE SEGURIDAD
 // ========================================
 function logSeguridad($evento, $detalles = []) {
+    $logFile = LOG_DIR . 'security.log';
     $log = sprintf(
         "[%s] %s - IP: %s - Detalles: %s\n",
         date('Y-m-d H:i:s'),
@@ -67,7 +123,7 @@ function logSeguridad($evento, $detalles = []) {
         json_encode($detalles)
     );
     
-    @file_put_contents(LOG_DIR . 'security.log', $log, FILE_APPEND);
+    @file_put_contents($logFile, $log, FILE_APPEND);
 }
 
 // ========================================
@@ -81,10 +137,12 @@ function sanitize($data) {
 }
 
 // ========================================
-// FUNCIÓN: VALIDAR TOKEN SIMPLE (Sin JWT aún)
+// FUNCIÓN: VERIFICAR SESIÓN
 // ========================================
 function verificarSesion($tiposPermitidos = []) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     
     if (!isset($_SESSION['user_id'])) {
         http_response_code(401);
@@ -130,23 +188,21 @@ function verificarRateLimit($accion, $limite = 50, $tiempo = 200) {
                 ]);
                 exit();
             } else {
-                // Reset después del tiempo
                 unlink($archivo);
             }
         }
     }
     
-    // Incrementar contador
     $intentos = file_exists($archivo) ? (int)file_get_contents($archivo) + 1 : 1;
-    file_put_contents($archivo, $intentos);
+    @file_put_contents($archivo, $intentos);
 }
 
 // ========================================
 // HEADERS DE SEGURIDAD
 // ========================================
 function configurarHeadersSeguridad() {
-    // CORS - se debe ajustar segun el dominio (de momento taremos en localhost)
-    $allowedOrigins = ['http://localhost', 'http://127.0.0.1', 'https://modricestudio.com', 'http://modricestudio.com'];
+    // CORS
+    $allowedOrigins = ['http://localhost', 'http://127.0.0.1', 'https://modricestudio.com'];
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     
     if (in_array($origin, $allowedOrigins) || APP_ENV === 'development') {
