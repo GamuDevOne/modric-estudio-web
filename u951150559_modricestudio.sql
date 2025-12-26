@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 23-12-2025 a las 09:21:57
--- Versión del servidor: 11.8.3-MariaDB-log
--- Versión de PHP: 7.2.34
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 26-12-2025 a las 20:49:08
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,66 +35,6 @@ CREATE TABLE `albumcliente` (
   `FechaSubida` datetime NOT NULL DEFAULT current_timestamp(),
   `FechaCaducidad` datetime NOT NULL,
   `Estado` varchar(20) NOT NULL DEFAULT 'Activo'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `asignacionvendedor`
---
-
-CREATE TABLE `asignacionvendedor` (
-  `ID_Asignacion` int(11) NOT NULL,
-  `ID_Vendedor` int(11) NOT NULL,
-  `ID_Colegio` int(11) NOT NULL,
-  `FechaAsignacion` date NOT NULL,
-  `Estado` varchar(20) NOT NULL DEFAULT 'Activo',
-  `FechaCreacion` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `bloqueofecha`
---
-
-CREATE TABLE `bloqueofecha` (
-  `ID_Bloqueo` int(11) NOT NULL,
-  `FechaInicio` date NOT NULL,
-  `FechaFin` date NOT NULL,
-  `Motivo` varchar(200) DEFAULT NULL,
-  `Estado` varchar(20) NOT NULL DEFAULT 'Activo',
-  `FechaCreacion` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `categoria`
---
-
-CREATE TABLE `categoria` (
-  `ID_Categoria` int(11) NOT NULL,
-  `NombreCategoria` varchar(100) NOT NULL,
-  `Descripcion` text DEFAULT NULL,
-  `FechaInicio` date NOT NULL,
-  `FechaFin` date NOT NULL,
-  `Estado` varchar(20) DEFAULT 'Activa' CHECK (`Estado` in ('Activa','Inactiva'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `categoriapedido`
---
-
-CREATE TABLE `categoriapedido` (
-  `ID_CategoriaPedido` int(11) NOT NULL,
-  `ID_Categoria` int(11) NOT NULL,
-  `ID_Pedido` int(11) NOT NULL,
-  `ID_Cliente` int(11) NOT NULL,
-  `Notas` text DEFAULT NULL,
-  `FechaRegistro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -149,20 +89,6 @@ CREATE TABLE `cotizacion` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `detallepedido`
---
-
-CREATE TABLE `detallepedido` (
-  `ID_Detalle` int(11) NOT NULL,
-  `ID_Pedido` int(11) NOT NULL,
-  `ID_Producto` int(11) NOT NULL,
-  `Cantidad` int(11) NOT NULL,
-  `PrecioUnitario` decimal(10,2) NOT NULL DEFAULT 0.00
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `factura`
 --
 
@@ -212,8 +138,8 @@ CREATE TABLE `historialabonos` (
 --
 
 INSERT INTO `historialabonos` (`ID_Abono`, `ID_Pedido`, `Monto`, `MetodoPago`, `Notas`, `FechaRegistro`, `ID_RegistradoPor`) VALUES
-(1, 1, 5.00, 'Efectivo', 'Abono inicial al registrar venta', '2025-12-23 08:58:11', 4),
-(2, 2, 9.00, 'Yappy', 'Abono inicial al registrar venta', '2025-12-23 09:08:20', 4),
+(1, 1, 5.00, 'Efectivo', 'Abono inicial', '2025-12-23 08:58:11', 4),
+(2, 2, 9.00, 'Yappy', 'Abono inicial', '2025-12-23 09:08:20', 4),
 (3, 2, 7.00, 'Efectivo', '', '2025-12-23 09:10:02', 1),
 (4, 2, 0.05, 'Efectivo', '', '2025-12-23 09:10:29', 1),
 (5, 1, 5.70, 'Yappy', '', '2025-12-23 09:13:00', 1);
@@ -357,7 +283,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`ID_Usuario`, `NombreCompleto`, `Correo`, `Usuario`, `Contrasena`, `TipoUsuario`, `Foto`, `GrupoGrado`, `LugarTrabajo`, `ContrasenaTemporal`, `FechaCreacionTemp`, `EsUsuarioTemporal`) VALUES
-(1, 'CEO admin', 'Modricestudio@gmail.com ', 'modric', 'admin', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
+(1, 'CEO admin', 'Modricestudio@gmail.com', 'modric', 'admin', 'CEO', NULL, NULL, NULL, NULL, NULL, 0),
 (4, 'vendedor ejemplo', 'vendedor@gmail.com', 'vend', 'vendedor', 'Vendedor', NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
@@ -378,14 +304,6 @@ CREATE TABLE `ventainfo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `ventainfo`
---
-
-INSERT INTO `ventainfo` (`ID_VentaInfo`, `ID_Pedido`, `NombreCliente`, `MetodoPago`, `EstadoPago`, `MontoAbonado`, `Notas`, `FechaRegistro`) VALUES
-(1, 1, 'cliente prueba a', 'Efectivo', 'Completo', 10.70, 'prueba\nEscuela: ejemplo\nGrupo: 9 c\nTeléfono: 65435544', '2025-12-23 08:58:11'),
-(2, 2, 'prueba 2 aa', 'Yappy', 'Completo', 16.05, 'prueba 2\nEscuela: ejemplo\nGrupo: 12 g\nTeléfono: 62289510', '2025-12-23 09:08:20');
-
---
 -- Índices para tablas volcadas
 --
 
@@ -394,89 +312,42 @@ INSERT INTO `ventainfo` (`ID_VentaInfo`, `ID_Pedido`, `NombreCliente`, `MetodoPa
 --
 ALTER TABLE `albumcliente`
   ADD PRIMARY KEY (`ID_Album`),
-  ADD KEY `IX_Album_Cliente` (`ID_Cliente`),
-  ADD KEY `IX_Album_Estado` (`Estado`);
-
---
--- Indices de la tabla `asignacionvendedor`
---
-ALTER TABLE `asignacionvendedor`
-  ADD PRIMARY KEY (`ID_Asignacion`),
-  ADD UNIQUE KEY `UQ_Vendedor_Colegio_Fecha` (`ID_Vendedor`,`ID_Colegio`,`FechaAsignacion`),
-  ADD KEY `IX_Asignacion_Fecha` (`FechaAsignacion`),
-  ADD KEY `IX_Asignacion_Colegio` (`ID_Colegio`);
-
---
--- Indices de la tabla `bloqueofecha`
---
-ALTER TABLE `bloqueofecha`
-  ADD PRIMARY KEY (`ID_Bloqueo`),
-  ADD KEY `IX_Bloqueo_Fecha` (`FechaInicio`,`FechaFin`);
-
---
--- Indices de la tabla `categoria`
---
-ALTER TABLE `categoria`
-  ADD PRIMARY KEY (`ID_Categoria`);
-
---
--- Indices de la tabla `categoriapedido`
---
-ALTER TABLE `categoriapedido`
-  ADD PRIMARY KEY (`ID_CategoriaPedido`),
-  ADD KEY `FK_CatPed_Categoria` (`ID_Categoria`),
-  ADD KEY `FK_CatPed_Pedido` (`ID_Pedido`),
-  ADD KEY `FK_CatPed_Cliente` (`ID_Cliente`);
+  ADD KEY `FK_Album_Cliente` (`ID_Cliente`);
 
 --
 -- Indices de la tabla `colegio`
 --
 ALTER TABLE `colegio`
-  ADD PRIMARY KEY (`ID_Colegio`),
-  ADD KEY `IX_Colegio_Estado` (`Estado`),
-  ADD KEY `IX_Colegio_Nombre` (`NombreColegio`);
+  ADD PRIMARY KEY (`ID_Colegio`);
 
 --
 -- Indices de la tabla `cotizacion`
 --
 ALTER TABLE `cotizacion`
   ADD PRIMARY KEY (`ID_Cotizacion`),
-  ADD KEY `FK_Cotizacion_Pedido` (`ID_Pedido`),
-  ADD KEY `IX_Cotizacion_Estado` (`Estado`),
-  ADD KEY `IX_Cotizacion_Fecha` (`FechaSolicitada`),
-  ADD KEY `IX_Cotizacion_Cliente` (`ID_Cliente`);
-
---
--- Indices de la tabla `detallepedido`
---
-ALTER TABLE `detallepedido`
-  ADD PRIMARY KEY (`ID_Detalle`),
-  ADD KEY `IX_Detalle_Pedido` (`ID_Pedido`),
-  ADD KEY `IX_Detalle_Producto` (`ID_Producto`);
+  ADD KEY `FK_Cotizacion_Cliente` (`ID_Cliente`),
+  ADD KEY `FK_Cotizacion_Pedido` (`ID_Pedido`);
 
 --
 -- Indices de la tabla `factura`
 --
 ALTER TABLE `factura`
   ADD PRIMARY KEY (`ID_Factura`),
-  ADD UNIQUE KEY `ID_Pedido` (`ID_Pedido`),
-  ADD UNIQUE KEY `UQ_Factura_NumeroOrden` (`NumeroOrden`);
+  ADD UNIQUE KEY `UQ_Factura_NumeroOrden` (`NumeroOrden`),
+  ADD UNIQUE KEY `UQ_Factura_Pedido` (`ID_Pedido`);
 
 --
 -- Indices de la tabla `fotoalbum`
 --
 ALTER TABLE `fotoalbum`
   ADD PRIMARY KEY (`ID_Foto`),
-  ADD KEY `IX_Foto_Album` (`ID_Album`);
+  ADD KEY `FK_Foto_Album` (`ID_Album`);
 
 --
 -- Indices de la tabla `historialabonos`
 --
 ALTER TABLE `historialabonos`
-  ADD PRIMARY KEY (`ID_Abono`),
-  ADD KEY `ID_RegistradoPor` (`ID_RegistradoPor`),
-  ADD KEY `IX_Abono_Pedido` (`ID_Pedido`),
-  ADD KEY `IX_Abono_Fecha` (`FechaRegistro`);
+  ADD PRIMARY KEY (`ID_Abono`);
 
 --
 -- Indices de la tabla `logdescarga`
@@ -484,33 +355,26 @@ ALTER TABLE `historialabonos`
 ALTER TABLE `logdescarga`
   ADD PRIMARY KEY (`ID_Log`),
   ADD KEY `FK_Log_Foto` (`ID_Foto`),
-  ADD KEY `FK_Log_Cliente` (`ID_Cliente`),
-  ADD KEY `IX_Log_Fecha` (`FechaDescarga`);
+  ADD KEY `FK_Log_Cliente` (`ID_Cliente`);
 
 --
 -- Indices de la tabla `pago`
 --
 ALTER TABLE `pago`
   ADD PRIMARY KEY (`ID_Pago`),
-  ADD KEY `IX_Pago_Pedido` (`ID_Pedido`);
+  ADD KEY `FK_Pago_Pedido` (`ID_Pedido`);
 
 --
 -- Indices de la tabla `paquete`
 --
 ALTER TABLE `paquete`
-  ADD PRIMARY KEY (`ID_Paquete`),
-  ADD KEY `FK_Paquete_Servicio` (`ID_Servicio`);
+  ADD PRIMARY KEY (`ID_Paquete`);
 
 --
 -- Indices de la tabla `pedido`
 --
 ALTER TABLE `pedido`
-  ADD PRIMARY KEY (`ID_Pedido`),
-  ADD KEY `FK_Pedido_Cliente` (`ID_Usuario`),
-  ADD KEY `FK_Pedido_Vendedor` (`ID_Vendedor`),
-  ADD KEY `FK_Pedido_Servicio` (`ID_Servicio`),
-  ADD KEY `FK_Pedido_Paquete` (`ID_Paquete`),
-  ADD KEY `FK_Pedido_Colegio` (`ID_Colegio`);
+  ADD PRIMARY KEY (`ID_Pedido`);
 
 --
 -- Indices de la tabla `producto`
@@ -531,15 +395,14 @@ ALTER TABLE `servicio`
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`ID_Usuario`),
   ADD UNIQUE KEY `UQ_Usuario_Correo` (`Correo`),
-  ADD UNIQUE KEY `Usuario` (`Usuario`),
-  ADD KEY `idx_usuario` (`Usuario`);
+  ADD UNIQUE KEY `UQ_Usuario_Usuario` (`Usuario`);
 
 --
 -- Indices de la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
   ADD PRIMARY KEY (`ID_VentaInfo`),
-  ADD KEY `IX_VentaInfo_Pedido` (`ID_Pedido`);
+  ADD KEY `FK_VentaInfo_Pedido` (`ID_Pedido`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -549,31 +412,7 @@ ALTER TABLE `ventainfo`
 -- AUTO_INCREMENT de la tabla `albumcliente`
 --
 ALTER TABLE `albumcliente`
-  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT de la tabla `asignacionvendedor`
---
-ALTER TABLE `asignacionvendedor`
-  MODIFY `ID_Asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `bloqueofecha`
---
-ALTER TABLE `bloqueofecha`
-  MODIFY `ID_Bloqueo` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `categoria`
---
-ALTER TABLE `categoria`
-  MODIFY `ID_Categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `categoriapedido`
---
-ALTER TABLE `categoriapedido`
-  MODIFY `ID_CategoriaPedido` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Album` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `colegio`
@@ -588,22 +427,16 @@ ALTER TABLE `cotizacion`
   MODIFY `ID_Cotizacion` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `detallepedido`
---
-ALTER TABLE `detallepedido`
-  MODIFY `ID_Detalle` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `factura`
 --
 ALTER TABLE `factura`
-  MODIFY `ID_Factura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `ID_Factura` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fotoalbum`
 --
 ALTER TABLE `fotoalbum`
-  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID_Foto` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `historialabonos`
@@ -615,7 +448,7 @@ ALTER TABLE `historialabonos`
 -- AUTO_INCREMENT de la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
-  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID_Log` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pago`
@@ -639,13 +472,13 @@ ALTER TABLE `pedido`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `ID_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Producto` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `servicio`
 --
 ALTER TABLE `servicio`
-  MODIFY `ID_Servicio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID_Servicio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
@@ -657,7 +490,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
-  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_VentaInfo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -670,33 +503,11 @@ ALTER TABLE `albumcliente`
   ADD CONSTRAINT `FK_Album_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `asignacionvendedor`
---
-ALTER TABLE `asignacionvendedor`
-  ADD CONSTRAINT `FK_Asignacion_Colegio` FOREIGN KEY (`ID_Colegio`) REFERENCES `colegio` (`ID_Colegio`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Asignacion_Vendedor` FOREIGN KEY (`ID_Vendedor`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `categoriapedido`
---
-ALTER TABLE `categoriapedido`
-  ADD CONSTRAINT `FK_CatPed_Categoria` FOREIGN KEY (`ID_Categoria`) REFERENCES `categoria` (`ID_Categoria`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_CatPed_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_CatPed_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Filtros para la tabla `cotizacion`
 --
 ALTER TABLE `cotizacion`
-  ADD CONSTRAINT `FK_Cotizacion_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Cotizacion_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `detallepedido`
---
-ALTER TABLE `detallepedido`
-  ADD CONSTRAINT `FK_Detalle_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Detalle_Producto` FOREIGN KEY (`ID_Producto`) REFERENCES `producto` (`ID_Producto`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_Cotizacion_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE SET NULL,
+  ADD CONSTRAINT `FK_Cotizacion_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `factura`
@@ -711,40 +522,17 @@ ALTER TABLE `fotoalbum`
   ADD CONSTRAINT `FK_Foto_Album` FOREIGN KEY (`ID_Album`) REFERENCES `albumcliente` (`ID_Album`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `historialabonos`
---
-ALTER TABLE `historialabonos`
-  ADD CONSTRAINT `historialabonos_ibfk_1` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE,
-  ADD CONSTRAINT `historialabonos_ibfk_2` FOREIGN KEY (`ID_RegistradoPor`) REFERENCES `usuario` (`ID_Usuario`);
-
---
 -- Filtros para la tabla `logdescarga`
 --
 ALTER TABLE `logdescarga`
-  ADD CONSTRAINT `FK_Log_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Log_Foto` FOREIGN KEY (`ID_Foto`) REFERENCES `fotoalbum` (`ID_Foto`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_Log_Cliente` FOREIGN KEY (`ID_Cliente`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_Log_Foto` FOREIGN KEY (`ID_Foto`) REFERENCES `fotoalbum` (`ID_Foto`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `pago`
 --
 ALTER TABLE `pago`
-  ADD CONSTRAINT `FK_Pago_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `paquete`
---
-ALTER TABLE `paquete`
-  ADD CONSTRAINT `FK_Paquete_Servicio` FOREIGN KEY (`ID_Servicio`) REFERENCES `servicio` (`ID_Servicio`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pedido`
---
-ALTER TABLE `pedido`
-  ADD CONSTRAINT `FK_Pedido_Cliente` FOREIGN KEY (`ID_Usuario`) REFERENCES `usuario` (`ID_Usuario`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Pedido_Colegio` FOREIGN KEY (`ID_Colegio`) REFERENCES `colegio` (`ID_Colegio`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Pedido_Paquete` FOREIGN KEY (`ID_Paquete`) REFERENCES `paquete` (`ID_Paquete`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Pedido_Servicio` FOREIGN KEY (`ID_Servicio`) REFERENCES `servicio` (`ID_Servicio`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Pedido_Vendedor` FOREIGN KEY (`ID_Vendedor`) REFERENCES `usuario` (`ID_Usuario`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_Pago_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `producto`
@@ -756,16 +544,16 @@ ALTER TABLE `producto`
 -- Filtros para la tabla `ventainfo`
 --
 ALTER TABLE `ventainfo`
-  ADD CONSTRAINT `FK_VentaInfo_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_VentaInfo_Pedido` FOREIGN KEY (`ID_Pedido`) REFERENCES `pedido` (`ID_Pedido`) ON DELETE CASCADE;
 
 DELIMITER $$
 --
 -- Eventos
 --
-CREATE DEFINER=`u951150559_modric`@`127.0.0.1` EVENT `CerrarAlbumsVencidos` ON SCHEDULE EVERY 1 DAY STARTS '2025-11-10 14:28:34' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-    UPDATE AlbumCliente 
-    SET Estado = 'Vencido'
-    WHERE FechaCaducidad < NOW() 
+CREATE DEFINER=`root`@`localhost` EVENT `CerrarAlbumsVencidos` ON SCHEDULE EVERY 1 DAY STARTS '2025-12-26 14:41:19' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+  UPDATE albumcliente
+  SET Estado = 'Vencido'
+  WHERE FechaCaducidad < NOW()
     AND Estado = 'Activo';
 END$$
 

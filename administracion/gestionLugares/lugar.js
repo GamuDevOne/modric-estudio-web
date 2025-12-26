@@ -300,7 +300,7 @@ function crearColegioCard(colegio) {
                         </svg>
                     </button>
                     
-                    !-- ✅ SIEMPRE MOSTRAR BOTÓN ELIMINAR -->
+                    <!-- ✅ SIEMPRE MOSTRAR BOTÓN ELIMINAR -->
                     <button class="btn-icon btn-delete" title="Eliminar lugar" onclick="eliminarColegio(${colegio.ID_Colegio}, '${nombreEscapado}')">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -547,8 +547,8 @@ let confirmarEliminacionForzada = false;
 function eliminarColegio(id, nombre) {
     // Convertir a número para asegurar tipo correcto
     lugarIdEliminar = parseInt(id);
-    confirmarEliminacionForzada = false; // Reset
-    
+    confirmarEliminacionForzadaLugar = false; // ← FIX: Reset con nombre correcto
+
     console.log('Eliminar colegio - ID recibido:', id, 'Tipo:', typeof id);
     console.log('Eliminar colegio - ID guardado:', lugarIdEliminar, 'Tipo:', typeof lugarIdEliminar);
     
@@ -558,21 +558,24 @@ function eliminarColegio(id, nombre) {
     }
     
     document.getElementById('nombreLugarEliminar').textContent = nombre;
-    document.getElementById('advertenciaVentas').style.display = 'none'; // Ocultar por defecto
+    document.getElementById('advertenciaVentas').style.display = 'none';
     document.getElementById('modalEliminarLugar').classList.add('active');
     document.body.classList.add('modal-open');
 }
 
+//cerrar modal eliminar 
 function closeModalEliminarLugar() {
     document.getElementById('modalEliminarLugar').classList.remove('active');
     document.body.classList.remove('modal-open');
     lugarIdEliminar = null;
-    confirmarEliminacionForzada = false;
+    confirmarEliminacionForzadaLugar = false; // ← FIX: Reset con nombre correcto
 }
 
 function confirmarEliminarLugar() {
-    // FIX CRÍTICO: GUARDAR ID ANTES DE CERRAR MODAL
+    // FIX: Guardar ID y estado ANTES de cerrar modal
     const idAUsar = lugarIdEliminar;
+    const forzar = confirmarEliminacionForzadaLugar; // ← FIX: Variable correcta
+    
     
     // VALIDACIÓN CON LA VARIABLE LOCAL
     if (!idAUsar || isNaN(idAUsar)) {
@@ -582,14 +585,13 @@ function confirmarEliminarLugar() {
         return;
     }
     
-    console.log('Confirmando eliminar colegio - ID a usar:', idAUsar);
-    console.log('Forzar eliminación:', confirmarEliminacionForzada);
+        console.log('✅ Confirmando eliminar colegio - ID:', idAUsar, 'Forzar:', forzar);
     
     // AHORA SÍ CERRAMOS EL MODAL
     closeModalEliminarLugar();
     showLoadingModal();
     
-    // USAR LA VARIABLE LOCAL EN EL FETCH
+    // Enviar petición con variable correcta
     fetch('../../php/gest-colegios.php', {
         method: 'POST',
         headers: {
@@ -598,22 +600,24 @@ function confirmarEliminarLugar() {
         body: JSON.stringify({
             action: 'eliminar_colegio',
             idColegio: idAUsar,
-            forzarEliminacion: confirmarEliminacionForzada
+            forzarEliminacion: forzar // ← FIX: Variable correcta
         })
     })
     .then(response => response.json())
     .then(data => {
         hideLoadingModal();
         
-        console.log('Respuesta eliminar colegio:', data);
+        console.log('Respuesta del servidor:', data);
         
         // ==========================================
         // CASO 1: Requiere confirmación (tiene ventas)
         // ==========================================
         if (data.requiereConfirmacion) {
+            console.log('⚠️ Requiere segunda confirmación - tiene', data.totalVentas, 'ventas');
+            
             // Restaurar ID para segunda confirmación
             lugarIdEliminar = idAUsar;
-            confirmarEliminacionForzada = true; // Marcar para forzar en próximo intento
+            confirmarEliminacionForzadaLugar = true; // ← FIX: Marcar para forzar
             
             // Actualizar modal con advertencia
             const advertencia = document.getElementById('advertenciaVentas');
@@ -626,7 +630,7 @@ function confirmarEliminarLugar() {
             advertencia.style.marginTop = '15px';
             advertencia.style.fontWeight = 'bold';
             
-            // Cambiar texto del botón de confirmación
+            // Cambiar texto del botón
             const btnEliminar = document.querySelector('#modalEliminarLugar .btn-danger');
             btnEliminar.textContent = 'Sí, eliminar TODO';
             btnEliminar.style.backgroundColor = '#b71c1c';
@@ -642,15 +646,17 @@ function confirmarEliminarLugar() {
         // CASO 2: Eliminación exitosa
         // ==========================================
         if (data.success) {
+            console.log('✅ Lugar eliminado correctamente');
             mostrarModal(data.message || 'Lugar eliminado correctamente', 'success');
             cargarColegios(); // Recargar lista
         } else {
+            console.error('❌ Error:', data.message);
             mostrarModal('Error: ' + data.message, 'error');
         }
     })
     .catch(error => {
         hideLoadingModal();
-        console.error('Error:', error);
+        console.error('❌ Error de conexión:', error);
         mostrarModal('Error de conexión', 'error');
     });
 }
@@ -835,6 +841,6 @@ window.onclick = function(event) {
     }
     if (event.target === document.getElementById('modalEliminarLugar')) {
         lugarIdEliminar = null;
-        confirmarEliminacionForzada = false;
+        confirmarEliminacionForzadaLugar = false; // ← FIX: Variable correcta
     }
 };
